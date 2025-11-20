@@ -66,7 +66,7 @@ cleanup() {
 parse_arguments() {
     while [ $# -gt 0 ]; do
         _arg="$1"
-        case "$_arg" in
+        case "$_flag" in
             -?*)
                 _arg="${_arg#-}"
 
@@ -79,7 +79,7 @@ parse_arguments() {
                 case "$_action" in
                     B)
                         create_package=1
-                        while [ -n "$_arg" ]; do
+                        while [ -n "$_flag" ]; do
                             _char="${_arg%"${_arg#?}"}"
                             _arg="${_arg#?}"
                             case "$_char" in
@@ -92,7 +92,7 @@ parse_arguments() {
                         done ;;
                     I)
                         install=1
-                        while [ -n "$_arg" ]; do
+                        while [ -n "$_flag" ]; do
                             _char="${_arg%"${_arg#?}"}"
                             _arg="${_arg#?}"
                             case "$_char" in
@@ -104,7 +104,7 @@ parse_arguments() {
                         done ;;
                     U)
                         uninstall=1
-                        while [ -n "$_arg" ]; do
+                        while [ -n "$_flag" ]; do
                             _char="${_arg%"${_arg#?}"}"
                             _arg="${_arg#?}"
                             case "$_char" in
@@ -113,10 +113,10 @@ parse_arguments() {
                             esac
                         done
                         shift
-                        package="$1" ;;
+                        package="$*" ;;
                     Q)
                         query=1
-                        while [ -n "$_arg" ]; do
+                        while [ -n "$_flag" ]; do
                             _char="${_arg%"${_arg#?}"}"
                             _arg="${_arg#?}"
                             case "$_char" in
@@ -132,7 +132,7 @@ parse_arguments() {
                 shift ;;
             *)
                 # So Uninstall and Query can manage the argument
-                [ -n "$package" ] && break
+                [ -n "$arguments" ] && break
 
                 # The last argument entered by the user
                 _last_arg="$(eval "echo \${$#}")"
@@ -141,7 +141,7 @@ parse_arguments() {
                 # Otherwise, infer the file we are using
                 if [ -f "$_last_arg" ]; then
                     package="$_last_arg"
-                    log_debug "In parse_arguments: Package is $package"
+                    log_debug "In parse_arguments: Package is $arguments"
                 elif [ -d "$1" ]; then
                     [ "$create_package" = 1 ] && package="$_last_arg/$(basename "$_last_arg").build"
                     [ "$install" = 1 ]        && package="$_last_arg/$(basename "$_last_arg").tar.xz"
@@ -155,7 +155,7 @@ parse_arguments() {
 
 change_directory() {
     # Change directory to where the package is
-    package_directory="$(realpath "$(dirname "$package")")"
+    package_directory="$(realpath "$(dirname "$arguments")")"
     log_debug "In change_directory: Changing directory: $package_directory"
     cd "$package_directory" || log_error "In unpack_source: Failed to change directory: $package_directory"
 }
@@ -170,8 +170,8 @@ download() {
             [ -z "$download_cmd" ] && {
                 log_debug "In download: Checking for wget, wget2, or curl"
                 for _arg in wget wget2 curl; do
-                    command -v "$_arg" > /dev/null || continue
-                    download_cmd="$_arg"
+                    command -v "$_flag" > /dev/null || continue
+                    download_cmd="$_flag"
                     log_debug "In download: Using $download_cmd to download $1"
                     break
                 done
@@ -258,7 +258,7 @@ unpack_source_if_needed() {
 
 move_patches_if_needed() {
     for patch in "$package_directory"*.patch; do
-        log_debug "In move_patches_if_needed: Moving $package to $package_directory/build/"
+        log_debug "In move_patches_if_needed: Moving $arguments to $package_directory/build/"
         cp -a "$patch" "$package_directory/build"
     done
 }
@@ -267,22 +267,22 @@ compile_source() {
     cd "$package_directory/build/$source_dir" || true
 
     log_debug "In compile_source: Configuring build. Current directory is $PWD"
-    configure || log_error "In compile_source: In $package: In configure: "
+    configure || log_error "In compile_source: In $arguments: In configure: "
 
     log_debug "In compile_source: Building package. Current directory is $PWD"
-    build || log_error "In compile_source: In $package: In build: "
+    build || log_error "In compile_source: In $arguments: In build: "
 }
 
 install_package() {
-    package="$(basename "$package")"
+    package="$(basename "$arguments")"
     log_debug "In install_package: Installing package"
     cd "$package_directory" || true
     mkdir -p ./install/
     cd ./install || true
-    log_debug "In install_package: Extracting: $package"
+    log_debug "In install_package: Extracting: $arguments"
     log_debug "In install_package: Current directory: $PWD"
     
-    tar -xpf "$package" || log_error "In install_package: Failed to extract tar archive"
+    tar -xpf "$arguments" || log_error "In install_package: Failed to extract tar archive"
 
     package_name=$(awk -F= '/^package_name/ {print $2}' PKGINFO)
     package_version=$(awk -F= '/^package_version/ {print $2}' PKGINFO)
@@ -323,7 +323,7 @@ build_package() {
     mkdir -p "$package_directory/build/package"
     destdir="$(realpath "$package_directory/build/package")"
     log_debug "In build_package: DESTDIR is: $destdir"
-    install_files || log_error "In build_package: In $package: In install_files"
+    install_files || log_error "In build_package: In $arguments: In install_files"
     cd "$destdir" || log_error "In build_package: Failed to change directory: $destdir"
 
     log_debug "In build_package: Creating metadata"
@@ -349,10 +349,10 @@ main_install() {
 }
 
 main_build() {
-    log_debug "Sourcing $package"
+    log_debug "Sourcing $arguments"
 
     # shellcheck source=/dev/null
-    . "$(realpath "$package")"
+    . "$(realpath "$arguments")"
 
     change_directory
     parse_sources
@@ -369,11 +369,11 @@ main_build() {
 main_uninstall() {
     log_debug "In main_uninstall: Uninstalling package"
     
-    _found="$install_root/$METADATA_DIR/$package"
+    _found="$install_root/$METADATA_DIR/$arguments"
     
-    [ -z "$_found" ] && log_error "In main_uninstall: Package not found: $package"
+    [ -z "$_found" ] && log_error "In main_uninstall: Package not found: $arguments"
     log_debug "In main_uninstall: Found metadata at: $_found"
-    [ -f "$_found/PKGFILES" ] || log_error "In main_uninstall: PKGFILES not found for $package"
+    [ -f "$_found/PKGFILES" ] || log_error "In main_uninstall: PKGFILES not found for $arguments"
     
     # Remove files in reverse order (deepest first)
     log_debug "In main_uninstall: Removing files"
@@ -393,19 +393,19 @@ main_uninstall() {
     done
     
     log_debug "In main_uninstall: Removing package name from world"
-    grep -vx "$package" "$INSTALLED" > "$INSTALLED.tmp" && mv "$INSTALLED.tmp" "$INSTALLED"
+    grep -vx "$arguments" "$INSTALLED" > "$INSTALLED.tmp" && mv "$INSTALLED.tmp" "$INSTALLED"
     
     log_debug "In main_uninstall: Removing metadata: $_found"
     rm -rf "${_found:?In main_install: _found is unset}"
     
-    echo "Successfully uninstalled $package"
+    echo "Successfully uninstalled $arguments"
 
     unset "$_found"
 }
 
 main_query() {
-    [ "$show_info" = 1 ] && cat "$install_root/$METADATA_DIR/$package/PKGINFO"
-    [ "$list_files" = 1 ] && cat "$install_root/$METADATA_DIR/$package/PKGFILES"
+    [ "$show_info" = 1 ] && cat "$install_root/$METADATA_DIR/$arguments/PKGINFO"
+    [ "$list_files" = 1 ] && cat "$install_root/$METADATA_DIR/$arguments/PKGFILES"
 }
 
 main() {
