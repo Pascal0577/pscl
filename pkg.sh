@@ -64,8 +64,6 @@ cleanup() {
 }
 
 parse_arguments() {
-    arguments=""
-
     while [ $# -gt 0 ]; do
         _flag="$1"
         case "$_flag" in
@@ -155,6 +153,7 @@ parse_arguments() {
             *) log_error "Unexpected argument: $1" ;;
         esac
     done
+    arguments="${arguments## }"
 }
 
 change_directory() {
