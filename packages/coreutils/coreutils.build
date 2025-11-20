@@ -4,8 +4,6 @@ package_name="coreutils"
 package_version="9.7"
 package_description="Basic utility programs needed by every operating system"
 package_source="https://ftp.gnu.org/gnu/coreutils/coreutils-9.7.tar.xz"
-patches="https://www.linuxfromscratch.org/patches/lfs/12.4/coreutils-9.7-upstream_fix-1.patch
-https://www.linuxfromscratch.org/patches/lfs/12.4/coreutils-9.7-i18n-1.patch"
 
 source_dir="$package_name-$package_version"
 

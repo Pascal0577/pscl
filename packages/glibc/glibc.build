@@ -6,7 +6,6 @@ package_description="GNU C Libraries"
 package_source="https://ftp.gnu.org/gnu/glibc/glibc-2.42.tar.xz"
 
 source_dir="glibc-2.42"
-patches="https://www.linuxfromscratch.org/patches/lfs/12.4/glibc-2.42-fhs-1.patch"
 
 configure() {
     patch -Np1 -i ./glibc-2.42-fhs-1.patch
