@@ -1,0 +1,21 @@
+#!/bin/sh
+
+package_name="linux-headers"
+package_version="6.16.1"
+package_description="API headers for glibc"
+package_source="https://www.kernel.org/pub/linux/kernel/v6.x/linux-6.16.1.tar.xz"
+
+source_dir="linux-$package_version"
+
+configure() {
+    make mrproper
+}
+
+build() {
+    make headers
+}
+
+install_files() {
+    find usr/include -type f ! -name '*.h' -delete
+    cp -rv usr/include "$destdir/usr"
+}

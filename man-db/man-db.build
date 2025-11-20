@@ -1,0 +1,27 @@
+#!/bin/sh
+
+package_name="man-db"
+package_version="2.13.1"
+package_description="programs for finding and viewing man pages"
+package_source="https://download.savannah.gnu.org/releases/man-db/man-db-2.13.1.tar.xz"
+
+source_dir="$package_name-$package_version"
+
+configure() {
+    ./configure --prefix=/usr                         \
+        --docdir=/usr/share/doc/man-db-2.13.1 \
+        --sysconfdir=/etc                     \
+        --disable-setuid                      \
+        --enable-cache-owner=bin              \
+        --with-browser=/usr/bin/lynx          \
+        --with-vgrind=/usr/bin/vgrind         \
+        --with-grap=/usr/bin/grap
+}
+
+build() {
+    make
+}
+
+install_files() {
+    make DESTDIR="$destdir" install
+}

@@ -1,0 +1,21 @@
+#!/bin/sh
+
+package_name="libuv"
+package_version="1.51.0"
+package_description=""
+package_source="https://dist.libuv.org/dist/v1.51.0/libuv-v1.51.0.tar.gz"
+
+source_dir="$package_name-v$package_version"
+
+configure() {
+	sh autogen.sh
+	./configure --prefix=/usr --disable-static
+}
+
+build() {
+    make
+}
+
+install_files() {
+    make DESTDIR="$destdir" install
+}

@@ -1,0 +1,21 @@
+#!/bin/sh
+
+package_name="m4"
+package_version="1.4.20"
+package_description="Macro processor"
+package_source="https://ftp.gnu.org/gnu/m4/m4-1.4.20.tar.xz"
+
+source_dir="$package_name-$package_version"
+
+configure() {
+    ./configure --prefix=/usr   \
+        --build="$(build-aux/config.guess)"
+}
+
+build() {
+    make
+}
+
+install_files() {
+    make DESTDIR="$destdir" install
+}

@@ -1,0 +1,21 @@
+#!/bin/sh
+
+package_name="libpsl"
+package_version="0.21.5"
+package_description="A library for accessing and resolving information from the Public Suffix List"
+package_source="https://github.com/rockdaboot/libpsl/releases/download/0.21.5/libpsl-0.21.5.tar.gz"
+
+source_dir="libpsl-0.21.5"
+
+configure() {
+    mkdir build
+    cd build || true
+
+    ../configure --prefix=/usr DESTDIR="$destdir"
+} 
+build() {
+    make
+}
+install_files() {
+    make DESTDIR="$destdir" install
+}

@@ -1,0 +1,22 @@
+#!/bin/sh
+
+package_name="texinfo"
+package_version="7.2"
+package_description="Programs for reading, writing, and converting info pages"
+package_source="https://ftp.gnu.org/gnu/texinfo/texinfo-7.2.tar.xz"
+
+source_dir="$package_name-$package_version"
+
+configure() {
+    sed 's/! $output_fil eq/$output_file ne/' -i tp/Texinfo/Convert/*.pm
+    ./configure --prefix=/usr
+}
+
+build() {
+    make
+}
+
+install_files() {
+    make DESTDIR="$destdir" install
+    make TEXMF=/usr/share/texmf DESTDIR="$destdir" install-tex
+}

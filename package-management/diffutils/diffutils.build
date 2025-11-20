@@ -1,0 +1,20 @@
+#!/bin/sh
+
+package_name="diffutils"
+package_version="3.12"
+package_description="Programs that show the differences between files or directories"
+package_source="https://ftp.gnu.org/gnu/diffutils/diffutils-3.12.tar.xz"
+
+source_dir="$package_name-$package_version"
+
+configure() {
+    ./configure --prefix=/usr
+}
+
+build() {
+    make
+}
+
+install_files() {
+    make DESTDIR="$destdir" install
+}

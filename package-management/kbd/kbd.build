@@ -1,0 +1,26 @@
+#!/bin/sh
+
+package_name="kbd"
+package_version="2.8.0"
+package_description="contains key-table files, console fonts, and keyboard utilities"
+package_source="https://www.kernel.org/pub/linux/utils/kbd/kbd-2.8.0.tar.xz"
+patches="https://www.linuxfromscratch.org/patches/lfs/12.4/kbd-2.8.0-backspace-1.patch"
+
+source_dir="$package_name-$package_version"
+
+configure() {
+    patch -Np1 -i ../kbd-2.8.0-backspace-1.patch
+
+    sed -i '/RESIZECONS_PROGS=/s/yes/no/' configure
+    sed -i 's/resizecons.8 //' docs/man/man8/Makefile.in
+
+    ./configure --prefix=/usr --disable-vlock
+}
+
+build() {
+    make
+}
+
+install_files() {
+    make DESTDIR="$destdir" install
+}

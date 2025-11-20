@@ -1,0 +1,20 @@
+#!/bin/sh
+
+package_name="efivar"
+package_version="39"
+package_description=""
+package_source="https://github.com/rhboot/efivar/archive/39/efivar-39.tar.gz"
+
+source_dir="$package_name-$package_version"
+
+configure() {
+    :
+}
+
+build() {
+    make ENABLE_DOCS=0
+}
+
+install_files() {
+    make DESTDIR="$destdir" ENABLE_DOCS=0 LIBDIR=/usr/lib install
+}

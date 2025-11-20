@@ -1,0 +1,24 @@
+#!/bin/sh
+
+package_name="cpio"
+package_version="2.15"
+package_description=""
+package_source="https://ftp.gnu.org/gnu/cpio/cpio-2.15.tar.bz2"
+
+source_dir="$package_name-$package_version"
+
+configure() {
+    sed -e "/^extern int (\*xstat)/s/()/(const char * restrict, struct stat * restrict)/" -i src/extern.h
+    sed -e "/^int (\*xstat)/s/()/(const char * restrict,  struct stat * restrict)/" -i src/global.c
+    ./configure --prefix=/usr \
+        --enable-mt   \
+        --with-rmt=/usr/libexec/rmt
+}
+
+build() {
+    make
+}
+
+install_files() {
+    make DESTDIR="$destdir" install
+}

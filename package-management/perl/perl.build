@@ -1,0 +1,44 @@
+#!/bin/sh
+
+package_name="perl"
+package_version="5.42.0"
+package_description="Practical Extraction and Report Language"
+package_source="https://www.cpan.org/src/5.0/perl-5.42.0.tar.xz"
+
+source_dir="$package_name-$package_version"
+
+configure() {
+    export BUILD_ZLIB=False
+    export BUILD_BZIP2=0
+
+    sh Configure -des                                          \
+        -D prefix=/usr                                \
+        -D vendorprefix=/usr                          \
+        -D privlib=/usr/lib/perl5/5.42/core_perl      \
+        -D archlib=/usr/lib/perl5/5.42/core_perl      \
+        -D sitelib=/usr/lib/perl5/5.42/site_perl      \
+        -D sitearch=/usr/lib/perl5/5.42/site_perl     \
+        -D vendorlib=/usr/lib/perl5/5.42/vendor_perl  \
+        -D vendorarch=/usr/lib/perl5/5.42/vendor_perl \
+        -D man1dir=/usr/share/man/man1                \
+        -D man3dir=/usr/share/man/man3                \
+        -D pager="/usr/bin/less -isR"                 \
+        -D useshrplib                                 \
+        -D usethreads
+}
+
+build() {
+    # Perl sucks and sometimes returns non-zero on successful builds
+    # So here we are, doing this dumb shit
+    make 2>&1 | tee build1.log || true
+    make 2>&1 | tee build2.log || true
+
+    if [ -f perl ] && [ -x perl ]; then
+        ./perl -v >/dev/null 2>&1 && return 0
+    fi
+}
+
+install_files() {
+    make DESTDIR="$destdir" install
+    unset BUILD_ZLIB BUILD_BZIP2
+}

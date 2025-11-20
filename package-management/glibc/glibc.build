@@ -1,0 +1,68 @@
+#!/bin/sh
+
+package_name="glibc"
+package_version="2.42"
+package_description="GNU C Libraries"
+package_source="https://ftp.gnu.org/gnu/glibc/glibc-2.42.tar.xz"
+
+source_dir="glibc-2.42"
+patches="https://www.linuxfromscratch.org/patches/lfs/12.4/glibc-2.42-fhs-1.patch"
+
+configure() {
+    patch -Np1 -i ./glibc-2.42-fhs-1.patch
+
+    sed -e '/unistd.h/i #include <string.h>' \
+        -e '/libc_rwlock_init/c\
+        __libc_rwlock_define_initialized (, reset_lock);\
+        memcpy (&lock, &reset_lock, sizeof (lock));' \
+        -i stdlib/abort.c 
+
+    mkdir build
+    cd build || return 1
+
+    echo "rootsbindir=/usr/sbin" > configparms
+
+    ../configure --prefix=/usr                   \
+             --disable-werror                \
+             --disable-nscd                  \
+             libc_cv_slibdir=/usr/lib        \
+             --enable-stack-protector=strong \
+             --enable-kernel=5.4
+}
+
+build() {
+    make
+}
+
+install_files() {
+    make DESTDIR="$destdir" install || log_error "Destdir is: $destdir"
+
+    # Fix a hardcoded path to the executable loader in the ldd script
+    sed '/RTLDLIST=/s@/usr@@g' -i "$destdir/usr/bin/ldd"
+    mkdir -p "$destdir/etc"
+    
+    cat > "$destdir/etc/nsswitch.conf" << "EOF"
+# Begin /etc/nsswitch.conf
+
+passwd: files systemd
+group: files systemd
+shadow: files systemd
+
+hosts: mymachines resolve [!UNAVAIL=return] files myhostname dns
+networks: files
+
+protocols: files
+services: files
+ethers: files
+rpc: files
+
+# End /etc/nsswitch.conf
+EOF
+
+    cat > "$destdir/etc/ld.so.conf" << "EOF"
+# Begin /etc/ld.so.conf
+/usr/local/lib
+/opt/lib
+
+EOF
+}

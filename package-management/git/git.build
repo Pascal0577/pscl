@@ -1,0 +1,23 @@
+#!/bin/sh
+
+package_name="git"
+package_version="2.51.2"
+package_description=""
+package_source="https://www.kernel.org/pub/software/scm/git/git-2.51.2.tar.xz"
+
+source_dir="$package_name-$package_version"
+
+configure() {
+	./configure --prefix=/usr                   \
+		--with-gitconfig=/etc/gitconfig \
+		--with-python=python3 \
+		--with-libpcre2 
+}
+
+build() {
+    make
+}
+
+install_files() {
+    make DESTDIR="$destdir" install
+}

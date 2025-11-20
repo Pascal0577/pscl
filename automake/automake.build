@@ -1,0 +1,20 @@
+#!/bin/sh
+
+package_name="automake"
+package_version="1.18.1"
+package_description="Programs for generating Makefiles for use with Autoconf"
+package_source="https://ftp.gnu.org/gnu/automake/automake-1.18.1.tar.xz"
+
+source_dir="$package_name-$package_version"
+
+configure() {
+    ./configure --prefix=/usr --docdir=/usr/share/doc/automake-1.18.1
+}
+
+build() {
+    make
+}
+
+install_files() {
+    make DESTDIR="$destdir" install
+}

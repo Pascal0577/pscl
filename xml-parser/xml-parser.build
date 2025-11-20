@@ -1,0 +1,20 @@
+#!/bin/sh
+
+package_name="xml-parser"
+package_version="2.47"
+package_description="A Perl interface to James Clark's XML parser, Expat"
+package_source="https://cpan.metacpan.org/authors/id/T/TO/TODDR/XML-Parser-2.47.tar.gz"
+
+source_dir="XML-Parser-$package_version"
+
+configure() {
+    perl Makefile.PL
+}
+
+build() {
+    make
+}
+
+install_files() {
+    make DESTDIR="$destdir" install
+}

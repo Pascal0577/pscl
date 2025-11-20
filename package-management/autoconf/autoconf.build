@@ -1,0 +1,20 @@
+#!/bin/sh
+
+package_name="autoconf"
+package_version="2.72"
+package_description="Programs for producing shell scripts that can automatically configure source code"
+package_source="https://ftp.gnu.org/gnu/autoconf/autoconf-2.72.tar.xz"
+
+source_dir="$package_name-$package_version"
+
+configure() {
+    ./configure --prefix=/usr
+}
+
+build() {
+    make
+}
+
+install_files() {
+    make DESTDIR="$destdir" install
+}

@@ -1,0 +1,33 @@
+#!/bin/sh
+
+package_name="ncurses"
+package_version="6.5-20250809"
+package_description="TUI Library"
+package_source="https://invisible-mirror.net/archives/ncurses/current/ncurses-6.5-20250809.tgz"
+
+source_dir="$package_name-$package_version"
+
+configure() {
+    ./configure --prefix=/usr           \
+        --mandir=/usr/share/man \
+        --with-shared           \
+        --without-debug         \
+        --without-normal        \
+        --with-cxx-shared       \
+        --enable-pc-files       \
+        --with-pkg-config-libdir=/usr/lib/pkgconfig
+}
+
+build() {
+    make
+}
+
+install_files() {
+    make DESTDIR="$destdir" install
+    command install -vm755 dest/usr/lib/libncursesw.so.6.5 /usr/lib
+
+    for lib in ncurses form panel menu ; do
+        ln -sfv lib${lib}w.so "$destdir"/usr/lib/lib${lib}.so
+        ln -sfv ${lib}w.pc    "$destdir"/usr/lib/pkgconfig/${lib}.pc
+    done
+}
