@@ -319,12 +319,12 @@ build_package() {
     cd "$destdir" || log_error "In build_package: Failed to change directory: $destdir"
 
     log_debug "In build_package: Creating metadata"
-    cat > "$destdir/PKGINFO" <<EOF
-package_name=$package_name
-package_version=${package_version:-unknown}
-builddate=$(date +%s)
-source = $package_source
-EOF
+    cat > "$destdir/PKGINFO" <<- EOF
+		package_name=$package_name
+		package_version=${package_version:-unknown}
+		builddate=$(date +%s)
+		source = $package_source
+	EOF
 
     find . ! -name '.' ! -name 'PKGFILES' ! -name 'PKGINFO' \
         \( -type f -o -type l -o -type d \) -printf '%P\n' > PKGFILES
