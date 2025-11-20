@@ -23,8 +23,6 @@ package=""          # The argument passed to the script
 install_root=""     # The root of the install. Used for bootstrapping
 package_directory=""
 
-package_checksums=""         # Provided by build script. List of checksums for sources
-
 sources_list=""
 checksums_list=""
 
@@ -258,6 +256,8 @@ move_patches_if_needed() {
 }
 
 compile_source() {
+    cd "$package_directory/build/$source_dir" || true
+
     log_debug "In compile_source: Configuring build. Current directory is $PWD"
     configure || log_error "In compile_source: In $package: In configure: "
 
