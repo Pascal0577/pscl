@@ -3,7 +3,7 @@
 package_name="make-ca"
 package_version="1.16.1"
 package_description=""
-package_source="https://github.com/lfs-book/make-ca/archive/v1.16.1/make-ca-1.16.1.tar.gz"
+package_source="https://github.com/lfs-book/make-ca/archive/v1.16.1/make-ca-1.16.1.tar.gz d41d8cd98f00b204e9800998ecf8427e"
 
 source_dir="$package_name-$package_version"
 

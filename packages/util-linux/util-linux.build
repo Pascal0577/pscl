@@ -3,7 +3,7 @@
 package_name="util-linux"
 package_version="2.41.1"
 package_description="Miscellaneous utility programs"
-package_source="https://www.kernel.org/pub/linux/utils/util-linux/v2.41/util-linux-2.41.1.tar.xz"
+package_source="https://www.kernel.org/pub/linux/utils/util-linux/v2.41/util-linux-2.41.1.tar.xz 7e5e68845e2f347cf96f5448165f1764"
 
 source_dir="$package_name-$package_version"
 

@@ -3,7 +3,7 @@
 package_name="lvm2"
 package_version="2.03.36"
 package_description="A set of tools that manage logical partitions"
-package_source="https://sourceware.org/ftp/lvm2/LVM2.2.03.36.tgz"
+package_source="https://sourceware.org/ftp/lvm2/LVM2.2.03.36.tgz 62a7c701fe07a5c30ff9fcb624cd3437"
 
 source_dir="LVM2.2.03.36"
 

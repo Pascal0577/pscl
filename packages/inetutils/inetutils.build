@@ -3,7 +3,7 @@
 package_name="inetutils"
 package_version="2.6"
 package_description="Programs for basic networking"
-package_source="https://ftp.gnu.org/gnu/inetutils/inetutils-2.6.tar.xz"
+package_source="https://ftp.gnu.org/gnu/inetutils/inetutils-2.6.tar.xz 401d7d07682a193960bcdecafd03de94"
 
 source_dir="$package_name-$package_version"
 

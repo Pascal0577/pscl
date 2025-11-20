@@ -3,7 +3,7 @@
 package_name="linux-headers"
 package_version="6.16.1"
 package_description="API headers for glibc"
-package_source="https://www.kernel.org/pub/linux/kernel/v6.x/linux-6.16.1.tar.xz"
+package_source="https://www.kernel.org/pub/linux/kernel/v6.x/linux-6.16.1.tar.xz 32d45755e4b39d06e9be58f6817445ee"
 
 source_dir="linux-$package_version"
 

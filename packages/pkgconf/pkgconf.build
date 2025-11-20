@@ -3,7 +3,7 @@
 package_name="pkgconf"
 package_version="2.5.1"
 package_description="A tool for passing the include path and/or library paths to build tools during the configure and make phases of package installations"
-package_source="https://distfiles.ariadne.space/pkgconf/pkgconf-2.5.1.tar.xz"
+package_source="https://distfiles.ariadne.space/pkgconf/pkgconf-2.5.1.tar.xz 3291128c917fdb8fccd8c9e7784b643b"
 
 source_dir="$package_name-$package_version"
 

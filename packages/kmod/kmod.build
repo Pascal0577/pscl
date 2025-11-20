@@ -3,7 +3,7 @@
 package_name="kmod"
 package_version="34.2"
 package_description="libraries and utilities for loading kernel modules"
-package_source="https://www.kernel.org/pub/linux/utils/kernel/kmod/kmod-34.2.tar.xz"
+package_source="https://www.kernel.org/pub/linux/utils/kernel/kmod/kmod-34.2.tar.xz 36f2cc483745e81ede3406fa55e1065a"
 
 source_dir="$package_name-$package_version"
 

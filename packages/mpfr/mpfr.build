@@ -3,7 +3,7 @@
 package_name="mpfr"
 package_version="4.2.2"
 package_description="Contains functions for multiple precision math"
-package_source="https://ftp.gnu.org/gnu/mpfr/mpfr-4.2.2.tar.xz"
+package_source="https://ftp.gnu.org/gnu/mpfr/mpfr-4.2.2.tar.xz 7c32c39b8b6e3ae85f25156228156061"
 
 source_dir="$package_name-$package_version"
 

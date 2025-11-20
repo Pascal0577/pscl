@@ -3,7 +3,7 @@
 package_name="json-c"
 package_version="0.18"
 package_description=""
-package_source="https://s3.amazonaws.com/json-c_releases/releases/json-c-0.18.tar.gz"
+package_source="https://s3.amazonaws.com/json-c_releases/releases/json-c-0.18.tar.gz e6593766de7d8aa6e3a7e67ebf1e522f"
 
 source_dir="$package_name-$package_version"
 

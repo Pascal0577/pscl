@@ -3,7 +3,7 @@
 package_name="tzdata"
 package_version="2025b"
 package_description="Time Zone Data"
-package_source="https://www.iana.org/time-zones/repository/releases/tzdata2025b.tar.gz"
+package_source="https://www.iana.org/time-zones/repository/releases/tzdata2025b.tar.gz d41d8cd98f00b204e9800998ecf8427e"
 
 source_dir="tzdata2025b"
 

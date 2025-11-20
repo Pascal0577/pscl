@@ -3,7 +3,7 @@
 package_name="systemd-man-pages"
 package_version="257.8"
 package_description="Man pages for SystemD"
-package_source="https://anduin.linuxfromscratch.org/LFS/systemd-man-pages-257.8.tar.xz"
+package_source="https://anduin.linuxfromscratch.org/LFS/systemd-man-pages-257.8.tar.xz a44063e2ec0cf4adfd2ed5c9e9e095c5"
 
 source_dir="$package_name-$package_version"
 

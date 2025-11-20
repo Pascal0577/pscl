@@ -3,7 +3,7 @@
 package_name="kbd"
 package_version="2.8.0"
 package_description="contains key-table files, console fonts, and keyboard utilities"
-package_source="https://www.kernel.org/pub/linux/utils/kbd/kbd-2.8.0.tar.xz"
+package_source="https://www.kernel.org/pub/linux/utils/kbd/kbd-2.8.0.tar.xz 24b5d24f7483726b88f214dc6c77aa41"
 
 source_dir="$package_name-$package_version"
 

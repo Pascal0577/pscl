@@ -3,7 +3,7 @@
 package_name="fastfetch"
 package_version="2.54.0"
 package_description="A fast fetch tool written in C"
-package_source="https://github.com/fastfetch-cli/fastfetch/releases/download/2.54.0/fastfetch-linux-amd64.tar.gz"
+package_source="https://github.com/fastfetch-cli/fastfetch/releases/download/2.54.0/fastfetch-linux-amd64.tar.gz d41d8cd98f00b204e9800998ecf8427e"
 
 source_dir="fastfetch-linux-amd64"
 

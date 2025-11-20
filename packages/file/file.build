@@ -3,7 +3,7 @@
 package_name="file"
 package_version="5.46"
 package_description="A utility for determining the type of a given file or files"
-package_source="https://astron.com/pub/file/file-5.46.tar.gz"
+package_source="https://astron.com/pub/file/file-5.46.tar.gz 459da2d4b534801e2e2861611d823864"
 
 source_dir="$package_name-$package_version"
 

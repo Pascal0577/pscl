@@ -3,7 +3,7 @@
 package_name="efivar"
 package_version="39"
 package_description=""
-package_source="https://github.com/rhboot/efivar/archive/39/efivar-39.tar.gz"
+package_source="https://github.com/rhboot/efivar/archive/39/efivar-39.tar.gz d41d8cd98f00b204e9800998ecf8427e"
 
 source_dir="$package_name-$package_version"
 

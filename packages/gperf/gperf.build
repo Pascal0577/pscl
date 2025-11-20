@@ -3,7 +3,7 @@
 package_name="gperf"
 package_version="3.3"
 package_description="Generates a perfect hash function from a key set"
-package_source="https://ftp.gnu.org/gnu/gperf/gperf-3.3.tar.gz"
+package_source="https://ftp.gnu.org/gnu/gperf/gperf-3.3.tar.gz 31753b021ea78a21f154bf9eecb8b079"
 
 source_dir="$package_name-$package_version"
 

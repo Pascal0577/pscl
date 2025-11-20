@@ -3,7 +3,7 @@
 package_name="elfutils"
 package_version="0.193"
 package_description="A library for handling ELF files"
-package_source="https://sourceware.org/ftp/elfutils/0.193/elfutils-0.193.tar.bz2"
+package_source="https://sourceware.org/ftp/elfutils/0.193/elfutils-0.193.tar.bz2 ceefa052ded950a4c523688799193a44"
 
 source_dir="$package_name-$package_version"
 

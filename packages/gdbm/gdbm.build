@@ -3,7 +3,7 @@
 package_name="gdbm"
 package_version="1.26"
 package_description="The GNU Database Manager"
-package_source="https://ftp.gnu.org/gnu/gdbm/gdbm-1.26.tar.gz"
+package_source="https://ftp.gnu.org/gnu/gdbm/gdbm-1.26.tar.gz aaa600665bc89e2febb3c7bd90679115"
 
 source_dir="$package_name-$package_version"
 

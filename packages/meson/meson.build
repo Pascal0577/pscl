@@ -3,7 +3,7 @@
 package_name="meson"
 package_version="1.8.3"
 package_description="an open source build system designed to be both extremely fast and as user friendly as possible"
-package_source="https://github.com/mesonbuild/meson/releases/download/1.8.3/meson-1.8.3.tar.gz"
+package_source="https://github.com/mesonbuild/meson/releases/download/1.8.3/meson-1.8.3.tar.gz d41d8cd98f00b204e9800998ecf8427e"
 
 source_dir="$package_name-$package_version"
 

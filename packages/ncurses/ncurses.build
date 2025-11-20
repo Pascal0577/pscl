@@ -3,7 +3,7 @@
 package_name="ncurses"
 package_version="6.5-20250809"
 package_description="TUI Library"
-package_source="https://invisible-mirror.net/archives/ncurses/current/ncurses-6.5-20250809.tgz"
+package_source="https://invisible-mirror.net/archives/ncurses/current/ncurses-6.5-20250809.tgz 679987405412f970561cc85e1e6428a2"
 
 source_dir="$package_name-$package_version"
 

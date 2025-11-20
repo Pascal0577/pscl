@@ -3,7 +3,7 @@
 package_name="man-pages"
 package_version="6.15"
 package_description="Man pages for GNU/Linux systems"
-package_source="https://www.kernel.org/pub/linux/docs/man-pages/man-pages-6.15.tar.xz"
+package_source="https://www.kernel.org/pub/linux/docs/man-pages/man-pages-6.15.tar.xz 16f68d70139dd2bbcae4102be4705753"
 
 source_dir="man-pages-6.15"
 

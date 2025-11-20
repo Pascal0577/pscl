@@ -3,7 +3,7 @@
 package_name="cmake"
 package_version="4.1.2"
 package_description="cmake build systemd"
-package_source="https://cmake.org/files/v4.1/cmake-4.1.2.tar.gz"
+package_source="https://cmake.org/files/v4.1/cmake-4.1.2.tar.gz 679304270e6e368de5e949a594d2e871"
 
 source_dir="$package_name-$package_version"
 

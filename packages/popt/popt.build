@@ -3,7 +3,7 @@
 package_name="popt"
 package_version="1.19"
 package_description=""
-package_source="https://ftp.osuosl.org/pub/rpm/popt/releases/popt-1.x/popt-1.19.tar.gz"
+package_source="https://ftp.osuosl.org/pub/rpm/popt/releases/popt-1.x/popt-1.19.tar.gz eaa2135fddb6eb03f2c87ee1823e5a78"
 
 source_dir="$package_name-$package_version"
 

@@ -3,7 +3,7 @@
 package_name="libaio"
 package_version="0.3.113"
 package_description="Asynchronous I/O facility"
-package_source="https://pagure.io/libaio/archive/libaio-0.3.113/libaio-0.3.113.tar.gz"
+package_source="https://pagure.io/libaio/archive/libaio-0.3.113/libaio-0.3.113.tar.gz 605237f35de238dfacc83bcae406d95d"
 
 source_dir="$package_name-$package_version"
 

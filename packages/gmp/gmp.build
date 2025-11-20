@@ -3,7 +3,7 @@
 package_name="gmp"
 package_version="6.3.0"
 package_description="Contains math libraries"
-package_source="https://ftp.gnu.org/gnu/gmp/gmp-6.3.0.tar.xz"
+package_source="https://ftp.gnu.org/gnu/gmp/gmp-6.3.0.tar.xz 956dc04e864001a9c22429f761f2c283"
 
 source_dir="$package_name-$package_version"
 

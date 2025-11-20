@@ -3,7 +3,7 @@
 package_name="libtool"
 package_version="2.5.4"
 package_description="The GNU generic library support script"
-package_source="https://ftp.gnu.org/gnu/libtool/libtool-2.5.4.tar.xz"
+package_source="https://ftp.gnu.org/gnu/libtool/libtool-2.5.4.tar.xz 22e0a29df8af5fdde276ea3a7d351d30"
 
 source_dir="$package_name-$package_version"
 

@@ -3,7 +3,7 @@
 package_name="groff"
 package_version="1.23.0"
 package_description="programs for processing and formatting text and images"
-package_source="https://ftp.gnu.org/gnu/groff/groff-1.23.0.tar.gz"
+package_source="https://ftp.gnu.org/gnu/groff/groff-1.23.0.tar.gz 5e4f40315a22bb8a158748e7d5094c7d"
 
 source_dir="$package_name-$package_version"
 

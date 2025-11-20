@@ -3,7 +3,7 @@
 package_name="perl"
 package_version="5.42.0"
 package_description="Practical Extraction and Report Language"
-package_source="https://www.cpan.org/src/5.0/perl-5.42.0.tar.xz"
+package_source="https://www.cpan.org/src/5.0/perl-5.42.0.tar.xz 7a6950a9f12d01eb96a9d2ed2f4e0072"
 
 source_dir="$package_name-$package_version"
 
