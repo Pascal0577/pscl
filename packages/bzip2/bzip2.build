@@ -4,7 +4,6 @@ package_name="bzip2"
 package_version="1.0.8"
 package_description="Programs for compressing a decompressing files"
 package_source="https://www.sourceware.org/pub/bzip2/bzip2-1.0.8.tar.gz"
-patches="https://www.linuxfromscratch.org/patches/lfs/12.4/bzip2-1.0.8-install_docs-1.patch"
 
 source_dir="$package_name-$package_version"
 
