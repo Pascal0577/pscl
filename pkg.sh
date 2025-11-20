@@ -340,7 +340,7 @@ build_package() {
 }
 
 main_install() {
-    change_directory
+    change_directory "$1"
     install_package "$1"
     echo "Successful!"
     exit 0
