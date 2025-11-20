@@ -430,10 +430,10 @@ main() {
     [ -z "$arguments" ] && log_error "In main: No arguments were provided"
     log_debug "In main: arguments are: $arguments"
 
-    [ "$install" = 1 ]        && for arg in $arguments; do main_install "$arg"; done   && exit 0
+    [ "$install" = 1 ]        && for arg in $arguments; do main_install   "$arg"; done && exit 0
     [ "$uninstall" = 1 ]      && for arg in $arguments; do main_uninstall "$arg"; done && exit 0
-    [ "$create_package" = 1 ] && for arg in $arguments; do main_build "$arg"; done     && exit 0
-    [ "$query" = 1 ]          && for arg in $arguments; do main_query "$arg"; done     && exit 0
+    [ "$create_package" = 1 ] && for arg in $arguments; do main_build     "$arg"; done && exit 0
+    [ "$query" = 1 ]          && for arg in $arguments; do main_query     "$arg"; done && exit 0
 }
 
 main "$@"
