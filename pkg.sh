@@ -153,7 +153,9 @@ parse_arguments() {
             *) log_error "Unexpected argument: $1" ;;
         esac
     done
-    arguments="${arguments## }"
+    # Remove leading spaces
+    arguments="${arguments#"${arguments%%[![:space:]]*}"}"
+    log_debug "In parse_arguments: arguments are: $arguments"
 }
 
 change_directory() {
