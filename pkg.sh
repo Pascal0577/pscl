@@ -151,7 +151,7 @@ parse_arguments() {
 
 change_directory() {
     # Change directory to where the package is
-    package_directory="$(realpath "$(dirname "$arguments")")"
+    package_directory="$(realpath "$(dirname "$1")")"
     log_debug "In change_directory: Changing directory: $package_directory"
     cd "$package_directory" || log_error "In unpack_source: Failed to change directory: $package_directory"
 }
@@ -346,12 +346,14 @@ main_install() {
 }
 
 main_build() {
-    log_debug "Sourcing $arguments"
+    _package_to_build="$1"
+
+    log_debug "Sourcing $_package_to_build"
 
     # shellcheck source=/dev/null
-    . "$(realpath "$arguments")"
+    . "$(realpath "$_package_to_build")"
 
-    change_directory
+    change_directory "$_package_to_build"
     parse_sources
     fetch_source
     verify_checksum_if_needed
@@ -364,13 +366,15 @@ main_build() {
 }
 
 main_uninstall() {
+    _package_to_uninstall="$1"
+
     log_debug "In main_uninstall: Uninstalling package"
     
-    _found="$install_root/$METADATA_DIR/$arguments"
+    _found="$install_root/$METADATA_DIR/$_package_to_uninstall"
     
-    [ -z "$_found" ] && log_error "In main_uninstall: Package not found: $arguments"
+    [ -z "$_found" ] && log_error "In main_uninstall: Package not found: $_package_to_uninstall"
     log_debug "In main_uninstall: Found metadata at: $_found"
-    [ -f "$_found/PKGFILES" ] || log_error "In main_uninstall: PKGFILES not found for $arguments"
+    [ -f "$_found/PKGFILES" ] || log_error "In main_uninstall: PKGFILES not found for $_package_to_uninstall"
     
     # Remove files in reverse order (deepest first)
     log_debug "In main_uninstall: Removing files"
@@ -390,12 +394,12 @@ main_uninstall() {
     done
     
     log_debug "In main_uninstall: Removing package name from world"
-    grep -vx "$arguments" "$INSTALLED" > "$INSTALLED.tmp" && mv "$INSTALLED.tmp" "$INSTALLED"
+    grep -vx "$_package_to_uninstall" "$INSTALLED" > "$INSTALLED.tmp" && mv "$INSTALLED.tmp" "$INSTALLED"
     
     log_debug "In main_uninstall: Removing metadata: $_found"
     rm -rf "${_found:?In main_install: _found is unset}"
     
-    echo "Successfully uninstalled $arguments"
+    echo "Successfully uninstalled $_package_to_uninstall"
 
     unset "$_found"
 }
@@ -412,11 +416,12 @@ main() {
 
     # Remove leading spaces
     arguments="${arguments#"${arguments%%[![:space:]]*}"}"
+    [ -z "$arguments" ] && log_error "In main: No arguments were provided"
     log_debug "In main: arguments are: $arguments"
 
-    [ "$install" = 1 ] && main_install
-    [ "$uninstall" = 1 ] && main_uninstall
-    [ "$create_package" = 1 ] && main_build
+    [ "$install" = 1 ]        && for arg in $arguments; do main_install "$arg"; done
+    [ "$uninstall" = 1 ]      && for arg in $arguments; do main_uninstall "$arg"; done
+    [ "$create_package" = 1 ] && for arg in $arguments; do main_build "$arg"; done
     [ "$query" = 1 ] && main_query
 }
 
