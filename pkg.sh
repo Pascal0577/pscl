@@ -40,29 +40,6 @@ log_debug() {
     [ "$verbose" = 1 ] && printf "%b[DEBUG]%b: %s\n" "$blue" "$default" "$1"
 }
 
-# Cleanup is extremely important, so it's very verbose
-cleanup() {
-    if [ "$cleanup" = 1 ]; then
-        log_debug "In cleanup: Running cleanup"
-        log_debug "In cleanup: cd $package_directory"
-        [ -n "$package_directory" ] && cd "$package_directory" || true
-
-        log_debug "In cleanup: rm -rf ./build/"
-        # Tarballs, git repos, and patches were downloaded to build dir
-        [ -d ./build/ ] && rm -rf ./build/
-
-        log_debug "In cleanup: rm -rf ./install/"
-        [ -d ./install/ ] && rm -rf ./install/
-
-        log_debug "In cleanup: cd $pwd"
-        cd "$pwd" || true
-
-        cleanup=0
-    else
-        log_warn "In cleanup: Cleanup called, but was disabled"
-    fi
-}
-
 parse_arguments() {
     while [ $# -gt 0 ]; do
         _flag="$1"
@@ -154,6 +131,31 @@ change_directory() {
     package_directory="$(realpath "$(dirname "$1")")"
     log_debug "In change_directory: Changing directory: $package_directory"
     cd "$package_directory" || log_error "In unpack_source: Failed to change directory: $package_directory"
+}
+
+# Cleanup is extremely important, so it's very verbose
+cleanup() {
+    if [ "$cleanup" = 1 ]; then
+        for arg in $arguments; do
+            cd "$pwd" || true
+            log_debug "In cleanup: Running cleanup"
+            change_directory "$arg"
+
+            log_debug "In cleanup: rm -rf ./build/"
+            # Tarballs, git repos, and patches were downloaded to build dir
+            [ -d ./build/ ] && rm -rf ./build/
+
+            log_debug "In cleanup: rm -rf ./install/"
+            [ -d ./install/ ] && rm -rf ./install/
+
+            log_debug "In cleanup: cd $pwd"
+            cd "$pwd" || true
+        done
+
+        cleanup=0
+    else
+        log_warn "In cleanup: Cleanup called, but was disabled"
+    fi
 }
 
 download() {
