@@ -1,5 +1,7 @@
 #!/bin/sh
 
+set -eu
+
 readonly red="\x1b[31m"
 readonly blue="\x1b[34m"
 readonly yellow="\x1b[33m"
@@ -227,12 +229,16 @@ fetch_source() {
 }
 
 verify_checksum_if_needed() {
+    # For every tarball, check it against every provided checksum
     if [ "$checksum_check" = 1 ]; then
         for tarball in $tarball_list; do
             _md5sum="$(md5sum "$tarball" | awk '{print $1}')"
             _checksum_verified=0
             for checksum in $checksums_list; do
-                [ "$_md5sum" = "$checksum" ] && _checksum_verified=1
+                [ "$_md5sum" = "$checksum" ] && {
+                    _checksum_verified=1
+                    log_debug "Checksum verified!"
+                }
             done
             [ "$_checksum_verified" = 0 ] && \
                 log_error "In verify_checksum_if_needed: Failed to verify $tarball"
