@@ -93,8 +93,7 @@ parse_arguments() {
                             elif [ -d "$arg" ]; then
                                 arguments="$arguments $arg/$(basename "$arg").build"
                             fi
-                        done
-                        return 0 ;;
+                        done ;;
                     I)
                         install=1
                         while [ -n "$_flag" ]; do
@@ -117,8 +116,7 @@ parse_arguments() {
                             elif [ -d "$arg" ]; then
                                 arguments="$arguments $arg/$(basename "$arg").tar.xz"
                             fi
-                        done
-                        return 0 ;;
+                        done ;;
                     U)
                         uninstall=1
                         while [ -n "$_flag" ]; do
@@ -131,8 +129,7 @@ parse_arguments() {
                         done
 
                         shift
-                        arguments="$*"
-                        return 0 ;;
+                        arguments="$*" ;;
                     Q)
                         query=1
                         while [ -n "$_flag" ]; do
@@ -146,8 +143,7 @@ parse_arguments() {
                             esac
                         done
                         shift
-                        arguments="$*"
-                        return 0 ;;
+                        arguments="$*" ;;
                 esac
                 shift ;;
             *) log_error "Unexpected argument: $1" ;;
