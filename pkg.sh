@@ -274,7 +274,7 @@ compile_source() {
 }
 
 install_package() {
-    package="$(basename "$arguments")"
+    arguments="$(basename "$arguments")"
     log_debug "In install_package: Installing package"
     cd "$package_directory" || true
     mkdir -p ./install/
