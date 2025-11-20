@@ -258,10 +258,10 @@ move_patches_if_needed() {
 }
 
 compile_source() {
-    log_debug "In compile_source: Configuring build"
+    log_debug "In compile_source: Configuring build. Current directory is $PWD"
     configure || log_error "In compile_source: In $package: In configure: "
 
-    log_debug "In compile_source: Building package"
+    log_debug "In compile_source: Building package. Current directory is $PWD"
     build || log_error "In compile_source: In $package: In build: "
 }
 
