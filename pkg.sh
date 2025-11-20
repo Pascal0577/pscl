@@ -88,11 +88,8 @@ parse_arguments() {
                         done
                         shift
                         for arg in "$@"; do
-                            if [ -f "$arg" ]; then
-                                arguments="$arguments $arg"
-                            elif [ -d "$arg" ]; then
-                                arguments="$arguments $arg/$(basename "$arg").build"
-                            fi
+                            [ -f "$arg" ] && arguments="$arguments $arg"
+                            [ -d "$arg" ] && arguments="$arguments $arg/$(basename "$arg").build"
                         done ;;
                     I)
                         install=1
@@ -111,11 +108,8 @@ parse_arguments() {
                         done
                         shift
                         for arg in "$@"; do
-                            if [ -f "$arg" ]; then
-                                arguments="$arguments $arg"
-                            elif [ -d "$arg" ]; then
-                                arguments="$arguments $arg/$(basename "$arg").tar.xz"
-                            fi
+                            [ -f "$arg" ] && arguments="$arguments $arg"
+                            [ -d "$arg" ] && arguments="$arguments $arg/$(basename "$arg").tar.xz"
                         done ;;
                     U)
                         uninstall=1
