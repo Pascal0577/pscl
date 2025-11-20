@@ -85,6 +85,7 @@ parse_arguments() {
                             _arg="${_arg#?}"
                             case "$_char" in
                                 k) certificate_check=0 ;;
+                                s) checksum_check=0 ;;
                                 c) cleanup=0 ;;
                                 v) verbose=1 ;;
                                 *) log_error "In parse_arguments: Invalid option for -B: -$_char" ;;
@@ -222,15 +223,19 @@ fetch_source() {
 }
 
 verify_checksum_if_needed() {
-    for tarball in $tarball_list; do
-        _md5sum="$(md5sum "$tarball" | awk '{print $1}')"
-        _checksum_verified=0
-        for checksum in $checksums_list; do
-            [ "$_md5sum" = "$checksum" ] && _checksum_verified=1
+    if [ "$checksum_check" = 1 ]; then
+        for tarball in $tarball_list; do
+            _md5sum="$(md5sum "$tarball" | awk '{print $1}')"
+            _checksum_verified=0
+            for checksum in $checksums_list; do
+                [ "$_md5sum" = "$checksum" ] && _checksum_verified=1
+            done
+            [ "$_checksum_verified" = 0 ] && \
+                log_error "In verify_checksum_if_needed: Failed to verify $tarball"
         done
-        [ "$_checksum_verified" = 0 ] && \
-            log_error "In verify_checksum_if_needed: Failed to verify $tarball"
-    done
+    else
+        return 1
+    fi
 }
 
 unpack_source_if_needed() {
