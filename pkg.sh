@@ -90,7 +90,8 @@ parse_arguments() {
                         for arg in "$@"; do
                             [ -f "$arg" ] && arguments="$arguments $arg"
                             [ -d "$arg" ] && arguments="$arguments $arg/$(basename "$arg").build"
-                        done ;;
+                        done
+                        return 0 ;;
                     I)
                         install=1
                         while [ -n "$_flag" ]; do
@@ -110,7 +111,8 @@ parse_arguments() {
                         for arg in "$@"; do
                             [ -f "$arg" ] && arguments="$arguments $arg"
                             [ -d "$arg" ] && arguments="$arguments $arg/$(basename "$arg").tar.xz"
-                        done ;;
+                        done
+                        return 0 ;;
                     U)
                         uninstall=1
                         while [ -n "$_flag" ]; do
@@ -123,7 +125,8 @@ parse_arguments() {
                         done
 
                         shift
-                        arguments="$*" ;;
+                        arguments="$*"
+                        return 0 ;;
                     Q)
                         query=1
                         while [ -n "$_flag" ]; do
@@ -137,15 +140,13 @@ parse_arguments() {
                             esac
                         done
                         shift
-                        arguments="$*" ;;
+                        arguments="$*"
+                        return 0 ;;
                 esac
                 shift ;;
             *) log_error "Unexpected argument: $1" ;;
         esac
     done
-    # Remove leading spaces
-    arguments="${arguments#"${arguments%%[![:space:]]*}"}"
-    log_debug "In parse_arguments: arguments are: $arguments"
 }
 
 change_directory() {
@@ -408,6 +409,10 @@ main() {
     trap cleanup INT TERM EXIT
     log_debug "In main: Parsing arguments"
     parse_arguments "$@"
+
+    # Remove leading spaces
+    arguments="${arguments#"${arguments%%[![:space:]]*}"}"
+    log_debug "In main: arguments are: $arguments"
 
     [ "$install" = 1 ] && main_install
     [ "$uninstall" = 1 ] && main_uninstall
