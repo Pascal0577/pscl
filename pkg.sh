@@ -274,13 +274,13 @@ install_package() {
     _package_to_install="$1"
     _package_to_install="$(basename "$_package_to_install")"
     log_debug "In install_package: Installing package"
-    cd "$package_directory" || true
+    # cd "$package_directory" || true
     mkdir -p ./install/
     cd ./install || true
     log_debug "In install_package: Extracting: $_package_to_install"
     log_debug "In install_package: Current directory: $PWD"
     
-    tar -xpf "$_package_to_install" || log_error "In install_package: Failed to extract tar archive"
+    tar -xpf "../$_package_to_install" || log_error "In install_package: Failed to extract tar archive"
 
     package_name=$(awk -F= '/^package_name/ {print $2}' PKGINFO)
     package_version=$(awk -F= '/^package_version/ {print $2}' PKGINFO)
