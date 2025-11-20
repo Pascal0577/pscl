@@ -112,6 +112,7 @@ parse_arguments() {
                             case "$_char" in
                                 i) show_info=1 ;;
                                 l) list_files=1 ;;
+                                w) print_world=1 ;;
                                 v) verbose=1 ;;
                                 *) log_error "Invalid option for -Q: -$_char" ;;
                             esac
@@ -414,8 +415,9 @@ main_uninstall() {
 }
 
 main_query() {
-    [ "$show_info" = 1 ] && cat "$install_root/$METADATA_DIR/$1/PKGINFO"
-    [ "$list_files" = 1 ] && cat "$install_root/$METADATA_DIR/$1/PKGFILES"
+    [ "$show_info" = 1 ]   && cat "$install_root/$METADATA_DIR/$1/PKGINFO"
+    [ "$list_files" = 1 ]  && cat "$install_root/$METADATA_DIR/$1/PKGFILES"
+    [ "$print_world" = 1 ] && cat "$install_root/$INSTALLED"
 }
 
 main() {
