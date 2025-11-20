@@ -121,12 +121,16 @@ parse_arguments() {
                                 i) show_info=1 ;;
                                 l) list_files=1 ;;
                                 v) verbose=1 ;;
-                                *) log_error "In parse_arguments: Invalid option for -S: -$_char" ;;
+                                *) log_error "In parse_arguments: Invalid option for -Q: -$_char" ;;
                             esac
-                        done ;;
+                        done
+                        shift
+                        package="$1"
+                        ;;
                 esac
                 shift ;;
             *)
+                [ -n "$package" ] && break
                 # The last argument entered by the user
                 _last_arg="$(eval "echo \${$#}")"
 
