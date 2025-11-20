@@ -20,7 +20,7 @@ checksum_check=1    # Whether to download and verify checksums of downloaded tar
 destdir=""          # Used when building packages
 download_cmd=""     # Used to download tarball sources later. See download function
 pwd="$PWD"          # Keep track of the directory we ran the command from
-package=""          # The argument passed to the script
+arguments=""        # The argument passed to the script
 install_root=""     # The root of the install. Used for bootstrapping
 package_directory=""
 
@@ -64,91 +64,95 @@ cleanup() {
 }
 
 parse_arguments() {
+    arguments=""
+
     while [ $# -gt 0 ]; do
-        _arg="$1"
+        _flag="$1"
         case "$_flag" in
             -?*)
-                _arg="${_arg#-}"
-
-                # First letter
-                _action="${_arg%"${_arg#?}"}"
-
-                # Everything after the first letter
-                _arg="${_arg#?}"
+                _flag="${_flag#-}"
+                _action="${_flag%"${_flag#?}"}"
+                _flag="${_flag#?}"
 
                 case "$_action" in
                     B)
                         create_package=1
                         while [ -n "$_flag" ]; do
-                            _char="${_arg%"${_arg#?}"}"
-                            _arg="${_arg#?}"
+                            _char="${_flag%"${_flag#?}"}"
+                            _flag="${_flag#?}"
                             case "$_char" in
                                 k) certificate_check=0 ;;
                                 s) checksum_check=0 ;;
                                 c) cleanup=0 ;;
                                 v) verbose=1 ;;
-                                *) log_error "In parse_arguments: Invalid option for -B: -$_char" ;;
-                            esac
-                        done ;;
-                    I)
-                        install=1
-                        while [ -n "$_flag" ]; do
-                            _char="${_arg%"${_arg#?}"}"
-                            _arg="${_arg#?}"
-                            case "$_char" in
-                                r) install_root="$2"; shift;;
-                                c) cleanup=0 ;;
-                                v) verbose=1 ;;
-                                *) log_error "In parse_arguments: Invalid option for -I: -$_char" ;;
-                            esac
-                        done ;;
-                    U)
-                        uninstall=1
-                        while [ -n "$_flag" ]; do
-                            _char="${_arg%"${_arg#?}"}"
-                            _arg="${_arg#?}"
-                            case "$_char" in
-                                v) verbose=1 ;;
-                                *) log_error "In parse_arguments: Invalid option for -U: -$_char" ;;
+                                *) log_error "Invalid option for -B: -$_char" ;;
                             esac
                         done
                         shift
-                        package="$*" ;;
+                        for arg in "$@"; do
+                            if [ -f "$arg" ]; then
+                                arguments="$arguments $arg"
+                            elif [ -d "$arg" ]; then
+                                arguments="$arguments $arg/$(basename "$arg").build"
+                            fi
+                        done
+                        return 0 ;;
+                    I)
+                        install=1
+                        while [ -n "$_flag" ]; do
+                            _char="${_flag%"${_flag#?}"}"
+                            _flag="${_flag#?}"
+                            case "$_char" in
+                                r)
+                                    install_root="$2"
+                                    shift
+                                    ;;
+                                c) cleanup=0 ;;
+                                v) verbose=1 ;;
+                                *) log_error "Invalid option for -I: -$_char" ;;
+                            esac
+                        done
+                        shift
+                        for arg in "$@"; do
+                            if [ -f "$arg" ]; then
+                                arguments="$arguments $arg"
+                            elif [ -d "$arg" ]; then
+                                arguments="$arguments $arg/$(basename "$arg").tar.xz"
+                            fi
+                        done
+                        return 0 ;;
+                    U)
+                        uninstall=1
+                        while [ -n "$_flag" ]; do
+                            _char="${_flag%"${_flag#?}"}"
+                            _flag="${_flag#?}"
+                            case "$_char" in
+                                v) verbose=1 ;;
+                                *) log_error "Invalid option for -U: -$_char" ;;
+                            esac
+                        done
+
+                        shift
+                        arguments="$*"
+                        return 0 ;;
                     Q)
                         query=1
                         while [ -n "$_flag" ]; do
-                            _char="${_arg%"${_arg#?}"}"
-                            _arg="${_arg#?}"
+                            _char="${_flag%"${_flag#?}"}"
+                            _flag="${_flag#?}"
                             case "$_char" in
                                 i) show_info=1 ;;
                                 l) list_files=1 ;;
                                 v) verbose=1 ;;
-                                *) log_error "In parse_arguments: Invalid option for -Q: -$_char" ;;
+                                *) log_error "Invalid option for -Q: -$_char" ;;
                             esac
                         done
                         shift
-                        package="$1" ;;
+                        arguments="$*"
+                        return 0 ;;
                 esac
                 shift ;;
-            *)
-                # So Uninstall and Query can manage the argument
-                [ -n "$arguments" ] && break
-
-                # The last argument entered by the user
-                _last_arg="$(eval "echo \${$#}")"
-
-                # If the argument is an actual file, perform actions on what was specified
-                # Otherwise, infer the file we are using
-                if [ -f "$_last_arg" ]; then
-                    package="$_last_arg"
-                    log_debug "In parse_arguments: Package is $arguments"
-                elif [ -d "$1" ]; then
-                    [ "$create_package" = 1 ] && package="$_last_arg/$(basename "$_last_arg").build"
-                    [ "$install" = 1 ]        && package="$_last_arg/$(basename "$_last_arg").tar.xz"
-                else
-                    log_error "In parse_arguments: Invalid argument: $1"
-                fi
-                shift ;;
+            *) log_error "Unexpected argument: $1" ;;
         esac
     done
 }
@@ -169,9 +173,9 @@ download() {
             # Figure out how to download the sources based on whether wget or curl is installed
             [ -z "$download_cmd" ] && {
                 log_debug "In download: Checking for wget, wget2, or curl"
-                for _arg in wget wget2 curl; do
-                    command -v "$_flag" > /dev/null || continue
-                    download_cmd="$_flag"
+                for _cmd in wget wget2 curl; do
+                    command -v "$_cmd" > /dev/null || continue
+                    download_cmd="$_cmd"
                     log_debug "In download: Using $download_cmd to download $1"
                     break
                 done
@@ -246,10 +250,11 @@ verify_checksum_if_needed() {
 
 unpack_source_if_needed() {
     if [ "$git" = 0 ]; then
-        log_debug "In unpack_source: unpacking tarball"
+        log_debug "In unpack_source_if_needed: unpacking tarball"
         
         for tarball in $tarball_list; do
-            tar -xf "$tarball" || log_error "In unpack_source: Failed to unpack: $tarball"
+            tar -xf "$tarball" || \
+                log_error "In unpack_source_if_needed: Failed to unpack: $tarball"
         done
     else
         return 1
