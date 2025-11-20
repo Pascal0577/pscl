@@ -13,10 +13,11 @@ verbose=0           # Enable verbose messages
 install=0           # Are we installing a package?
 create_package=0    # Are we building a package?
 uninstall=0         # Are we uninstalling a package?
+query=0             # Are we querying a package's info?
 cleanup=1           # Whether to cleanup the build directory when building packages
 certificate_check=1 # Whether to perform cert checks when downloading sources
 checksum_check=1    # Whether to download and verify checksums of downloaded tarballs when building
-destdir=""          #      
+destdir=""          # Used when building packages
 download_cmd=""     # Used to download tarball sources later. See download function
 pwd="$PWD"          # Keep track of the directory we ran the command from
 package=""          # The argument passed to the script
@@ -111,8 +112,8 @@ parse_arguments() {
                                 *) log_error "In parse_arguments: Invalid option for -U: -$_char" ;;
                             esac
                         done ;;
-                    S)
-                        search=1
+                    Q)
+                        query=1
                         while [ -n "$_arg" ]; do
                             _char="${_arg%"${_arg#?}"}"
                             _arg="${_arg#?}"
@@ -361,15 +362,7 @@ main_build() {
 main_uninstall() {
     log_debug "In main_uninstall: Uninstalling package"
     
-    _found=""
-    for _dir in "$install_root/$METADATA_DIR"/*; do
-        [ ! -d "$_dir" ] && continue
-        _name=$(awk -F= '/^package_name/ {print $2}' "$_dir/PKGINFO" 2>/dev/null)
-        [ "$_name" = "$package" ] && {
-            _found="$_dir"
-            break
-        }
-    done
+    _found="$install_root/$METADATA_DIR/$package"
     
     [ -z "$_found" ] && log_error "In main_uninstall: Package not found: $package"
     log_debug "In main_uninstall: Found metadata at: $_found"
@@ -403,6 +396,11 @@ main_uninstall() {
     unset "$_found"
 }
 
+main_query() {
+    [ "$show_info" = 1 ] && cat "$install_root/$METADATA_DIR/$package/PKGINFO"
+    [ "$list_files" = 1 ] && cat "$install_root/$METADATA_DIR/$package/PKGFILES"
+}
+
 main() {
     trap cleanup INT TERM EXIT
     log_debug "In main: Parsing arguments"
@@ -411,6 +409,7 @@ main() {
     [ "$install" = 1 ] && main_install
     [ "$uninstall" = 1 ] && main_uninstall
     [ "$create_package" = 1 ] && main_build
+    [ "$query" = 1 ] && main_query
 }
 
 main "$@"
