@@ -1,7 +1,5 @@
 #!/bin/sh
 
-set -eu
-
 readonly red="\x1b[31m"
 readonly blue="\x1b[34m"
 readonly yellow="\x1b[33m"
