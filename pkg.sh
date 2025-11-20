@@ -343,7 +343,6 @@ main_install() {
     change_directory "$1"
     install_package "$1"
     echo "Successful!"
-    exit 0
 }
 
 main_build() {
@@ -363,7 +362,6 @@ main_build() {
     compile_source
     build_package
     echo "Successful!"
-    exit 0
 }
 
 main_uninstall() {
@@ -406,8 +404,8 @@ main_uninstall() {
 }
 
 main_query() {
-    [ "$show_info" = 1 ] && cat "$install_root/$METADATA_DIR/$arguments/PKGINFO"
-    [ "$list_files" = 1 ] && cat "$install_root/$METADATA_DIR/$arguments/PKGFILES"
+    [ "$show_info" = 1 ] && cat "$install_root/$METADATA_DIR/$1/PKGINFO"
+    [ "$list_files" = 1 ] && cat "$install_root/$METADATA_DIR/$1/PKGFILES"
 }
 
 main() {
@@ -420,10 +418,10 @@ main() {
     [ -z "$arguments" ] && log_error "In main: No arguments were provided"
     log_debug "In main: arguments are: $arguments"
 
-    [ "$install" = 1 ]        && for arg in $arguments; do main_install "$arg"; done
-    [ "$uninstall" = 1 ]      && for arg in $arguments; do main_uninstall "$arg"; done
-    [ "$create_package" = 1 ] && for arg in $arguments; do main_build "$arg"; done
-    [ "$query" = 1 ] && main_query
+    [ "$install" = 1 ]        && for arg in $arguments; do main_install "$arg"; done   && exit 0
+    [ "$uninstall" = 1 ]      && for arg in $arguments; do main_uninstall "$arg"; done && exit 0
+    [ "$create_package" = 1 ] && for arg in $arguments; do main_build "$arg"; done     && exit 0
+    [ "$query" = 1 ]          && for arg in $arguments; do main_query "$arg"; done     && exit 0
 }
 
 main "$@"
