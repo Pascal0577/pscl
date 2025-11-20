@@ -111,7 +111,9 @@ parse_arguments() {
                                 v) verbose=1 ;;
                                 *) log_error "In parse_arguments: Invalid option for -U: -$_char" ;;
                             esac
-                        done ;;
+                        done
+                        shift
+                        package="$1" ;;
                     Q)
                         query=1
                         while [ -n "$_arg" ]; do
@@ -125,12 +127,13 @@ parse_arguments() {
                             esac
                         done
                         shift
-                        package="$1"
-                        ;;
+                        package="$1" ;;
                 esac
                 shift ;;
             *)
+                # So Uninstall and Query can manage the argument
                 [ -n "$package" ] && break
+
                 # The last argument entered by the user
                 _last_arg="$(eval "echo \${$#}")"
 
