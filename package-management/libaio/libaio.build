@@ -1,0 +1,20 @@
+#!/bin/sh
+
+package_name="libaio"
+package_version="0.3.113"
+package_description="Asynchronous I/O facility"
+package_source="https://pagure.io/libaio/archive/libaio-0.3.113/libaio-0.3.113.tar.gz"
+
+source_dir="$package_name-$package_version"
+
+configure() {
+    sed -i '/install.*libaio.a/s/^/#/' src/Makefile
+}
+
+build() {
+    make
+}
+
+install_files() {
+    make DESTDIR="$destdir" install
+}

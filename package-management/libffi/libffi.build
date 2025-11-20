@@ -1,0 +1,22 @@
+#!/bin/sh
+
+package_name="libffi"
+package_version="3.5.2"
+package_description="A portable, high level programming interface to various calling conventions"
+package_source="https://github.com/libffi/libffi/releases/download/v3.5.2/libffi-3.5.2.tar.gz"
+
+source_dir="$package_name-$package_version"
+
+configure() {
+    ./configure --prefix=/usr    \
+        --disable-static \
+        --with-gcc-arch=native
+}
+
+build() {
+    make
+}
+
+install_files() {
+    make DESTDIR="$destdir" install
+}

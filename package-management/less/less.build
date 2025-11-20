@@ -1,0 +1,20 @@
+#!/bin/sh
+
+package_name="less"
+package_version="679"
+package_description="A text file viewer"
+package_source="https://www.greenwoodsoftware.com/less/less-679.tar.gz"
+
+source_dir="$package_name-$package_version"
+
+configure() {
+    ./configure --prefix=/usr --sysconfdir=/etc
+}
+
+build() {
+    make
+}
+
+install_files() {
+    make DESTDIR="$destdir" install
+}

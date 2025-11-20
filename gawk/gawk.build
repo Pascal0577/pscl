@@ -1,0 +1,22 @@
+#!/bin/sh
+
+package_name="gawk"
+package_version="5.3.2"
+package_description="Programs for manipulating text files"
+package_source="https://ftp.gnu.org/gnu/gawk/gawk-5.3.2.tar.xz"
+
+source_dir="$package_name-$package_version"
+
+configure() {
+    sed -i 's/extras//' Makefile.in
+    ./configure --prefix=/usr
+}
+
+build() {
+    make
+}
+
+install_files() {
+    make DESTDIR="$destdir" install
+    ln -sv gawk.1 "$destdir/usr/share/man/man1/awk.1"
+}

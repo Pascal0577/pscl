@@ -1,0 +1,21 @@
+#!/bin/sh
+
+package_name="iproute2"
+package_version="6.16.0"
+package_description="programs for basic and advanced IPV4-based networking"
+package_source="https://www.kernel.org/pub/linux/utils/net/iproute2/iproute2-6.16.0.tar.xz"
+
+source_dir="$package_name-$package_version"
+
+configure() {
+    sed -i /ARPD/d Makefile
+    rm -fv man/man8/arpd.8
+}
+
+build() {
+    make NETNS_RUN_DIR=/run/netns
+}
+
+install_files() {
+    make SBINDIR=/usr/sbin DESTDIR="$destdir" install
+}

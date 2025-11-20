@@ -1,0 +1,20 @@
+#!/bin/sh
+
+package_name="libcap"
+package_version="2.76"
+package_description="The userspace interface to the POSIX 1003.1e capabilities available in Linux kernels"
+package_source="https://www.kernel.org/pub/linux/libs/security/linux-privs/libcap2/libcap-2.76.tar.xz"
+
+source_dir="$package_name-$package_version"
+
+configure() {
+    sed -i '/install -m.*STA/d' libcap/Makefile
+}
+
+build() {
+    make prefix=/usr lib=lib
+}
+
+install_files() {
+    make DESTDIR="$destdir" prefix=/usr lib=lib install
+}

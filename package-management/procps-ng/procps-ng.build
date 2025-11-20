@@ -1,0 +1,27 @@
+#!/bin/sh
+
+package_name="procps-ng"
+package_version="4.0.5"
+package_description="programs for monitoring processes"
+package_source="https://sourceforge.net/projects/procps-ng/files/Production/procps-ng-4.0.5.tar.xz"
+
+source_dir="$package_name-$package_version"
+
+configure() {
+    ./configure --prefix=/usr                           \
+        --docdir=/usr/share/doc/procps-ng-4.0.5 \
+        --disable-static                        \
+        --disable-kill                          \
+        --enable-watch8bit                      \
+        --with-systemd                          \
+        SYSTEMD_CFLAGS="-I/usr/include" \
+        SYSTEMD_LIBS="-lsystemd"
+}
+
+build() {
+    make
+}
+
+install_files() {
+    make DESTDIR="$destdir" install
+}

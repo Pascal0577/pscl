@@ -1,0 +1,20 @@
+#!/bin/sh
+
+package_name="lz4"
+package_version="1.10.0"
+package_description="A speedy compression and decompression algorithm"
+package_source="https://github.com/lz4/lz4/releases/download/v1.10.0/lz4-1.10.0.tar.gz"
+
+source_dir="$package_name-$package_version"
+
+configure() {
+    :
+}
+
+build() {
+    make BUILD_STATIC=no PREFIX=/usr
+}
+
+install_files() {
+    make BUILD_STATIC=no DESTDIR="$destdir" install
+}

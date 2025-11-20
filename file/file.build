@@ -1,0 +1,31 @@
+#!/bin/sh
+
+package_name="file"
+package_version="5.46"
+package_description="A utility for determining the type of a given file or files"
+package_source="https://astron.com/pub/file/file-5.46.tar.gz"
+
+source_dir="$package_name-$package_version"
+
+configure() {
+    mkdir build
+    (
+    cd build || return 1
+        ../configure --disable-bzlib      \
+                     --disable-libseccomp \
+                     --disable-xzlib      \
+                     --disable-zlib
+        make
+    )
+
+    ./configure --prefix=/usr \
+                --build="$(./config.guess)"
+}
+
+build() {
+    make FILE_COMPILE="$(pwd)/build/src/file"
+}
+
+install_files() {
+    make DESTDIR="$destdir" install
+}

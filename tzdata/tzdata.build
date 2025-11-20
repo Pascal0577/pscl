@@ -1,0 +1,33 @@
+#!/bin/sh
+
+package_name="tzdata"
+package_version="2025b"
+package_description="Time Zone Data"
+package_source="https://www.iana.org/time-zones/repository/releases/tzdata2025b.tar.gz"
+
+source_dir="tzdata2025b"
+
+configure() {
+    :
+}
+
+build() {
+    :
+}
+
+install_files() {
+    ZONEINFO="$destdir/usr/share/zoneinfo"
+    mkdir -pv "$ZONEINFO/posix"
+    mkdir -pv "$ZONEINFO/right"
+
+    for tz in etcetera southamerica northamerica europe africa antarctica  \
+              asia australasia backward; do
+        zic -L /dev/null   -d "$ZONEINFO"       ${tz}
+        zic -L /dev/null   -d "$ZONEINFO/posix" ${tz}
+        zic -L leapseconds -d "$ZONEINFO/right" ${tz}
+    done
+
+    cp -v zone.tab zone1970.tab iso3166.tab "$ZONEINFO"
+    zic -d "$ZONEINFO" -p America/New_York
+    unset ZONEINFO tz
+}

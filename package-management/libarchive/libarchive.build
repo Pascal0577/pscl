@@ -1,0 +1,21 @@
+#!/bin/sh
+
+package_name="libarchive"
+package_version="3.8.2"
+package_description=""
+package_source="https://github.com/libarchive/libarchive/releases/download/v3.8.2/libarchive-3.8.2.tar.xz"
+
+
+source_dir="$package_name-$package_version"
+
+configure() {
+	./configure --prefix=/usr --disable-static
+}
+
+build() {
+    make
+}
+
+install_files() {
+    make DESTDIR="$destdir" install
+}

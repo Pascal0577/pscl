@@ -1,0 +1,19 @@
+#!/bin/sh
+
+package_name=""
+package_version=""
+package_description=""
+package_source=""
+
+source_dir="$package_name-$package_version"
+
+configure() {
+}
+
+build() {
+    make
+}
+
+install_files() {
+    make DESTDIR="$destdir" install
+}

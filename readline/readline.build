@@ -1,0 +1,30 @@
+#!/bin/sh
+
+package_name="readline"
+package_version="8.3"
+package_description="A set of libraries that offer command-line editing and history capabilities"
+package_source="https://ftp.gnu.org/gnu/readline/readline-8.3.tar.gz"
+
+source_dir="$package_name-$package_version"
+
+configure() {
+    # Avoids a linking bug in ldconfig
+    sed -i '/MV.*old/d' Makefile.in
+    sed -i '/{OLDSUFF}/c:' support/shlib-install
+
+    # Prevent hard coded rpath
+    sed -i 's/-Wl,-rpath,[^ ]*//' support/shobj-conf
+
+    ./configure --prefix=/usr    \
+        --disable-static \
+        --with-curses    \
+        --docdir=/usr/share/doc/readline-8.3
+}
+
+build() {
+    make SHLIB_LIBS="-lncursesw"
+}
+
+install_files() {
+    make DESTDIR="$destdir" install
+}

@@ -1,0 +1,21 @@
+#!/bin/sh
+
+package_name="findutils"
+package_version="4.10.0"
+package_description="Programs to find files"
+package_source="https://ftp.gnu.org/gnu/findutils/findutils-4.10.0.tar.xz"
+
+source_dir="$package_name-$package_version"
+
+configure() {
+    ./configure --prefix=/usr                   \
+                --localstatedir=/var/lib/locate
+}
+
+build() {
+    make
+}
+
+install_files() {
+    make DESTDIR="$destdir" install
+}

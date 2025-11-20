@@ -1,0 +1,20 @@
+#!/bin/sh
+
+package_name="popt"
+package_version="1.19"
+package_description=""
+package_source="https://ftp.osuosl.org/pub/rpm/popt/releases/popt-1.x/popt-1.19.tar.gz"
+
+source_dir="$package_name-$package_version"
+
+configure() {
+    ./configure --prefix=/usr --disable-static
+}
+
+build() {
+    make
+}
+
+install_files() {
+    make DESTDIR="$destdir" install
+}

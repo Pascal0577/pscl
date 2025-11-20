@@ -1,0 +1,32 @@
+#!/bin/sh
+
+package_name="gmp"
+package_version="6.3.0"
+package_description="Contains math libraries"
+package_source="https://ftp.gnu.org/gnu/gmp/gmp-6.3.0.tar.xz"
+
+source_dir="$package_name-$package_version"
+
+configure() {
+    # Compatibility with GCC 15 and later
+    sed -i '/long long t1;/,+1s/()/(...)/' configure
+
+    ./configure --prefix=/usr \
+        --enable-cxx     \
+        --disable-static \
+        --docdir=/usr/share/doc/gmp-6.3.0
+}
+
+build() {
+    make
+    make html
+
+    # Check if 199 of the tests pass
+    make check 2>&1 | tee gmp-check-log
+    awk '/# PASS:/{total+=$3} ; END{print total}' gmp-check-log
+}
+
+install_files() {
+    make DESTDIR="$destdir" install
+    make DESTDIR="$destdir" install-html
+}

@@ -1,0 +1,22 @@
+#!/bin/sh
+
+package_name="xz"
+package_version="5.8.1"
+package_description="It's xz. You know what it does"
+package_source="https://github.com//tukaani-project/xz/releases/download/v5.8.1/xz-5.8.1.tar.xz"
+
+source_dir="$package_name-$package_version"
+
+configure() {
+    ./configure --prefix=/usr    \
+        --disable-static \
+        --docdir=/usr/share/doc/xz-5.8.1
+}
+
+build() {
+    make
+}
+
+install_files() {
+    make DESTDIR="$destdir" install
+}

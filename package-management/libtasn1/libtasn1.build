@@ -1,0 +1,20 @@
+#!/bin/sh
+
+package_name="libtasn1"
+package_version="4.20.0"
+package_description=""
+package_source="https://ftp.gnu.org/gnu/libtasn1/libtasn1-4.20.0.tar.gz"
+
+source_dir="$package_name-$package_version"
+
+configure() {
+	./configure --prefix=/usr --disable-static
+}
+
+build() {
+    make
+}
+
+install_files() {
+    make DESTDIR="$destdir" install
+}
