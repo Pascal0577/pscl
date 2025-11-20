@@ -343,6 +343,7 @@ main_install() {
     change_directory "$1"
     install_package "$1"
     echo "Successful!"
+    cd "$pwd" || true
 }
 
 main_build() {
@@ -362,6 +363,7 @@ main_build() {
     compile_source
     build_package
     echo "Successful!"
+    cd "$pwd" || true
 }
 
 main_uninstall() {
@@ -401,6 +403,8 @@ main_uninstall() {
     echo "Successfully uninstalled $_package_to_uninstall"
 
     unset "$_found"
+
+    cd "$pwd" || true
 }
 
 main_query() {
