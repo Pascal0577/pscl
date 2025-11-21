@@ -148,17 +148,24 @@ is_installed() {
     return 1
 }
 
+
+find_package_dir() {
+    _pkg="$1"
+    for repo in $repository_list; do
+        if [ -f "$repo/$_pkg/" ]; then
+            echo "$repo/$_pkg/"
+            return 0
+        fi
+    done
+    log_error "In find_package_build: Could not find build dir for: $_pkg"
+}
+
 # Cleanup is extremely important, so it's very verbose
 cleanup() {
     if [ "$cleanup" = 1 ]; then
-        for arg in $BUILD_ORDER; do
-            log_debug "In cleanup: Running cleanup"
-
-            for repo in $repository_list; do
-                [ -d "$repo/$arg" ] && arg_dir="$repo/$arg"
-            done
-
-            cd "$arg_dir" || true
+        log_debug "In cleanup: Running cleanup"
+        for arg in $BUILD_ORDER; do 
+            cd "$(find_package_dir "$arg")" || continue
 
             # Tarballs, git repos, and patches were downloaded to build dir
             if [ -d ./build/ ]; then
@@ -203,17 +210,6 @@ remove_string_from_list() {
     done
     # Trim leading space
     echo "$_result" | sed 's/^ //'
-}
-
-find_package_build() {
-    _pkg="$1"
-    for repo in $repository_list; do
-        if [ -f "$repo/$_pkg/$_pkg.build" ]; then
-            echo "$repo/$_pkg/$_pkg.build"
-            return 0
-        fi
-    done
-    log_error "In find_package_build: Could not find build file for: $_pkg"
 }
 
 list_of_dependencies() {
@@ -551,8 +547,11 @@ main() {
         done
         for package_name in $BUILD_ORDER; do
             log_debug "In main: build order is: $BUILD_ORDER"
-            _build_file="$(find_package_build "$package_name")"
-            main_install "$_build_file"
+            _build_file="$(find_package_dir "$package_name").build"
+            _built_package="$(find_package_dir "$package_name").tar.xz"
+            if [ -f "$_built_package" ]; then
+                main_install "$_built_package"
+            fi
         done && exit 0
     fi
 
@@ -568,8 +567,10 @@ main() {
         done
         for package_name in $BUILD_ORDER; do
             log_debug "In main: build order is: $BUILD_ORDER"
-            _build_file="$(find_package_build "$package_name")"
-            main_build "$_build_file"
+            _build_dir="$(find_package_build "$package_name")"
+            _build_file="$(find_package_build "$package_name").build"
+            _built_package="$(find_package_build "$package_name").tar.xz"
+            [ ! -f "$_built_package" ] && main_build "$_build_file"
         done && exit 0
     fi
 
