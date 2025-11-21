@@ -545,7 +545,7 @@ main() {
         done
         for package_name in $BUILD_ORDER; do
             log_debug "In main: build order is: $BUILD_ORDER"
-            _build_file="$(find_package_build "$package_name")"
+            _build_file="$(find_package_build $package_name)"
             main_build "$_build_file"
         done && exit 0
     fi
