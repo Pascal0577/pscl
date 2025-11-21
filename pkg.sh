@@ -557,6 +557,7 @@ main() {
             _built_package="$_build_dir/$(find_package_dir "$package_name")/$package_name.tar.xz"
 
             log_debug "In main: Build dir is: $_build_dir"
+            log_debug "In main: Package name is: $package_name"
             if [ -f "$_built_package" ]; then
                 log_debug "In main: installing $_built_package"
                 main_install "$_built_package"
