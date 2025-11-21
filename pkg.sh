@@ -27,7 +27,7 @@ package_directory=""
 
 sources_list=""
 checksums_list=""
-repository_list="${repository_list:-/sources/package-management/package}"
+repository_list="${repository_list:-/sources/package-management/packages}"
 
 # These variables are used in the dependency resolution function
 VISITING_SET=""
