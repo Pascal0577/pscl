@@ -558,7 +558,7 @@ main() {
 
             log_debug "In main: Build dir is: $_build_dir"
             log_debug "In main: Package name is: $package_name"
-            if [ -f "$_built_package" ]; then
+            if [ -e "$_built_package" ]; then
                 log_debug "In main: installing $_built_package"
                 main_install "$_built_package"
             elif [ "$build_to_install" = 1 ]; then
@@ -586,7 +586,7 @@ main() {
             _build_dir="$(find_package_dir "$package_name")"
             _build_file="$_build_dir/$package_name.build"
             _built_package="$_build_dir/$package_name.tar.xz"
-            if [ ! -f "$_built_package" ]; then
+            if [ ! -e "$_built_package" ]; then
                 log_debug "In main: Building: $package_name"
                 log_debug "In main: Build file is: $_build_file"
                 main_build "$_build_file"
