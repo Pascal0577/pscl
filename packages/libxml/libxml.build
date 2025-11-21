@@ -1,0 +1,30 @@
+#!/bin/sh
+
+package_name="libxml"
+package_version="2.14.5"
+package_description="Contains libraries and utilities used for parsing XML files"
+package_source="https://download.gnome.org/sources/libxml2/2.14/libxml2-2.14.5.tar.xz 59aac4e5d1d350ba2c4bddf1f7bc5098"
+package_dependencies="icu"
+
+source_dir="$package_name-$package_version"
+
+configure() {
+    cd "$source_dir" || log_error "In $package_name.build: Failed to cd to $source_dir"
+    ./configure --prefix=/usr     \
+        --sysconfdir=/etc \
+        --disable-static  \
+        --with-history    \
+        --with-icu        \
+        PYTHON=/usr/bin/python3 \
+        --docdir=/usr/share/doc/libxml2-2.14.5
+}
+
+build() {
+    make
+}
+
+install_files() {
+    make DESTDIR="$destdir" install
+    rm -f "{$destdir:?}/usr/lib/libxml2.la" &&
+    sed '/libs=/s/xml2.*/xml2"/' -i "${destdir:?}/usr/bin/xml2-config"
+}

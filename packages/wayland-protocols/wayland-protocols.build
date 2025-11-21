@@ -1,0 +1,24 @@
+#!/bin/sh
+
+package_name="wayland-protocols"
+package_version="1.45"
+package_description="Contains additional Wayland protocols that add functionality outside of protocols already in the Wayland core"
+package_source="https://gitlab.freedesktop.org/wayland/wayland-protocols/-/releases/1.45/downloads/wayland-protocols-1.45.tar.xz a235baeab3f1c6d57ac4c7c00ecd7e48"
+package_dependencies="wayland"
+
+source_dir="$package_name-$package_version"
+
+configure() {
+    cd "$source_dir" || log_error "In $package_name.build: Failed to cd to $source_dir"
+    mkdir build
+    cd build || true
+    meson setup --prefix=/usr --buildtype=release
+}
+
+build() {
+    ninja
+}
+
+install_files() {
+    DESTDIR="$destdir" ninja install
+}

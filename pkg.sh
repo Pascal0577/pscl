@@ -6,7 +6,7 @@ readonly yellow="\x1b[33m"
 readonly default="\x1b[39m"
 
 readonly METADATA_DIR="/var/lib/pkg"
-readonly INSTALLED="/$METADATA_DIR/installed"
+readonly INSTALLED="$METADATA_DIR/installed"
 
 git=0               # Whether we are using a git repo as a source
 verbose=0           # Enable verbose messages
@@ -224,7 +224,7 @@ fetch_source() {
         tarball_list="$tarball_list $_name_of_downloaded_file"
     done
 
-    return 1
+    return 0
 }
 
 verify_checksum_if_needed() {
@@ -243,7 +243,7 @@ verify_checksum_if_needed() {
                 log_error "In verify_checksum_if_needed: Failed to verify $tarball"
         done
     else
-        return 1
+        return 0
     fi
 }
 
@@ -256,7 +256,7 @@ unpack_source_if_needed() {
                 log_error "In unpack_source_if_needed: Failed to unpack: $tarball"
         done
     else
-        return 1
+        return 0
     fi
 }
 
@@ -268,7 +268,7 @@ move_patches_if_needed() {
 }
 
 compile_source() {
-    cd "$package_directory/build/$source_dir" || true
+    cd "$package_directory/build/" || true
 
     log_debug "In compile_source: Configuring build. Current directory is $PWD"
     configure || log_error "In compile_source: In $arguments: In configure: "

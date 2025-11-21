@@ -1,0 +1,23 @@
+#!/bin/sh
+
+package_name="xcb-proto"
+package_version="1.17.0"
+package_description="Provides the XML-XCB protocol"
+package_source="https://xorg.freedesktop.org/archive/individual/proto/xcb-proto-1.17.0.tar.xz c415553d2ee1a8cea43c3234a079b53f"
+
+source_dir="$package_name-$package_version"
+
+configure() {
+    PYTHON=python3 ./configure --prefix=/usr \
+        --sysconfdir=/etc     \
+        --localstatedir=/var  \
+        --disable-static
+}
+
+build() {
+    :
+}
+
+install_files() {
+    make DESTDIR="$destdir" install
+}

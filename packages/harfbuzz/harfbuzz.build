@@ -1,0 +1,28 @@
+#!/bin/sh
+
+package_name="harfbuzz"
+package_version="11.4.1"
+package_description="An OpenType text shaping engine"
+package_source="https://github.com/harfbuzz/harfbuzz/releases/download/11.4.1/harfbuzz-11.4.1.tar.xz 0f2f8fe443032019b5ca9598c8e2b912"
+package_dependencies="freetype"
+
+source_dir="$package_name-$package_version"
+
+configure() {
+    cd "$source_dir" || log_error "In $package_name.build: Failed to cd to $source_dir"
+    mkdir build
+    cd build || true
+
+    meson setup ..    \
+        --prefix=/usr \
+        --buildtype=release \
+        -D docs=disabled
+}
+
+build() {
+    ninja
+}
+
+install_files() {
+    DESTDIR="$destdir" ninja install
+}
