@@ -226,6 +226,7 @@ list_of_dependencies() {
 
 get_dependency_graph() {
     _node="$1"
+    log_debug "In get_dependency_graph: Current node is: $_node"
     # Error if there's a circular dependency
     if string_is_in_list "$_node" "$VISITING_SET"; then
         log_error "In get_dependency_graph: Circular dependency detected involving: $_node"
