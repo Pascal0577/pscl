@@ -1,0 +1,27 @@
+#!/bin/sh
+
+package_name="wayland"
+package_version="1.24.0"
+package_description="Project to define a protocol for a compositor to talk to its clients as well as a library implementation of the protocol"
+package_source="https://gitlab.freedesktop.org/wayland/wayland/-/releases/1.24.0/downloads/wayland-1.24.0.tar.xz fda0b2a73ea2716f61d75767e02008e1"
+package_dependencies="libxml"
+
+source_dir="$package_name-$package_version"
+
+configure() {
+    cd "$source_dir" || log_error "In $package_name.build: Failed to cd to $source_dir"
+    mkdir build
+    cd build || true
+    meson setup ..          \
+        --prefix=/usr       \
+        --buildtype=release \
+        -D documentation=false
+}
+
+build() {
+    ninja
+}
+
+install_files() {
+    DESTDIR="$destdir" ninja install
+}

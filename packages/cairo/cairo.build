@@ -1,0 +1,24 @@
+#!/bin/sh
+
+package_name="cairo"
+package_version="1.18.4"
+package_description="A 2D graphics library with support for multiple output devices"
+package_source="https://www.cairographics.org/releases/cairo-1.18.4.tar.xz"
+package_dependencies="libpng pixman libxorg fontconfig glib"
+
+source_dir="$package_name-$package_version"
+
+configure() {
+    cd "$source_dir" || log_error "In $package_name.build: Failed to cd to $source_dir"
+    mkdir build
+    cd build || true
+    meson setup --prefix=/usr --buildtype=release ..
+}
+
+build() {
+    ninja
+}
+
+install_files() {
+    DESTDIR="$destdir" ninja install
+}

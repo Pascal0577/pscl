@@ -1,0 +1,25 @@
+#!/bin/sh
+
+package_name="libpng"
+package_version="1.6.50"
+package_description="Contains libraries used by other programs for reading and writing PNG files"
+package_source="https://downloads.sourceforge.net/libpng/libpng-1.6.50.tar.xz e583e61455c4f40d565d85c0e9a2fbf9"
+package_dependencies=""
+
+source_dir="$package_name-$package_version"
+
+configure() {
+    cd "$source_dir" || log_error "In $package_name.build: Failed to cd to $source_dir"
+    patch -p1 ../libpng-1.6.47-apng.patch
+    ./configure --prefix=/usr --disable-static
+}
+
+build() {
+    make
+}
+
+install_files() {
+    make DESTDIR="$destdir" install
+    mkdir -p "${destir:?}/usr/share/doc/libpng-1.6.50"
+    cp README libpng-manual.txt "${destdir:?}/usr/share/doc/libpng-1.6.50"
+}

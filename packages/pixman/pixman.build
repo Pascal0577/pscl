@@ -1,0 +1,24 @@
+#!/bin/sh
+
+package_name="pixman"
+package_version="0.46.4"
+package_description="Contains a library that provides low-level pixel manipulation features such as image compositing and trapezoid rasterization"
+package_source="https://www.cairographics.org/releases/pixman-0.46.4.tar.gz c08173c8e1d2cc79428d931c13ffda59"
+package_dependencies=""
+
+source_dir="$package_name-$package_version"
+
+configure() {
+    cd "$source_dir" || log_error "In $package_name.build: Failed to cd to $source_dir"
+    mkdir build
+    cd build || true
+    meson setup --prefix=/usr --buildtype=release ..
+}
+
+build() {
+    ninja
+}
+
+install_files() {
+    DESTDIR="$destdir" ninja install
+}

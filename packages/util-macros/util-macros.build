@@ -1,0 +1,24 @@
+#!/bin/sh
+
+package_name="util-macros"
+package_version="1.20.1"
+package_description="m4 macros used by all Xorg packages"
+package_source="https://www.x.org/pub/individual/util/util-macros-1.20.2.tar.xz 5f683a1966834b0a6ae07b3680bcb863"
+package_dependencies=""
+
+source_dir="$package_name-$package_version"
+
+configure() {
+    ./configure --prefix=/usr \
+        --sysconfdir=/etc     \
+        --localstatedir=/var  \
+        --disable-static
+}
+
+build() {
+    :
+}
+
+install_files() {
+    make DESTDIR="$destdir" install
+}

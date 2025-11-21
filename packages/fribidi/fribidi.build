@@ -1,0 +1,24 @@
+#!/bin/sh
+
+package_name="fribidi"
+package_version="1.0.16"
+package_description="An implementation of the Unicode Bidirectional Algorithm (BIDI)"
+package_source="https://github.com/fribidi/fribidi/releases/download/v1.0.16/fribidi-1.0.16.tar.xz 333ad150991097a627755b752b87f9ff"
+package_dependencies=""
+
+source_dir="$package_name-$package_version"
+
+configure() {
+    cd "$source_dir" || log_error "In $package_name.build: Failed to cd to $source_dir"
+    mkdir build
+    cd build || true
+    meson setup --prefix=/usr --buildtype=release ..
+}
+
+build() {
+    ninja
+}
+
+install_files() {
+    DESTDIR="$destdir" ninja install
+}

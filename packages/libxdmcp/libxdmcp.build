@@ -1,0 +1,25 @@
+#!/bin/sh
+
+package_name="libxdmcp"
+package_version="1.1.5"
+package_description="Contains a library implementing the X Display Manager Control Protocol"
+package_source="https://www.x.org/pub/individual/lib/libXdmcp-1.1.5.tar.xz ce0af51de211e4c99a111e64ae1df290"
+package_dependencies="xorgproto"
+
+source_dir="$package_name-$package_version"
+
+configure() {
+    ./configure --prefix=/usr \
+        --sysconfdir=/etc     \
+        --localstatedir=/var  \
+        --disable-static      \
+        --docdir=/usr/share/doc/libXdmcp-1.1.5
+}
+
+build() {
+    make
+}
+
+install_files() {
+    make DESTDIR="$destdir" install
+}

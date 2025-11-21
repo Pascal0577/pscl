@@ -1,0 +1,24 @@
+#!/bin/sh
+
+package_name="xcb-util"
+package_version="0.4.1"
+package_description="Provides additional extensions to the XCB library"
+package_source="https://xcb.freedesktop.org/dist/xcb-util-0.4.1.tar.xz 34d749eab0fd0ffd519ac64798d79847"
+package_dependencies="libxcb"
+
+source_dir="$package_name-$package_version"
+
+configure() {
+    ./configure --prefix=/usr \
+        --sysconfdir=/etc     \
+        --localstatedir=/var  \
+        --disable-static
+}
+
+build() {
+    make
+}
+
+install_files() {
+    make DESTDIR="$destdir" install
+}

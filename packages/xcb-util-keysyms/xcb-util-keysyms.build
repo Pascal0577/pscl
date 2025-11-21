@@ -1,0 +1,24 @@
+#!/bin/sh
+
+package_name="xcb-util-keysyms"
+package_version="0.4.1"
+package_description=""
+package_source="https://xcb.freedesktop.org/dist/xcb-util-keysyms-0.4.1.tar.xz fbdc05f86f72f287ed71b162f1a9725a"
+package_dependencies="libxcb xcb-util"
+
+source_dir="$package_name-$package_version"
+
+configure() {
+    ./configure --prefix=/usr \
+        --sysconfdir=/etc     \
+        --localstatedir=/var  \
+        --disable-static
+}
+
+build() {
+    make
+}
+
+install_files() {
+    make DESTDIR="$destdir" install
+}
