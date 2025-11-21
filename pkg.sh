@@ -134,40 +134,47 @@ parse_arguments() {
     done
 }
 
-change_directory() {
+get_package_dir() (
+    _repository_list="$1"
+    package_directory=""
     # Change directory to where the package is
     for repo in $repository_list; do
         package_directory="$(realpath "$(dirname "$1")")"
-        log_debug "In change_directory: Changing directory: $package_directory"
-        cd "$package_directory" || log_error "In unpack_source: Failed to change directory: $package_directory"
     done
-}
+    echo "$package_directory"
+)
 
 # Check if a package is already installed
-is_installed() {
+is_installed() (
     _pkg_name="$1"
     [ -d "$install_root/$METADATA_DIR/$_pkg_name" ] && return 0
     return 1
-}
+)
 
 
-find_package_dir() {
+find_package_dir() (
     _pkg="$1"
+    _repository_list="$2"
+
     for repo in $repository_list; do
         if [ -d "$repo/$_pkg/" ]; then
             echo "$repo/$_pkg/"
             return 0
         fi
     done
+
     log_error "In find_package_dir: Could not find build dir for: $_pkg"
-}
+)
 
 # Cleanup is extremely important, so it's very verbose
-cleanup() {
-    if [ "$cleanup" = 1 ]; then
+cleanup() (
+    _do_cleanup="$1"
+    _list_of_packages="$2"
+
+    if [ "$_do_cleanup" = 1 ]; then
         log_debug "In cleanup: Running cleanup"
-        for arg in $BUILD_ORDER; do 
-            cd "$(find_package_dir "$arg")" || continue
+        for arg in $_list_of_packages; do 
+            cd "$(find_package_dir "$arg" "$repository_list")" || continue
 
             # Tarballs, git repos, and patches were downloaded to build dir
             if [ -d ./build/ ]; then
@@ -188,22 +195,24 @@ cleanup() {
     else
         log_warn "In cleanup: Cleanup called, but was disabled"
     fi
-}
+)
 
-string_is_in_list() {
+string_is_in_list() (
     _string="$1"
     shift
     _list="${*:-}"
+
     for word in $_list; do
         [ "$_string" = "$word" ] && return 0
     done
     return 1
-}
+)
 
-remove_string_from_list() {
+remove_string_from_list() (
     _string="$1"
     shift
     _list="${*:-}"
+
     _result=""
     for word in $_list; do
         if [ "$word" != "$_string" ]; then
@@ -212,12 +221,13 @@ remove_string_from_list() {
     done
     # Trim leading space
     echo "$_result" | sed 's/^ //'
-}
+)
 
-list_of_dependencies() {
+list_of_dependencies() (
     _package="$(basename "$1")"
+    _repository_list="$2"
 
-    for repo in $repository_list; do
+    for repo in $_repository_list; do
         if [ -d "$repo/$_package" ]; then
             _dependency_list="$(grep "package_dependencies=" "$repo/$_package/$_package.build" | \
                 sed 's/package_dependencies=//')"
@@ -228,9 +238,9 @@ list_of_dependencies() {
     done
 
     echo "$_dependency_list"
-}
+)
 
-get_dependency_graph() {
+get_dependency_graph() (
     _node=$1
     _visiting=$2
     _resolved=$3
@@ -248,7 +258,7 @@ get_dependency_graph() {
 
     _visiting="$_visiting $_node"
 
-    _deps=$(list_of_dependencies "$_node")
+    _deps=$(list_of_dependencies "$_node" "repository_list")
     log_debug "In get_dependency_graph: Dependencies for $_node are: $_deps"
 
     for child in $_deps; do
@@ -264,9 +274,11 @@ get_dependency_graph() {
     log_debug "In get_dependency_graph: Adding $_node to dependency graph"
 
     echo "$_visiting|$_resolved|$_order"
-}
+)
 
-download() {
+download() (
+    _source="$1"
+
     # If the source is a git repo, then clone it. Otherwise, use the download command
     case "$1" in
         *.git)
@@ -297,10 +309,13 @@ download() {
             # We specifically do not want a quoted string
             $download_cmd "$1" || return 1
             _name_of_downloaded_file="${1##*/}"
+            echo "$_name_of_downloaded_file"
     esac
-}
+)
 
-parse_sources() {
+parse_sources() (
+    _unparsed_sources="$1"
+
     # Read the package source line-by-line 
     log_debug "In parse_sources: Parsing sources list"
     while IFS= read -r line; do
@@ -313,10 +328,15 @@ parse_sources() {
     done <<- EOF
 	$package_source
 	EOF
-}
+
+    echo "$sources_list|$checksums_list"
+)
 
 # Fetches all of the listed sources using the download function
-fetch_source() {
+fetch_source() (
+    _sources_list="$1"
+    _tarball_list=""
+
     log_debug "In fetch_source: Creating build directory: $PWD/build"
     [ -d ./build ] && log_error "In fetch_source: build directory already exists: $PWD/build"
 
@@ -326,21 +346,25 @@ fetch_source() {
     log_debug "In fetch_source: Checking if sources were provided"
     [ -z "$package_source" ] && log_error "In fetch_source: No sources provided"
 
-    for source in $sources_list; do
-        download "$source" || log_error "In fetch_source: Failed to download source: $source"
-        tarball_list="$tarball_list $_name_of_downloaded_file"
+    for source in $_sources_list; do
+        _name_of_downloaded_file="$(download "$source")"
+        _tarball_list="$_tarball_list $_name_of_downloaded_file"
     done
 
-    return 0
-}
+    echo "$_tarball_list"
+)
 
-verify_checksum_if_needed() {
+verify_checksum_if_needed() (
+    _tarball_list="$1"
+    _checksums_list="$2"
+    _checksum_check="$3"
+
     # For every tarball, check it against every provided checksum
-    if [ "$checksum_check" = 1 ]; then
-        for tarball in $tarball_list; do
+    if [ "$_checksum_check" = 1 ]; then
+        for tarball in $_tarball_list; do
             _md5sum="$(md5sum "$tarball" | awk '{print $1}')"
             _checksum_verified=0
-            for checksum in $checksums_list; do
+            for checksum in $_checksums_list; do
                 [ "$_md5sum" = "$checksum" ] && {
                     _checksum_verified=1
                     log_debug "Checksum verified!"
@@ -352,7 +376,7 @@ verify_checksum_if_needed() {
     else
         return 0
     fi
-}
+)
 
 unpack_source_if_needed() {
     if [ "$git" = 0 ]; then
@@ -368,22 +392,28 @@ unpack_source_if_needed() {
 }
 
 move_patches_if_needed() {
-    log_debug "In move_patches_if_needed: Package directory it $package_directory"
-    for patch in "$package_directory"/*.patch; do
-        log_debug "In move_patches_if_needed: Moving $arguments to $package_directory/build/"
-        cp -a "$patch" "$package_directory/build"
+    _package="$1"
+    _package_directory="$(get_package_dir "$_package")"
+
+    log_debug "In move_patches_if_needed: Package directory it $_package_directory"
+    for patch in "$_package_directory"/*.patch; do
+        log_debug "In move_patches_if_needed: Moving $arguments to $_package_directory/build/"
+        cp -a "$patch" "$_package_directory/build"
     done
 }
 
-compile_source() {
-    cd "$package_directory/build/" || true
+compile_source() (
+    _package="$1"
+    _package_directory="$(get_package_dir "$_package")"
+
+    cd "$_package_directory/build/" || true
 
     log_debug "In compile_source: Configuring build. Current directory is $PWD"
     configure || log_error "In compile_source: In $arguments: In configure: "
 
     log_debug "In compile_source: Building package. Current directory is $PWD"
     build || log_error "In compile_source: In $arguments: In build: "
-}
+)
 
 install_package() {
     _package_to_install="$1"
@@ -461,8 +491,10 @@ main_install() {
     cd "$pwd" || true
 }
 
-main_build() {
+main_build() (
     _package_to_build="$1"
+    _certificate_check="$2"
+    _checksum_check="$3"
 
     log_debug "Sourcing $_package_to_build"
 
@@ -470,16 +502,26 @@ main_build() {
     . "$(realpath "$_package_to_build")"
 
     change_directory "$_package_to_build"
-    parse_sources
-    fetch_source
-    verify_checksum_if_needed
+
+    _parsed_sources="$(
+        parse_sources "$package_source"
+    )"
+    _sources_list=$(echo "$_parsed_sources" | cut -d '|' -f1)
+    _checksums_list=$(echo "$_parsed_sources" | cut -d '|' -f2)
+
+    # Downloads all sources and returns a list of the downloaded tarballs
+    _tarball_list="$(
+        fetch_source "$_parsed_sources" "$_certificate_check"
+    )"
+
+    verify_checksum_if_needed "$_tarball_list" "$_checksums_list" "$_checksum_check"
     unpack_source_if_needed
-    move_patches_if_needed
-    compile_source
+    move_patches_if_needed "$_package_to_build"
+    compile_source "$_package_to_build"
     build_package
     echo "Successful!"
     cd "$pwd" || true
-}
+)
 
 main_uninstall() {
     _package_to_uninstall="$1"
