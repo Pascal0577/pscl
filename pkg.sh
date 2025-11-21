@@ -66,8 +66,7 @@ parse_arguments() {
                         done
                         shift
                         for arg in "$@"; do
-                            [ -f "$arg" ] && arguments="$arguments $arg"
-                            [ -d "$arg" ] && arguments="$arguments $arg/$(basename "$arg").build"
+                            arguments="$arguments $(get_package_name "$arg")"
                         done
                         return 0 ;;
                     I)
@@ -87,8 +86,7 @@ parse_arguments() {
                         done
                         shift
                         for arg in "$@"; do
-                            [ -f "$arg" ] && arguments="$arguments $arg"
-                            [ -d "$arg" ] && arguments="$arguments $arg/$(basename "$arg").tar.xz"
+                            arguments="$arguments $(get_package_name "$arg")"
                         done
                         return 0 ;;
                     U)
