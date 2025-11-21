@@ -8,6 +8,7 @@ package_source="https://github.com/besser82/libxcrypt/releases/download/v4.4.38/
 source_dir="$package_name-$package_version"
 
 configure() {
+    cd "$source_dir" || log_error "In $package_name.build: Failed to cd to $source_dir"
     ./configure --prefix=/usr                \
             --enable-hashes=strong,glibc \
             --enable-obsolete-api=no     \

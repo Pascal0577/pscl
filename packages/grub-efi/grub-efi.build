@@ -8,6 +8,7 @@ package_source="https://ftp.gnu.org/gnu/grub/grub-2.12.tar.xz 60c564b1bdc39d8e43
 source_dir="grub-$package_version"
 
 configure() {
+    cd "$source_dir" || log_error "In $package_name.build: Failed to cd to $source_dir"
     echo depends bli part_gpt > grub-core/extra_deps.lst
     ./configure --prefix=/usr        \
         --sysconfdir=/etc    \

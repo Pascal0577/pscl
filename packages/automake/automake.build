@@ -8,6 +8,7 @@ package_source="https://ftp.gnu.org/gnu/automake/automake-1.18.1.tar.xz cea31dbf
 source_dir="$package_name-$package_version"
 
 configure() {
+    cd "$source_dir" || log_error "In $package_name.build: Failed to cd to $source_dir"
     ./configure --prefix=/usr --docdir=/usr/share/doc/automake-1.18.1
 }
 

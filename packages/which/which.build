@@ -8,6 +8,7 @@ package_source="https://ftp.gnu.org/gnu/which/which-2.23.tar.gz 1963b85914132d78
 source_dir="$package_name-$package_version"
 
 configure() {
+    cd "$source_dir" || log_error "In $package_name.build: Failed to cd to $source_dir"
     ./configure --prefix=/usr
 }
 

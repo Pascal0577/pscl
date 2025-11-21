@@ -8,6 +8,7 @@ package_source="https://ftp.gnu.org/gnu/gettext/gettext-0.26.tar.xz 8e14e926f088
 source_dir="$package_name-$package_version"
 
 configure() {
+    cd "$source_dir" || log_error "In $package_name.build: Failed to cd to $source_dir"
     ./configure --prefix=/usr    \
         --disable-static \
         --docdir=/usr/share/doc/gettext-0.26

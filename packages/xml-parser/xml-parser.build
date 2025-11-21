@@ -8,6 +8,7 @@ package_source="https://cpan.metacpan.org/authors/id/T/TO/TODDR/XML-Parser-2.47.
 source_dir="XML-Parser-$package_version"
 
 configure() {
+    cd "$source_dir" || log_error "In $package_name.build: Failed to cd to $source_dir"
     perl Makefile.PL
 }
 

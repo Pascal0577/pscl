@@ -8,6 +8,7 @@ package_source="https://ftp.gnu.org/gnu/wget/wget-1.25.0.tar.gz c70ba58b36f944e8
 source_dir="wget-1.25.0"
 
 configure() {
+    cd "$source_dir" || log_error "In $package_name.build: Failed to cd to $source_dir"
     ./configure --prefix=/usr      \
                 --sysconfdir=/etc  \
                 --with-ssl=openssl

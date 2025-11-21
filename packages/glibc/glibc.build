@@ -8,6 +8,7 @@ package_source="https://ftp.gnu.org/gnu/glibc/glibc-2.42.tar.xz 23c6f5a27932b435
 source_dir="glibc-2.42"
 
 configure() {
+    cd "$source_dir" || log_error "In $package_name.build: Failed to cd to $source_dir"
     patch -Np1 -i ./glibc-2.42-fhs-1.patch
 
     sed -e '/unistd.h/i #include <string.h>' \

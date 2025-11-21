@@ -8,6 +8,7 @@ package_source="https://github.com/facebook/zstd/releases/download/v1.5.7/zstd-1
 source_dir="$package_name-$package_version"
 
 configure() { :; }
+    cd "$source_dir" || log_error "In $package_name.build: Failed to cd to $source_dir"
 
 build() {
     make prefix=/usr

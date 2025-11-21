@@ -8,6 +8,7 @@ package_source="https://ftp.gnu.org/gnu/groff/groff-1.23.0.tar.gz 5e4f40315a22bb
 source_dir="$package_name-$package_version"
 
 configure() {
+    cd "$source_dir" || log_error "In $package_name.build: Failed to cd to $source_dir"
     PAGE=letter ./configure --prefix=/usr
 }
 

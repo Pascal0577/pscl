@@ -8,6 +8,7 @@ package_source="https://ftp.gnu.org/gnu/dejagnu/dejagnu-1.6.3.tar.gz 68c5208c582
 source_dir="$package_name-$package_version"
 
 configure() {
+    cd "$source_dir" || log_error "In $package_name.build: Failed to cd to $source_dir"
     mkdir build
     cd build || return 1
     ../configure --prefix=/usr

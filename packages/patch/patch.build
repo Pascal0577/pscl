@@ -8,6 +8,7 @@ package_source="https://ftp.gnu.org/gnu/patch/patch-2.8.tar.xz 149327a021d41c8f8
 source_dir="$package_name-$package_version"
 
 configure() {
+    cd "$source_dir" || log_error "In $package_name.build: Failed to cd to $source_dir"
     ./configure --prefix=/usr
 }
 

@@ -8,6 +8,7 @@ package_source="https://ftp.gnu.org/gnu/gperf/gperf-3.3.tar.gz 31753b021ea78a21f
 source_dir="$package_name-$package_version"
 
 configure() {
+    cd "$source_dir" || log_error "In $package_name.build: Failed to cd to $source_dir"
     ./configure --prefix=/usr --docdir=/usr/share/doc/gperf-3.3
 }
 

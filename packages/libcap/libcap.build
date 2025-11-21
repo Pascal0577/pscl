@@ -8,6 +8,7 @@ package_source="https://www.kernel.org/pub/linux/libs/security/linux-privs/libca
 source_dir="$package_name-$package_version"
 
 configure() {
+    cd "$source_dir" || log_error "In $package_name.build: Failed to cd to $source_dir"
     sed -i '/install -m.*STA/d' libcap/Makefile
 }
 

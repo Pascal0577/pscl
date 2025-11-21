@@ -8,6 +8,7 @@ package_source="https://github.com/lfs-book/make-ca/archive/v1.16.1/make-ca-1.16
 source_dir="$package_name-$package_version"
 
 configure() {
+    cd "$source_dir" || log_error "In $package_name.build: Failed to cd to $source_dir"
 	:
 }
 

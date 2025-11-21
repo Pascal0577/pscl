@@ -8,6 +8,7 @@ package_source="https://www.kernel.org/pub/linux/utils/kbd/kbd-2.8.0.tar.xz 24b5
 source_dir="$package_name-$package_version"
 
 configure() {
+    cd "$source_dir" || log_error "In $package_name.build: Failed to cd to $source_dir"
     patch -Np1 -i ../kbd-2.8.0-backspace-1.patch
 
     sed -i '/RESIZECONS_PROGS=/s/yes/no/' configure

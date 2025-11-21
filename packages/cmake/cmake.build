@@ -8,6 +8,7 @@ package_source="https://cmake.org/files/v4.1/cmake-4.1.2.tar.gz 679304270e6e368d
 source_dir="$package_name-$package_version"
 
 configure() {
+    cd "$source_dir" || log_error "In $package_name.build: Failed to cd to $source_dir"
     sed -i '/"lib64"/s/64//' Modules/GNUInstallDirs.cmake &&
 
     ./bootstrap --prefix=/usr        \

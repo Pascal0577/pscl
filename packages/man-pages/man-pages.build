@@ -8,6 +8,7 @@ package_source="https://www.kernel.org/pub/linux/docs/man-pages/man-pages-6.15.t
 source_dir="man-pages-6.15"
 
 configure() {
+    cd "$source_dir" || log_error "In $package_name.build: Failed to cd to $source_dir"
     cd "$source_dir"
     rm  man3/crypt*
 }

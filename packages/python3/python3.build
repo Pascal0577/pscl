@@ -8,6 +8,7 @@ package_source="https://www.python.org/ftp/python/3.13.7/Python-3.13.7.tar.xz 25
 source_dir="Python-3.13.7"
 
 configure() {
+    cd "$source_dir" || log_error "In $package_name.build: Failed to cd to $source_dir"
     ./configure --prefix=/usr          \
         --enable-shared        \
         --with-system-expat    \

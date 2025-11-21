@@ -8,6 +8,7 @@ package_source="https://github.com/fastfetch-cli/fastfetch/releases/download/2.5
 source_dir="fastfetch-linux-amd64"
 
 configure() {
+    cd "$source_dir" || log_error "In $package_name.build: Failed to cd to $source_dir"
 	:
 }
 

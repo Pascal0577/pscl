@@ -8,6 +8,7 @@ package_source="https://github.com/linux-pam/linux-pam/releases/download/v1.7.1/
 source_dir="Linux-PAM-$package_version"
 
 configure() {
+    cd "$source_dir" || log_error "In $package_name.build: Failed to cd to $source_dir"
     mkdir build
     cd build
 

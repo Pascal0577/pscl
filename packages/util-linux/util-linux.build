@@ -8,6 +8,7 @@ package_source="https://www.kernel.org/pub/linux/utils/util-linux/v2.41/util-lin
 source_dir="$package_name-$package_version"
 
 configure() {
+    cd "$source_dir" || log_error "In $package_name.build: Failed to cd to $source_dir"
     mkdir -pv "$destdir/var/lib/hwclock"
     ./configure --bindir=/usr/bin     \
         --libdir=/usr/lib     \

@@ -8,6 +8,7 @@ package_source="https://github.com/systemd/systemd/archive/v257.8/systemd-257.8.
 source_dir="$package_name-$package_version"
 
 configure() {
+    cd "$source_dir" || log_error "In $package_name.build: Failed to cd to $source_dir"
     sed -e 's/GROUP="render"/GROUP="video"/' \
         -e 's/GROUP="sgx", //'               \
         -i rules.d/50-udev-default.rules.in

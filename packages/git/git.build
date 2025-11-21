@@ -8,6 +8,7 @@ package_source="https://www.kernel.org/pub/software/scm/git/git-2.51.2.tar.xz 6d
 source_dir="$package_name-$package_version"
 
 configure() {
+    cd "$source_dir" || log_error "In $package_name.build: Failed to cd to $source_dir"
 	./configure --prefix=/usr                   \
 		--with-gitconfig=/etc/gitconfig \
 		--with-python=python3 \

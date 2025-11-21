@@ -8,6 +8,7 @@ package_source="https://github.com/rockdaboot/libpsl/releases/download/0.21.5/li
 source_dir="libpsl-0.21.5"
 
 configure() {
+    cd "$source_dir" || log_error "In $package_name.build: Failed to cd to $source_dir"
     mkdir build
     cd build || true
 

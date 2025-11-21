@@ -8,6 +8,7 @@ package_source="https://github.com/alpinelinux/mkinitfs/archive/refs/tags/3.12.0
 source_dir="$package_name-$package_version"
 
 configure() {
+    cd "$source_dir" || log_error "In $package_name.build: Failed to cd to $source_dir"
     :
 }
 

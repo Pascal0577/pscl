@@ -8,6 +8,7 @@ package_source="https://www.cpan.org/src/5.0/perl-5.42.0.tar.xz 7a6950a9f12d01eb
 source_dir="$package_name-$package_version"
 
 configure() {
+    cd "$source_dir" || log_error "In $package_name.build: Failed to cd to $source_dir"
     export BUILD_ZLIB=False
     export BUILD_BZIP2=0
 

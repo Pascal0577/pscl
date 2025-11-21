@@ -8,6 +8,7 @@ package_source="https://download.savannah.gnu.org/releases/man-db/man-db-2.13.1.
 source_dir="$package_name-$package_version"
 
 configure() {
+    cd "$source_dir" || log_error "In $package_name.build: Failed to cd to $source_dir"
     ./configure --prefix=/usr                         \
         --docdir=/usr/share/doc/man-db-2.13.1 \
         --sysconfdir=/etc                     \

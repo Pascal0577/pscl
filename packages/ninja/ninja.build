@@ -8,6 +8,7 @@ package_source="https://github.com/ninja-build/ninja/archive/v1.12.1/ninja-1.12.
 source_dir="$package_name-$package_version"
 
 configure() {
+    cd "$source_dir" || log_error "In $package_name.build: Failed to cd to $source_dir"
     sed -i '/int Guess/a \
         int   j = 0;\
         char* jobs = getenv( "NINJAJOBS" );\

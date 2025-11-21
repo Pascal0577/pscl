@@ -8,6 +8,7 @@ package_source="https://github.com/vim/vim/archive/v9.1.1629/vim-9.1.1629.tar.gz
 source_dir="$package_name-$package_version"
 
 configure() {
+    cd "$source_dir" || log_error "In $package_name.build: Failed to cd to $source_dir"
     echo '#define SYS_VIMRC_FILE "/etc/vimrc"' >> src/feature.h
     ./configure --prefix=/usr
 }

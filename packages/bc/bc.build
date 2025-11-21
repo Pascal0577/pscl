@@ -8,6 +8,7 @@ package_source="https://github.com/gavinhoward/bc/releases/download/7.0.3/bc-7.0
 source_dir="$package_name-$package_version"
 
 configure() {
+    cd "$source_dir" || log_error "In $package_name.build: Failed to cd to $source_dir"
     CC='gcc -std=c99' ./configure --prefix=/usr -G -O3 -r
 }
 

@@ -8,6 +8,7 @@ package_source="https://ftp.gnu.org/gnu/gmp/gmp-6.3.0.tar.xz 956dc04e864001a9c22
 source_dir="$package_name-$package_version"
 
 configure() {
+    cd "$source_dir" || log_error "In $package_name.build: Failed to cd to $source_dir"
     # Compatibility with GCC 15 and later
     sed -i '/long long t1;/,+1s/()/(...)/' configure
 

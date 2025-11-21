@@ -8,6 +8,7 @@ package_source="https://ftp.gnu.org/gnu/cpio/cpio-2.15.tar.bz2 3394d444ca1905ea5
 source_dir="$package_name-$package_version"
 
 configure() {
+    cd "$source_dir" || log_error "In $package_name.build: Failed to cd to $source_dir"
     sed -e "/^extern int (\*xstat)/s/()/(const char * restrict, struct stat * restrict)/" -i src/extern.h
     sed -e "/^int (\*xstat)/s/()/(const char * restrict,  struct stat * restrict)/" -i src/global.c
     ./configure --prefix=/usr \

@@ -8,6 +8,7 @@ package_source="https://github.com/mesonbuild/meson/releases/download/1.8.3/meso
 source_dir="$package_name-$package_version"
 
 configure() {
+    cd "$source_dir" || log_error "In $package_name.build: Failed to cd to $source_dir"
     :
 }
 

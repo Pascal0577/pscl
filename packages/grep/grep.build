@@ -8,6 +8,7 @@ package_source="https://ftp.gnu.org/gnu/grep/grep-3.12.tar.xz 5d9301ed9d209c4a88
 source_dir="$package_name-$package_version"
 
 configure() {
+    cd "$source_dir" || log_error "In $package_name.build: Failed to cd to $source_dir"
     sed -i "s/echo/#echo/" src/egrep.sh
     ./configure --prefix=/usr
 }

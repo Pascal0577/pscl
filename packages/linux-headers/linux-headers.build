@@ -8,6 +8,7 @@ package_source="https://www.kernel.org/pub/linux/kernel/v6.x/linux-6.16.1.tar.xz
 source_dir="linux-$package_version"
 
 configure() {
+    cd "$source_dir" || log_error "In $package_name.build: Failed to cd to $source_dir"
     make mrproper
 }
 

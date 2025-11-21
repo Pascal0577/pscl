@@ -8,6 +8,7 @@ package_source="https://www.iana.org/time-zones/repository/releases/tzdata2025b.
 source_dir="tzdata2025b"
 
 configure() {
+    cd "$source_dir" || log_error "In $package_name.build: Failed to cd to $source_dir"
     :
 }
 

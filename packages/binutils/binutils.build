@@ -8,6 +8,7 @@ package_source="https://sourceware.org/pub/binutils/releases/binutils-2.45.tar.x
 source_dir="$package_name-$package_version"
 
 configure() {
+    cd "$source_dir" || log_error "In $package_name.build: Failed to cd to $source_dir"
     mkdir build
     cd build || return 1
 

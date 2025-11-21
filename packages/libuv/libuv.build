@@ -8,6 +8,7 @@ package_source="https://dist.libuv.org/dist/v1.51.0/libuv-v1.51.0.tar.gz 5e0109e
 source_dir="$package_name-v$package_version"
 
 configure() {
+    cd "$source_dir" || log_error "In $package_name.build: Failed to cd to $source_dir"
 	sh autogen.sh
 	./configure --prefix=/usr --disable-static
 }

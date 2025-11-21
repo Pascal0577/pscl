@@ -8,6 +8,7 @@ package_source="https://pagure.io/libaio/archive/libaio-0.3.113/libaio-0.3.113.t
 source_dir="$package_name-$package_version"
 
 configure() {
+    cd "$source_dir" || log_error "In $package_name.build: Failed to cd to $source_dir"
     sed -i '/install.*libaio.a/s/^/#/' src/Makefile
 }
 

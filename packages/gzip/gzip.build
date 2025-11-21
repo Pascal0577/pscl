@@ -8,6 +8,7 @@ package_source="https://ftp.gnu.org/gnu/gzip/gzip-1.14.tar.xz 4bf5a10f287501ee8e
 source_dir="$package_name-$package_version"
 
 configure() {
+    cd "$source_dir" || log_error "In $package_name.build: Failed to cd to $source_dir"
     ./configure --prefix=/usr
 }
 

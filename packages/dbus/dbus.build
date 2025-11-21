@@ -8,6 +8,7 @@ package_source="https://dbus.freedesktop.org/releases/dbus/dbus-1.16.2.tar.xz 97
 source_dir="$package_name-$package_version"
 
 configure() {
+    cd "$source_dir" || log_error "In $package_name.build: Failed to cd to $source_dir"
     mkdir build
     cd build || true
 

@@ -8,6 +8,7 @@ package_source="https://download.savannah.gnu.org/releases/attr/attr-2.5.2.tar.g
 source_dir="$package_name-$package_version"
 
 configure() {
+    cd "$source_dir" || log_error "In $package_name.build: Failed to cd to $source_dir"
     ./configure --prefix=/usr     \
             --disable-static  \
             --sysconfdir=/etc \

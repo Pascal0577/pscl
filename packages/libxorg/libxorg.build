@@ -42,6 +42,7 @@ $url/libXpresent-1.0.1.tar.xz bdd3ec17c6181fd7b26f6775886c730d
 package_dependencies="libxcb fontconfig dbus"
 
 configure() {
+    cd "$source_dir" || log_error "In $package_name.build: Failed to cd to $source_dir"
     for dir in *; do
         dir="${dir%/}"
         [ -d "$dir" ] || continue

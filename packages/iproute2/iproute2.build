@@ -8,6 +8,7 @@ package_source="https://www.kernel.org/pub/linux/utils/net/iproute2/iproute2-6.1
 source_dir="$package_name-$package_version"
 
 configure() {
+    cd "$source_dir" || log_error "In $package_name.build: Failed to cd to $source_dir"
     sed -i /ARPD/d Makefile
     rm -fv man/man8/arpd.8
 }

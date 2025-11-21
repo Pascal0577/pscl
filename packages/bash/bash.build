@@ -8,6 +8,7 @@ package_source="https://ftp.gnu.org/gnu/bash/bash-5.3.tar.gz 977c8c0c5ae6309191e
 source_dir="$package_name-$package_version"
 
 configure() {
+    cd "$source_dir" || log_error "In $package_name.build: Failed to cd to $source_dir"
     ./configure --prefix=/usr             \
         --without-bash-malloc     \
         --with-installed-readline \

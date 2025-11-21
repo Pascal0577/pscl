@@ -8,6 +8,7 @@ package_source="https://ftp.gnu.org/gnu/readline/readline-8.3.tar.gz 25a73bfb2a3
 source_dir="$package_name-$package_version"
 
 configure() {
+    cd "$source_dir" || log_error "In $package_name.build: Failed to cd to $source_dir"
     # Avoids a linking bug in ldconfig
     sed -i '/MV.*old/d' Makefile.in
     sed -i '/{OLDSUFF}/c:' support/shlib-install
