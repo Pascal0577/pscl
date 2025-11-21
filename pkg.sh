@@ -220,6 +220,7 @@ list_of_dependencies() {
         fi
     done
 
+    log_debug "In list_of_dependencies: Dependencies for $_package are: $_dependency_list"
     echo "$_dependency_list"
 }
 
@@ -231,9 +232,11 @@ get_dependency_graph() {
     fi
     
     if string_is_in_list "$_node" "$RESOLVED_SET"; then
+        log_debug "In get_dependency_graph: $_node has been resolved. Skipping"
         return 0
     fi
     
+    log_debug "In get_dependency_graph: visiting $_node"
     VISITING_SET="$VISITING_SET $_node"
     
     for child in $(list_of_dependencies "$_node"); do
@@ -243,6 +246,7 @@ get_dependency_graph() {
     # remove node from visiting_set
     VISITING_SET="$(remove_string_from_list "$_node" "$VISITING_SET")"
     
+    log_debug "In get_dependency_graph: Added $_node to build order"
     RESOLVED_SET="$RESOLVED_SET $_node"
     BUILD_ORDER="$BUILD_ORDER $_node"
 }
@@ -545,7 +549,7 @@ main() {
         done
         for package_name in $BUILD_ORDER; do
             log_debug "In main: build order is: $BUILD_ORDER"
-            _build_file="$(find_package_build $package_name)"
+            _build_file="$(find_package_build "$package_name")"
             main_build "$_build_file"
         done && exit 0
     fi
