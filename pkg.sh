@@ -134,9 +134,12 @@ parse_arguments() {
 
 change_directory() {
     # Change directory to where the package is
-    package_directory="$(realpath "$(dirname "$1")")"
-    log_debug "In change_directory: Changing directory: $package_directory"
-    cd "$package_directory" || log_error "In unpack_source: Failed to change directory: $package_directory"
+    for repo in $repository_list; do
+        package_directory="$(realpath "$(dirname "$repo/$1")")"
+        [ -d "$package_directory" ] || continue
+        log_debug "In change_directory: Changing directory: $package_directory"
+        cd "$package_directory" || log_error "In unpack_source: Failed to change directory: $package_directory"
+    done
 }
 
 # Check if a package is already installed
