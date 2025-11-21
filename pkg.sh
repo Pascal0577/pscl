@@ -560,7 +560,7 @@ main() {
             _pkg_name="$(basename "$(dirname "$arg")")"
             if [ "$resolve_dependencies" = 1 ]; then
                 result=$(get_dependency_graph "$_pkg_name" "" "" "")
-                BUILD_ORDER=$(echo "$result"   | cut -d '|' -f3)
+                BUILD_ORDER=$(echo "$result" | cut -d '|' -f3)
             else
                 BUILD_ORDER="$BUILD_ORDER $_pkg_name"
             fi
@@ -570,7 +570,7 @@ main() {
             _build_dir="$(find_package_dir "$package_name")"
             _build_file="$(find_package_dir "$package_name").build"
             _built_package="$(find_package_dir "$package_name").tar.xz"
-            [ ! -f "$_built_package" ] && main_build "$_build_file"
+            if [ ! -f "$_built_package" ]; then main_build "$_build_file"; else continue; fi
         done && exit 0
     fi
 
