@@ -515,6 +515,7 @@ main() {
             fi
         done
         for package in $BUILD_ORDER; do
+            log_debug "In main: build order is: $BUILD_ORDER"
             main_install "$package"
         done && exit 0
     fi
@@ -528,6 +529,7 @@ main() {
             fi
         done
         for package in $BUILD_ORDER; do
+            log_debug "In main: build order is: $BUILD_ORDER"
             main_build "$package"
         done && exit 0
     fi
