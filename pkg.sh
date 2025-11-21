@@ -531,6 +531,7 @@ main() {
             _built_package="$_package_dir/$package_name.tar.xz"
 
             if is_installed "$package_name" && [ "$install_force" = 0 ]; then
+                log_warn "$package_name is already installed. Set -If to force install it"
                 continue
             elif [ -e "$_built_package" ]; then
                 log_debug "In main: installing $_built_package"
