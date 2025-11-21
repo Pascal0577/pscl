@@ -542,9 +542,10 @@ main() {
         for arg in $arguments; do
             _pkg_name="$(basename "$(dirname "$arg")")"
             if [ "$resolve_dependencies" = 1 ]; then
-                get_dependency_graph "$arg"
+                result=$(get_dependency_graph "$_pkg_name" "" "" "")
+                BUILD_ORDER=$(echo "$result" | cut -d '|' -f3)
             else
-                BUILD_ORDER="$BUILD_ORDER $arg"
+                BUILD_ORDER="$BUILD_ORDER $_pkg_name"
             fi
         done
         for package_name in $BUILD_ORDER; do
