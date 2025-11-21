@@ -548,6 +548,7 @@ main() {
                 BUILD_ORDER="$BUILD_ORDER $_pkg_name"
             fi
         done
+
         for package_name in $BUILD_ORDER; do
             log_debug "In main: build order is: $BUILD_ORDER"
 
@@ -555,7 +556,7 @@ main() {
             _build_file="$_build_dir/$package_name.build"
             _built_package="$_build_dir/$(find_package_dir "$package_name")/$package_name.tar.xz"
 
-            log_debug "In main: $_built_package"
+            log_debug "In main: Build dir is: $_build_dir"
             if [ -f "$_built_package" ]; then
                 log_debug "In main: installing $_built_package"
                 main_install "$_built_package"
