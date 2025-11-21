@@ -238,9 +238,12 @@ get_dependency_graph() {
     
     log_debug "In get_dependency_graph: visiting $_node"
     VISITING_SET="$VISITING_SET $_node"
+
+    _deps="$(list_of_dependencies "$_node")"
+    log_debug "In get_dependency_graph: Dependencies of $_node are: [$_deps]"
     
     for child in $(list_of_dependencies "$_node"); do
-        get_dependency_graph $child
+        get_dependency_graph "$child"
     done
     
     # remove node from visiting_set
