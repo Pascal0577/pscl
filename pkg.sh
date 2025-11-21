@@ -225,36 +225,42 @@ list_of_dependencies() {
 }
 
 get_dependency_graph() {
-    local _node="$1"
-    log_debug "In get_dependency_graph: Current node is: $_node"
-    # Error if there's a circular dependency
-    if string_is_in_list "$_node" "$VISITING_SET"; then
-        log_error "In get_dependency_graph: Circular dependency detected involving: $_node"
+    node=$1
+    visiting=$2
+    resolved=$3
+    order=$4
+
+    # Circular dependency
+    if string_is_in_list "$node" "$visiting"; then
+        log_error "Circular dependency involving: $node"
     fi
 
-    if string_is_in_list "$_node" "$RESOLVED_SET"; then
-        log_debug "In get_dependency_graph: $_node has been resolved. Skipping"
+    # Already resolved?
+    if string_is_in_list "$node" "$resolved"; then
+        echo "$visiting|$resolved|$order"
         return 0
     fi
 
-    log_debug "In get_dependency_graph: visiting $_node"
-    VISITING_SET="$VISITING_SET $_node"
+    # Mark node as visiting
+    visiting="$visiting $node"
 
-    _deps="$(list_of_dependencies "$_node")"
-    log_debug "In get_dependency_graph: Dependencies of $_node are: [$_deps]"
+    # Get dependencies
+    deps=$(list_of_dependencies "$node")
 
-    # ew... recursuion...
-    [ -n "$_deps" ] && for child in $_deps; do
-        get_dependency_graph "$child"
+    # Recurse through each child
+    for child in $deps; do
+        result=$(get_dependency_graph "$child" "$visiting" "$resolved" "$order") || return 1
+        visiting=$(echo "$result" | cut -d '|' -f1)
+        resolved=$(echo "$result" | cut -d '|' -f2)
+        order=$(echo "$result"   | cut -d '|' -f3)
     done
 
-    # remove node from visiting_set
-    VISITING_SET="$(remove_string_from_list "$_node" "$VISITING_SET")"
+    # Move node from visiting → resolved
+    visiting=$(remove_string_from_list "$node" "$visiting")
+    resolved="$resolved $node"
+    order="$order $node"
 
-    log_debug "In get_dependency_graph: Added $_node to build order"
-    log_debug "In get_dependency_graph: RESOLVED_SET is: [$RESOLVED_SET]"
-    RESOLVED_SET="$RESOLVED_SET $_node"
-    BUILD_ORDER="$BUILD_ORDER $_node"
+    echo "$visiting|$resolved|$order"
 }
 
 download() {
@@ -548,7 +554,8 @@ main() {
         for arg in $arguments; do
             _pkg_name="$(basename "$(dirname "$arg")")"
             if [ "$resolve_dependencies" = 1 ]; then
-                get_dependency_graph "$_pkg_name"
+                result=$(get_dependency_graph "$_pkg_name" "" "" "")
+                BUILD_ORDER=$(echo "$result"   | cut -d '|' -f3)
             else
                 BUILD_ORDER="$BUILD_ORDER $_pkg_name"
             fi
