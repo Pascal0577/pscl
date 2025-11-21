@@ -158,7 +158,7 @@ cleanup() {
                 [ -d "$repo/$arg" ] && arg_dir="$repo/$arg"
             done
 
-            change_directory "$arg_dir"
+            cd "$arg_dir" || true
 
             # Tarballs, git repos, and patches were downloaded to build dir
             if [ -d ./build/ ]; then
