@@ -220,7 +220,6 @@ list_of_dependencies() {
         fi
     done
 
-    log_debug "In list_of_dependencies: Dependencies for $_package are: $_dependency_list"
     echo "$_dependency_list"
 }
 
