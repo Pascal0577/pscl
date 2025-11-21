@@ -162,12 +162,12 @@ cleanup() {
 
             # Tarballs, git repos, and patches were downloaded to build dir
             if [ -d ./build/ ]; then
-                log_debug "In cleanup: rm -rf $(realpath "$arg/build/")"
+                log_debug "In cleanup: rm -rf $(realpath "build/")"
                 rm -rf ./build/
             fi
 
             if [ -d ./install/ ]; then
-                log_debug "In cleanup: rm -rf $(realpath "$arg/install/")"
+                log_debug "In cleanup: rm -rf $(realpath "install/")"
                 rm -rf ./install/
             fi
 
