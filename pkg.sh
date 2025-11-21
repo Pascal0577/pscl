@@ -15,6 +15,7 @@ create_package=0    # Are we building a package?
 uninstall=0         # Are we uninstalling a package?
 query=0             # Are we querying a package's info?
 cleanup=1           # Whether to cleanup the build directory when building packages
+resolve_dependencies=1
 certificate_check=1 # Whether to perform cert checks when downloading sources
 checksum_check=1    # Whether to download and verify checksums of downloaded tarballs when building
 destdir=""          # Used when building packages
@@ -26,6 +27,12 @@ package_directory=""
 
 sources_list=""
 checksums_list=""
+repository_list="${repository_list:-/sources/package-management/package}"
+
+# These variables are used in the dependency resolution function
+VISITING_SET=""
+RESOLVED_SET=""
+BUILD_ORDER=""
 
 log_error() {
     printf "%b[ERROR]%b: %s\n" "$red" "$default" "$1" >&2
@@ -58,6 +65,7 @@ parse_arguments() {
                             case "$_char" in
                                 k) certificate_check=0 ;;
                                 s) checksum_check=0 ;;
+                                b) resolve_dependencies=0 ;;
                                 c) cleanup=0 ;;
                                 v) verbose=1 ;;
                                 *) log_error "Invalid option for -B: -$_char" ;;
@@ -75,10 +83,8 @@ parse_arguments() {
                             _char="${_flag%"${_flag#?}"}"
                             _flag="${_flag#?}"
                             case "$_char" in
-                                r)
-                                    install_root="$2"
-                                    shift
-                                    ;;
+                                r) install_root="$2"; shift ;;
+                                b) resolve_dependencies=0 ;;
                                 c) cleanup=0 ;;
                                 v) verbose=1 ;;
                                 *) log_error "Invalid option for -I: -$_char" ;;
@@ -96,6 +102,7 @@ parse_arguments() {
                             _char="${_flag%"${_flag#?}"}"
                             _flag="${_flag#?}"
                             case "$_char" in
+                                r) install_root="$2"; shift ;;
                                 v) verbose=1 ;;
                                 *) log_error "Invalid option for -U: -$_char" ;;
                             esac
@@ -134,6 +141,13 @@ change_directory() {
     cd "$package_directory" || log_error "In unpack_source: Failed to change directory: $package_directory"
 }
 
+# Check if a package is already installed
+is_installed() {
+    _pkg_name="$1"
+    [ -d "$install_root/$METADATA_DIR/$_pkg_name" ] && return 0
+    return 1
+}
+
 # Cleanup is extremely important, so it's very verbose
 cleanup() {
     if [ "$cleanup" = 1 ]; then
@@ -157,6 +171,68 @@ cleanup() {
     else
         log_warn "In cleanup: Cleanup called, but was disabled"
     fi
+}
+
+string_is_in_list() {
+    _string="$1"
+    shift
+    _list="${*:-}"
+    for word in $_list; do
+        [ "$_string" = "$word" ] && return 0
+    done
+    return 1
+}
+
+remove_string_from_list() {
+    _string="$1"
+    shift
+    _list="${*:-}"
+    _result=""
+    for word in $_list; do
+        if [ "$word" != "$_string" ]; then
+            _result="$_result $word"
+        fi
+    done
+    # Trim leading space
+    echo "$_result" | sed 's/^ //'
+}
+
+list_of_dependencies() {
+    _package="$(basename "$1")"
+
+    for repo in $repository_list; do
+        if [ -d "$repo/$_package" ]; then
+            _dependency_list="$(grep "package_dependencies=" "$repo/$_package/$_package.build" | \
+                sed 's/package_dependencies=//')"
+            break
+        fi
+    done
+
+    echo "$_dependency_list"
+}
+
+get_dependency_graph() {
+    _node="$1"
+    # Error if there's a circular dependency
+    if string_is_in_list "$_node" "$VISITING_SET"; then
+        log_error "In get_dependency_graph: Circular dependency detected involving: $_node"
+    fi
+    
+    if string_is_in_list "$_node" "$RESOLVED_SET"; then
+        return 0
+    fi
+    
+    VISITING_SET="$VISITING_SET $_node"
+    
+    for child in $(list_of_dependencies "$_node"); do
+        get_dependency_graph "$child"
+    done
+    
+    # remove node from visiting_set
+    VISITING_SET="$(remove_string_from_list "$_node" "$VISITING_SET")"
+    
+    RESOLVED_SET="$RESOLVED_SET $_node"
+    BUILD_ORDER="$BUILD_ORDER $_node"
 }
 
 download() {
@@ -430,10 +506,41 @@ main() {
     [ -z "$arguments" ] && log_error "In main: No arguments were provided"
     log_debug "In main: arguments are: $arguments"
 
-    [ "$install" = 1 ]        && for arg in $arguments; do main_install   "$arg"; done && exit 0
-    [ "$uninstall" = 1 ]      && for arg in $arguments; do main_uninstall "$arg"; done && exit 0
-    [ "$create_package" = 1 ] && for arg in $arguments; do main_build     "$arg"; done && exit 0
-    [ "$query" = 1 ]          && for arg in $arguments; do main_query     "$arg"; done && exit 0
+    if [ "$install" = 1 ]; then
+        for arg in $arguments; do
+            if [ "$resolve_dependencies" = 1 ]; then
+                get_dependency_graph "$arg"
+            else
+                BUILD_ORDER="$BUILD_ORDER $arg"
+            fi
+        done
+        for package in $BUILD_ORDER; do
+            main_install "$package"
+        done && exit 0
+    fi
+
+    if [ "$create_package" = 1 ]; then
+        for arg in $arguments; do
+            if [ "$resolve_dependencies" = 1 ]; then
+                get_dependency_graph "$arg"
+            else
+                BUILD_ORDER="$BUILD_ORDER $arg"
+            fi
+        done
+        for package in $BUILD_ORDER; do
+            main_build "$package"
+        done && exit 0
+    fi
+
+    if [ "$uninstall" = 1 ]; then
+        for arg in $arguments; do
+            main_uninstall "$arg"
+        done && exit 0
+    fi
+
+    [ "$query" = 1 ] && for arg in $arguments; do
+        main_query "$arg"
+    done && exit 0
 }
 
 main "$@"
