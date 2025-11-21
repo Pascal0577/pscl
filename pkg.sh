@@ -135,8 +135,7 @@ parse_arguments() {
 change_directory() {
     # Change directory to where the package is
     for repo in $repository_list; do
-        package_directory="$(realpath "$(dirname "$repo/$1")")"
-        [ -d "$package_directory" ] || continue
+        package_directory="$(realpath "$(dirname "$1")")"
         log_debug "In change_directory: Changing directory: $package_directory"
         cd "$package_directory" || log_error "In unpack_source: Failed to change directory: $package_directory"
     done
@@ -153,8 +152,10 @@ is_installed() {
 cleanup() {
     if [ "$cleanup" = 1 ]; then
         for arg in $BUILD_ORDER; do
-            cd "$pwd" || true
             log_debug "In cleanup: Running cleanup"
+            for repo in $repository_list; do
+                [ -d "$repo/$arg" ] && arg="$repo/$arg"
+            done
             change_directory "$arg"
 
             log_debug "In cleanup: rm -rf $(realpath ./build/)"
