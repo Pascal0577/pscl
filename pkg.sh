@@ -149,16 +149,16 @@ is_installed() {
 # Cleanup is extremely important, so it's very verbose
 cleanup() {
     if [ "$cleanup" = 1 ]; then
-        for arg in $arguments; do
+        for arg in $BUILD_ORDER; do
             cd "$pwd" || true
             log_debug "In cleanup: Running cleanup"
             change_directory "$arg"
 
-            log_debug "In cleanup: rm -rf ./build/"
+            log_debug "In cleanup: rm -rf $(realpath ./build/)"
             # Tarballs, git repos, and patches were downloaded to build dir
             [ -d ./build/ ] && rm -rf ./build/
 
-            log_debug "In cleanup: rm -rf ./install/"
+            log_debug "In cleanup: rm -rf $(realpath ./install/)"
             [ -d ./install/ ] && rm -rf ./install/
 
             log_debug "In cleanup: cd $pwd"
