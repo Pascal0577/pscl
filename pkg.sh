@@ -216,6 +216,8 @@ list_of_dependencies() {
         if [ -d "$repo/$_package" ]; then
             _dependency_list="$(grep "package_dependencies=" "$repo/$_package/$_package.build" | \
                 sed 's/package_dependencies=//')"
+            _dependency_list="${_dependency_list##\"}"
+            _dependency_list="${_dependency_list%%\"}"
             break
         fi
     done
