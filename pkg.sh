@@ -550,9 +550,12 @@ main() {
         done
         for package_name in $BUILD_ORDER; do
             log_debug "In main: build order is: $BUILD_ORDER"
+
             _build_dir="$(find_package_dir "$package_name")"
             _build_file="$_build_dir/$package_name.build"
             _built_package="$_build_dir/$(find_package_dir "$package_name")/$package_name.tar.xz"
+
+            log_debug "In main: $_built_package"
             if [ -f "$_built_package" ]; then
                 log_debug "In main: installing $_built_package"
                 main_install "$_built_package"
@@ -562,6 +565,7 @@ main() {
             else
                 log_error "In main: No package found."
             fi
+
         done && exit 0
     fi
 
