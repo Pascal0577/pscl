@@ -562,6 +562,7 @@ main() {
             elif [ "$build_to_install" = 1 ]; then
                 log_debug "In main: building: $_build_file"
                 main_build "$_build_file"
+                main_install "$_built_package"
             else
                 log_error "In main: No package found."
             fi
