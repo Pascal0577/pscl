@@ -558,6 +558,7 @@ main() {
 
             log_debug "In main: Build dir is: $_build_dir"
             log_debug "In main: Package name is: $package_name"
+            log_debug "In main: Built package is: $_built_package"
             if [ -e "$_built_package" ]; then
                 log_debug "In main: installing $_built_package"
                 main_install "$_built_package"
