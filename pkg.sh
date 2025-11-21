@@ -571,6 +571,7 @@ main() {
             _build_file="$(find_package_dir "$package_name").build"
             _built_package="$(find_package_dir "$package_name").tar.xz"
             log_debug "In main: Building: $package_name"
+            log_debug "In main: Build file is: $_build_file"
             main_build "$_build_file"
         done && exit 0
     fi
