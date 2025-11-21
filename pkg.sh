@@ -242,7 +242,7 @@ get_dependency_graph() {
     _deps="$(list_of_dependencies "$_node")"
     log_debug "In get_dependency_graph: Dependencies of $_node are: [$_deps]"
     
-    for child in $(list_of_dependencies "$_node"); do
+    [ -n "$_deps" ] && for child in $_deps; do
         get_dependency_graph "$child"
     done
     
