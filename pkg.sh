@@ -16,6 +16,7 @@ uninstall=0         # Are we uninstalling a package?
 query=0             # Are we querying a package's info?
 cleanup=1           # Whether to cleanup the build directory when building packages
 resolve_dependencies=1
+build_to_install=0
 certificate_check=1 # Whether to perform cert checks when downloading sources
 checksum_check=1    # Whether to download and verify checksums of downloaded tarballs when building
 destdir=""          # Used when building packages
@@ -63,7 +64,7 @@ parse_arguments() {
                             case "$_char" in
                                 k) certificate_check=0 ;;
                                 s) checksum_check=0 ;;
-                                b) resolve_dependencies=0 ;;
+                                d) resolve_dependencies=0 ;;
                                 c) cleanup=0 ;;
                                 v) verbose=1 ;;
                                 *) log_error "Invalid option for -B: -$_char" ;;
@@ -82,7 +83,8 @@ parse_arguments() {
                             _flag="${_flag#?}"
                             case "$_char" in
                                 r) install_root="$2"; shift ;;
-                                b) resolve_dependencies=0 ;;
+                                b) build_to_install=1 ;;
+                                d) resolve_dependencies=0 ;;
                                 c) cleanup=0 ;;
                                 v) verbose=1 ;;
                                 *) log_error "Invalid option for -I: -$_char" ;;
@@ -547,10 +549,17 @@ main() {
         done
         for package_name in $BUILD_ORDER; do
             log_debug "In main: build order is: $BUILD_ORDER"
-            _build_file="$(find_package_dir "$package_name")/$package_name.build"
-            _built_package="$(find_package_dir "$package_name")/$package_name.tar.xz"
+            _build_dir="$(find_package_dir "$package_name")"
+            _build_file="$_build_dir/$package_name.build"
+            _built_package="$_build_dir/$(find_package_dir "$package_name")/$package_name.tar.xz"
             if [ -f "$_built_package" ]; then
+                log_debug "In main: installing $_built_package"
                 main_install "$_built_package"
+            elif [ "$build_to_install" = 1 ]; then
+                log_debug "In main: building: $_build_file"
+                main_build "$_build_file"
+            else
+                log_error "In main: No package found."
             fi
         done && exit 0
     fi
@@ -568,8 +577,8 @@ main() {
         for package_name in $BUILD_ORDER; do
             log_debug "In main: build order is: $BUILD_ORDER"
             _build_dir="$(find_package_dir "$package_name")"
-            _build_file="$(find_package_dir "$package_name")/$package_name.build"
-            _built_package="$(find_package_dir "$package_name")/$package_name.tar.xz"
+            _build_file="$_build_dir/$package_name.build"
+            _built_package="$_build_dir/$package_name.tar.xz"
             if [ ! -f "$_built_package" ]; then
                 log_debug "In main: Building: $package_name"
                 log_debug "In main: Build file is: $_build_file"
