@@ -319,8 +319,8 @@ parse_sources() {
 
 # Fetches all of the listed sources using the download function
 fetch_source() {
-    log_debug "In fetch_source: Creating build directory"
-    [ -d ./build ] && log_error "In fetch_source: build directory already exists. Please remove it"
+    log_debug "In fetch_source: Creating build directory: $PWD/build"
+    [ -d ./build ] && log_error "In fetch_source: build directory already exists: $PWD/build"
 
     mkdir ./build
     cd ./build || true
