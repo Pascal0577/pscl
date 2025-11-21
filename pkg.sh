@@ -152,7 +152,7 @@ is_installed() {
 find_package_dir() {
     _pkg="$1"
     for repo in $repository_list; do
-        if [ -f "$repo/$_pkg/" ]; then
+        if [ -d "$repo/$_pkg/" ]; then
             echo "$repo/$_pkg/"
             return 0
         fi
