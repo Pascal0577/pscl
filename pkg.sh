@@ -197,6 +197,17 @@ remove_string_from_list() {
     echo "$_result" | sed 's/^ //'
 }
 
+find_package_build() {
+    _pkg="$1"
+    for repo in $repository_list; do
+        if [ -f "$repo/$_pkg/$_pkg.build" ]; then
+            echo "$repo/$_pkg/$_pkg.build"
+            return 0
+        fi
+    done
+    log_error "In find_package_build: Could not find build file for: $_pkg"
+}
+
 list_of_dependencies() {
     _package="$(basename "$1")"
 
@@ -508,29 +519,33 @@ main() {
 
     if [ "$install" = 1 ]; then
         for arg in $arguments; do
+            _pkg_name="$(basename "$(dirname "$arg")")"
             if [ "$resolve_dependencies" = 1 ]; then
                 get_dependency_graph "$arg"
             else
                 BUILD_ORDER="$BUILD_ORDER $arg"
             fi
         done
-        for package in $BUILD_ORDER; do
+        for package_name in $BUILD_ORDER; do
             log_debug "In main: build order is: $BUILD_ORDER"
-            main_install "$package"
+            _build_file="$(find_package_build "$package_name")"
+            main_install "$_build_file"
         done && exit 0
     fi
 
     if [ "$create_package" = 1 ]; then
         for arg in $arguments; do
+            _pkg_name="$(basename "$(dirname "$arg")")"
             if [ "$resolve_dependencies" = 1 ]; then
-                get_dependency_graph "$arg"
+                get_dependency_graph "$_pkg_name"
             else
-                BUILD_ORDER="$BUILD_ORDER $arg"
+                BUILD_ORDER="$BUILD_ORDER $_pkg_name"
             fi
         done
-        for package in $BUILD_ORDER; do
+        for package_name in $BUILD_ORDER; do
             log_debug "In main: build order is: $BUILD_ORDER"
-            main_build "$package"
+            _build_file="$(find_package_build "$package_name")"
+            main_build "$_build_file"
         done && exit 0
     fi
 
