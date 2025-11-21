@@ -154,15 +154,15 @@ cleanup() {
         for arg in $BUILD_ORDER; do
             log_debug "In cleanup: Running cleanup"
             for repo in $repository_list; do
-                [ -d "$repo/$arg" ] && arg="$repo/$arg"
+                [ -d "$repo/$arg" ] && arg_dir="$repo/$arg"
             done
-            change_directory "$arg"
+            change_directory "$arg_dir"
 
-            log_debug "In cleanup: rm -rf $(realpath ./build/)"
+            log_debug "In cleanup: rm -rf $(realpath "./$arg/build/")"
             # Tarballs, git repos, and patches were downloaded to build dir
             [ -d ./build/ ] && rm -rf ./build/
 
-            log_debug "In cleanup: rm -rf $(realpath ./install/)"
+            log_debug "In cleanup: rm -rf $(realpath "./$arg/install/")"
             [ -d ./install/ ] && rm -rf ./install/
 
             log_debug "In cleanup: cd $pwd"
