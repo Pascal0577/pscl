@@ -239,7 +239,7 @@ get_dependency_graph() {
     VISITING_SET="$VISITING_SET $_node"
     
     for child in $(list_of_dependencies "$_node"); do
-        get_dependency_graph "$child"
+        get_dependency_graph $child
     done
     
     # remove node from visiting_set
