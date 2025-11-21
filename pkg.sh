@@ -230,26 +230,28 @@ get_dependency_graph() {
     if string_is_in_list "$_node" "$VISITING_SET"; then
         log_error "In get_dependency_graph: Circular dependency detected involving: $_node"
     fi
-    
+
     if string_is_in_list "$_node" "$RESOLVED_SET"; then
         log_debug "In get_dependency_graph: $_node has been resolved. Skipping"
         return 0
     fi
-    
+
     log_debug "In get_dependency_graph: visiting $_node"
     VISITING_SET="$VISITING_SET $_node"
 
     _deps="$(list_of_dependencies "$_node")"
     log_debug "In get_dependency_graph: Dependencies of $_node are: [$_deps]"
-    
+
+    # ew... recursuion...
     [ -n "$_deps" ] && for child in $_deps; do
         get_dependency_graph "$child"
     done
-    
+
     # remove node from visiting_set
     VISITING_SET="$(remove_string_from_list "$_node" "$VISITING_SET")"
-    
+
     log_debug "In get_dependency_graph: Added $_node to build order"
+    log_debug "In get_dependency_graph: RESOLVED_SET is: [$RESOLVED_SET]"
     RESOLVED_SET="$RESOLVED_SET $_node"
     BUILD_ORDER="$BUILD_ORDER $_node"
 }
