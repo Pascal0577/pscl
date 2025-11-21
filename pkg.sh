@@ -29,9 +29,7 @@ sources_list=""
 checksums_list=""
 repository_list="${repository_list:-/sources/package-management/packages}"
 
-# These variables are used in the dependency resolution function
-VISITING_SET=""
-RESOLVED_SET=""
+# Used in dependency resolution
 BUILD_ORDER=""
 
 log_error() {
@@ -44,7 +42,7 @@ log_warn() {
 }
 
 log_debug() {
-    [ "$verbose" = 1 ] && printf "%b[DEBUG]%b: %s\n" "$blue" "$default" "$1"
+    [ "$verbose" = 1 ] && printf "%b[DEBUG]%b: %s\n" "$blue" "$default" "$1" >&2
 }
 
 parse_arguments() {
@@ -225,42 +223,39 @@ list_of_dependencies() {
 }
 
 get_dependency_graph() {
-    node=$1
-    visiting=$2
-    resolved=$3
-    order=$4
+    _node=$1
+    _visiting=$2
+    _resolved=$3
+    _order=$4
 
-    # Circular dependency
-    if string_is_in_list "$node" "$visiting"; then
-        log_error "Circular dependency involving: $node"
+    # Errors if there's a circular dependency
+    if string_is_in_list "$_node" "$_visiting"; then
+        log_error "Circular dependency involving: $_node"
     fi
 
-    # Already resolved?
-    if string_is_in_list "$node" "$resolved"; then
-        echo "$visiting|$resolved|$order"
+    if string_is_in_list "$_node" "$_resolved"; then
+        echo "$_visiting|$_resolved|$_order"
         return 0
     fi
 
-    # Mark node as visiting
-    visiting="$visiting $node"
+    _visiting="$_visiting $_node"
 
-    # Get dependencies
-    deps=$(list_of_dependencies "$node")
+    _deps=$(list_of_dependencies "$_node")
+    log_debug "In get_dependency_graph: Dependencies for $_node are: $_deps"
 
-    # Recurse through each child
-    for child in $deps; do
-        result=$(get_dependency_graph "$child" "$visiting" "$resolved" "$order") || return 1
-        visiting=$(echo "$result" | cut -d '|' -f1)
-        resolved=$(echo "$result" | cut -d '|' -f2)
-        order=$(echo "$result"   | cut -d '|' -f3)
+    for child in $_deps; do
+        result=$(get_dependency_graph "$child" "$_visiting" "$_resolved" "$_order") || return 1
+        _visiting=$(echo "$result" | cut -d '|' -f1)
+        _resolved=$(echo "$result" | cut -d '|' -f2)
+        _order=$(echo "$result" | cut -d '|' -f3)
     done
 
-    # Move node from visiting → resolved
-    visiting=$(remove_string_from_list "$node" "$visiting")
-    resolved="$resolved $node"
-    order="$order $node"
+    _visiting=$(remove_string_from_list "$_node" "$_visiting")
+    _resolved="$_resolved $_node"
+    _order="$_order $_node"
+    log_debug "In get_dependency_graph: Adding $_node to dependency graph"
 
-    echo "$visiting|$resolved|$order"
+    echo "$_visiting|$_resolved|$_order"
 }
 
 download() {
