@@ -8,26 +8,20 @@ readonly default="\x1b[39m"
 readonly METADATA_DIR="/var/lib/pkg"
 readonly INSTALLED="$METADATA_DIR/installed"
 
-git=0               # Whether we are using a git repo as a source
 verbose=0           # Enable verbose messages
 install=0           # Are we installing a package?
 create_package=0    # Are we building a package?
 uninstall=0         # Are we uninstalling a package?
 query=0             # Are we querying a package's info?
-cleanup=1           # Whether to cleanup the build directory when building packages
+do_cleanup=1           # Whether to cleanup the build directory when building packages
 resolve_dependencies=1
 build_to_install=0
+install_force=0
 certificate_check=1 # Whether to perform cert checks when downloading sources
 checksum_check=1    # Whether to download and verify checksums of downloaded tarballs when building
-destdir=""          # Used when building packages
-download_cmd=""     # Used to download tarball sources later. See download function
 pwd="$PWD"          # Keep track of the directory we ran the command from
 arguments=""        # The argument passed to the script
 install_root=""     # The root of the install. Used for bootstrapping
-package_directory=""
-
-sources_list=""
-checksums_list=""
 repository_list="${repository_list:-/sources/package-management/packages}"
 
 # Used in dependency resolution
@@ -65,7 +59,7 @@ parse_arguments() {
                                 k) certificate_check=0 ;;
                                 s) checksum_check=0 ;;
                                 d) resolve_dependencies=0 ;;
-                                c) cleanup=0 ;;
+                                c) do_cleanup=0 ;;
                                 v) verbose=1 ;;
                                 *) log_error "Invalid option for -B: -$_char" ;;
                             esac
@@ -85,7 +79,8 @@ parse_arguments() {
                                 r) install_root="$2"; shift ;;
                                 b) build_to_install=1 ;;
                                 d) resolve_dependencies=0 ;;
-                                c) cleanup=0 ;;
+                                f) install_force=1 ;;
+                                c) do_cleanup=0 ;;
                                 v) verbose=1 ;;
                                 *) log_error "Invalid option for -I: -$_char" ;;
                             esac
@@ -134,16 +129,6 @@ parse_arguments() {
     done
 }
 
-get_package_dir() (
-    _repository_list="$1"
-    package_directory=""
-    # Change directory to where the package is
-    for repo in $repository_list; do
-        package_directory="$(realpath "$(dirname "$1")")"
-    done
-    echo "$package_directory"
-)
-
 # Check if a package is already installed
 is_installed() (
     _pkg_name="$1"
@@ -151,10 +136,14 @@ is_installed() (
     return 1
 )
 
+get_package_name() ( basename "$1" | sed 's/\.build$//' | sed 's/\.tar.*$//' )
 
-find_package_dir() (
-    _pkg="$1"
-    _repository_list="$2"
+# Returns the directory containing the package's build script
+# Takes in the package to find as the first argument and the list of respositories as the second
+# Package can be either a path to a build script, path to the package directory, or just the package name
+get_package_dir() (
+    _pkg="$(get_package_name "$1")"
+    _pkg="${_pkg%.build}"
 
     for repo in $repository_list; do
         if [ -d "$repo/$_pkg/" ]; then
@@ -163,35 +152,27 @@ find_package_dir() (
         fi
     done
 
-    log_error "In find_package_dir: Could not find build dir for: $_pkg"
+    log_error "In get_package_dir: Could not find build dir for: $_pkg"
 )
 
 # Cleanup is extremely important, so it's very verbose
 cleanup() (
-    _do_cleanup="$1"
-    _list_of_packages="$2"
+    _pkg="$1"
 
-    if [ "$_do_cleanup" = 1 ]; then
+    if [ "$do_cleanup" = 1 ]; then
         log_debug "In cleanup: Running cleanup"
-        for arg in $_list_of_packages; do 
-            cd "$(find_package_dir "$arg" "$repository_list")" || continue
+        cd "$(get_package_dir "$_pkg")" || true
 
-            # Tarballs, git repos, and patches were downloaded to build dir
-            if [ -d ./build/ ]; then
-                log_debug "In cleanup: rm -rf $(realpath "build/")"
-                rm -rf ./build/
-            fi
+        # Tarballs, git repos, and patches were downloaded to build dir
+        if [ -d ./build/ ]; then
+            log_debug "In cleanup: rm -rf $(realpath "build/")"
+            rm -rf ./build/
+        fi
 
-            if [ -d ./install/ ]; then
-                log_debug "In cleanup: rm -rf $(realpath "install/")"
-                rm -rf ./install/
-            fi
-
-            log_debug "In cleanup: cd $pwd"
-            cd "$pwd" || true
-        done
-
-        cleanup=0
+        if [ -d ./install/ ]; then
+            log_debug "In cleanup: rm -rf $(realpath "install/")"
+            rm -rf ./install/
+        fi
     else
         log_warn "In cleanup: Cleanup called, but was disabled"
     fi
@@ -225,9 +206,8 @@ remove_string_from_list() (
 
 list_of_dependencies() (
     _package="$(basename "$1")"
-    _repository_list="$2"
 
-    for repo in $_repository_list; do
+    for repo in $repository_list; do
         if [ -d "$repo/$_package" ]; then
             _dependency_list="$(grep "package_dependencies=" "$repo/$_package/$_package.build" | \
                 sed 's/package_dependencies=//')"
@@ -258,7 +238,7 @@ get_dependency_graph() (
 
     _visiting="$_visiting $_node"
 
-    _deps=$(list_of_dependencies "$_node" "repository_list")
+    _deps=$(list_of_dependencies "$_node")
     log_debug "In get_dependency_graph: Dependencies for $_node are: $_deps"
 
     for child in $_deps; do
@@ -276,122 +256,79 @@ get_dependency_graph() (
     echo "$_visiting|$_resolved|$_order"
 )
 
+get_download_cmd() (
+    _download_cmd=""
+
+    log_debug "In get_download_cmd: Checking for wget, wget2, or curl"
+    for _cmd in wget wget2 curl; do
+        command -v "$_cmd" > /dev/null || continue
+        _download_cmd="$_cmd"
+        log_debug "In get_download_cmd: Using $_download_cmd"
+        break
+    done
+
+    [ -z "$_download_cmd" ] && log_error "In get_download_cmd: no suitable download tools found"
+    [ "$certificate_check" = 0 ] && log_warn "In get_download_cmd: Certificate check disabled"
+
+    case "$_download_cmd" in
+        wget|wget2)
+            [ "$certificate_check" = 0 ] && _download_cmd="$_download_cmd --no-check-certificate" ;;
+        curl)
+            [ "$certificate_check" = 0 ] && _download_cmd="$_download_cmd -k"
+            _download_cmd="$_download_cmd -L -O" ;;
+    esac
+
+    echo "$_download_cmd"
+)
+
 download() (
     _source="$1"
+    _download_cmd="$2"
 
     # If the source is a git repo, then clone it. Otherwise, use the download command
-    case "$1" in
+    case "$_source" in
         *.git)
-            git clone "$1" || return 1 ;;
+            git clone "$_source" || return 1 ;;
         *)
-            # Figure out how to download the sources based on whether wget or curl is installed
-            [ -z "$download_cmd" ] && {
-                log_debug "In download: Checking for wget, wget2, or curl"
-                for _cmd in wget wget2 curl; do
-                    command -v "$_cmd" > /dev/null || continue
-                    download_cmd="$_cmd"
-                    log_debug "In download: Using $download_cmd to download $1"
-                    break
-                done
-
-                [ -z "$download_cmd" ] && log_error "In download: no suitable download tools found"
-                [ "$certificate_check" = 0 ] && log_warn "In download: Certificate check is disabled"
-
-                case "$download_cmd" in
-                    wget|wget2)
-                        [ "$certificate_check" = 0 ] && download_cmd="$download_cmd --no-check-certificate" ;;
-                    curl)
-                        [ "$certificate_check" = 0 ] && download_cmd="$download_cmd -k"
-                        download_cmd="$download_cmd -L -O" ;;
-                esac
-            }
-
             # We specifically do not want a quoted string
-            $download_cmd "$1" || return 1
-            _name_of_downloaded_file="${1##*/}"
+            $_download_cmd "$_source" || return 1
+            _name_of_downloaded_file="${_source##*/}"
             echo "$_name_of_downloaded_file"
     esac
 )
 
-parse_sources() (
-    _unparsed_sources="$1"
-
-    # Read the package source line-by-line 
-    log_debug "In parse_sources: Parsing sources list"
-    while IFS= read -r line; do
-        _source="$(printf '%s\n' "$line" | awk '{print $1}')"
-        _checksum="$(printf '%s\n' "$line" | awk '{print $2}')"
-        sources_list="$sources_list $_source"
-        checksums_list="$checksums_list $_checksum"
-    # THESE ARE INDENTED WITH TAB CHARACTERS FOR BETTER FORMATTING
-    # THESE ARE NOT SPACES
-    done <<- EOF
-	$package_source
-	EOF
-
-    echo "$sources_list|$checksums_list"
-)
-
-# Fetches all of the listed sources using the download function
-fetch_source() (
+prepare_sources() (
     _sources_list="$1"
-    _tarball_list=""
-
-    log_debug "In fetch_source: Creating build directory: $PWD/build"
-    [ -d ./build ] && log_error "In fetch_source: build directory already exists: $PWD/build"
-
-    mkdir ./build
-    cd ./build || true
-
-    log_debug "In fetch_source: Checking if sources were provided"
-    [ -z "$package_source" ] && log_error "In fetch_source: No sources provided"
-
-    for source in $_sources_list; do
-        _name_of_downloaded_file="$(download "$source")"
-        _tarball_list="$_tarball_list $_name_of_downloaded_file"
-    done
-
-    echo "$_tarball_list"
-)
-
-verify_checksum_if_needed() (
-    _tarball_list="$1"
     _checksums_list="$2"
-    _checksum_check="$3"
-
-    # For every tarball, check it against every provided checksum
-    if [ "$_checksum_check" = 1 ]; then
+    
+    _download_cmd="$(get_download_cmd)"
+    [ -z "$_sources_list" ] && log_error "No sources provided"
+    
+    _tarball_list=""
+    for source in $_sources_list; do
+        _tarball="$(download "$source" "$_download_cmd")"
+        _tarball_list="$_tarball_list $_tarball"
+    done
+    
+    # Verify checksums if enabled
+    [ "$checksum_check" = 1 ] && {
         for tarball in $_tarball_list; do
             _md5sum="$(md5sum "$tarball" | awk '{print $1}')"
-            _checksum_verified=0
+            _verified=0
             for checksum in $_checksums_list; do
-                [ "$_md5sum" = "$checksum" ] && {
-                    _checksum_verified=1
-                    log_debug "Checksum verified!"
-                }
+                [ "$_md5sum" = "$checksum" ] && _verified=1 && break
             done
-            [ "$_checksum_verified" = 0 ] && \
-                log_error "In verify_checksum_if_needed: Failed to verify $tarball"
+            [ "$_verified" = 0 ] && log_error "Checksum failed: $tarball"
         done
-    else
-        return 0
-    fi
+    }
+    
+    # Unpack tarballs
+    for tarball in $_tarball_list; do
+        tar -xf "$tarball" || log_error "Failed to unpack: $tarball"
+    done
 )
 
-unpack_source_if_needed() {
-    if [ "$git" = 0 ]; then
-        log_debug "In unpack_source_if_needed: unpacking tarball"
-        
-        for tarball in $tarball_list; do
-            tar -xf "$tarball" || \
-                log_error "In unpack_source_if_needed: Failed to unpack: $tarball"
-        done
-    else
-        return 0
-    fi
-}
-
-move_patches_if_needed() {
+move_patches_if_needed() (
     _package="$1"
     _package_directory="$(get_package_dir "$_package")"
 
@@ -400,37 +337,87 @@ move_patches_if_needed() {
         log_debug "In move_patches_if_needed: Moving $arguments to $_package_directory/build/"
         cp -a "$patch" "$_package_directory/build"
     done
-}
-
-compile_source() (
-    _package="$1"
-    _package_directory="$(get_package_dir "$_package")"
-
-    cd "$_package_directory/build/" || true
-
-    log_debug "In compile_source: Configuring build. Current directory is $PWD"
-    configure || log_error "In compile_source: In $arguments: In configure: "
-
-    log_debug "In compile_source: Building package. Current directory is $PWD"
-    build || log_error "In compile_source: In $arguments: In build: "
 )
 
-install_package() {
-    _package_to_install="$1"
-    _package_to_install="$(basename "$_package_to_install")"
+build_package() (
+    _pkg="$1"
+    _package_directory="$(get_package_dir "$_pkg")"
+    _package_name="$(get_package_name "$_pkg")"
+    _package_version="${package_version:-unknown}"
+
+    log_debug "In build_package: Package directory it $_package_directory"
+    for patch in "$_package_directory"/*.patch; do
+        log_debug "In move_patches_if_needed: Moving $arguments to $_package_directory/build/"
+        cp -a "$patch" "$_package_directory/build"
+    done
+
+    configure || log_error "In compile_source: In $arguments: In configure: "
+    build || log_error "In compile_source: In $arguments: In build: "
+
+    log_debug "In build_package: Building package"
+    mkdir -p "$_package_directory/build/package"
+    export DESTDIR="$(realpath "$_package_directory/build/package")"
+
+    # for compatibility
+    destdir="$DESTDIR"
+
+    log_debug "In build_package: DESTDIR is: $DESTDIR"
+    install_files || log_error "In build_package: In $_pkg: In install_files"
+
+    log_debug "In build_package: Creating metadata"
+    cat > "$DESTDIR/PKGINFO" <<- EOF
+		package_name=$_package_name
+		package_version=${_package_version:-unknown}
+		builddate=$(date +%s)
+		source = $package_source
+	EOF
+
+    find . ! -name '.' ! -name 'PKGFILES' ! -name 'PKGINFO' \
+        \( -type f -o -type l -o -type d \) -printf '%P\n' > PKGFILES
+
+    cd "$DESTDIR" || log_error "In build_package: Failed to change directory: $DESTDIR"
+    tar -Jcpf "$_package_directory/$_package_name.tar.xz" . \
+        || log_error "In build_package: Failed to create tar archive: $_package_name.tar"
+)
+
+main_build() (
+    _package_to_build="$1"
+    _package_dir="$(get_package_dir "$_package_to_build")"
+
+    log_debug "Sourcing $_package_to_build"
+
+    # shellcheck source=/dev/null
+    . "$(realpath "$_package_to_build")"
+
+    mkdir -p "$_package_dir/build"
+    cd "$_package_dir/build" || log_error "In main_build: Failed to change directory: $_package_dir/build"
+
+    _sources_list="$(echo "$package_source" | awk '{print $1}')"
+    _checksums_list="$(echo "$package_source" | awk '{print $2}')"
+
+    prepare_sources "$_sources_list" "$_checksums_list"
+    build_package "$_package_to_build"
+    echo "Successful!"
+)
+
+main_install() (
+    _pkg="$1"
+
+    # Guarantee that no matter the input, _package_to_install always points to a compressed tar archive
+    _package_directory="$(get_package_dir "$_pkg")"
+    _package_name="$(get_package_name "$_pkg")"
+    _package_to_install="$_package_directory/$_package_name.tar.xz"
+
     log_debug "In install_package: Installing package"
-    # cd "$package_directory" || true
-    mkdir -p ./install/
-    cd ./install || true
-    log_debug "In install_package: Extracting: $_package_to_install"
+    mkdir -p "${_package_directory:?}/install"
+    cd "$_package_directory/install" || log_error "In install_package: Failed to change directory: $_package_directory/install"
+
     log_debug "In install_package: Current directory: $PWD"
+    log_debug "In install_package: Extracting: $_package_to_install"
     
-    tar -xpf "../$_package_to_install" || log_error "In install_package: Failed to extract tar archive"
+    tar -xpf "$_package_to_install" || log_error "In install_package: Failed to extract tar archive: $_package_to_install"
 
-    package_name=$(awk -F= '/^package_name/ {print $2}' PKGINFO)
-    package_version=$(awk -F= '/^package_version/ {print $2}' PKGINFO)
-
-    _data_dir="$install_root/$METADATA_DIR/$package_name"
+    _data_dir="$install_root/$METADATA_DIR/$_package_name"
     log_debug "In install_package: data dir is: $_data_dir"
 
     # Create it if it doesn't exist already
@@ -441,8 +428,8 @@ install_package() {
     [ -f ./PKGINFO ]  && mv ./PKGINFO  "$_data_dir"
 
     # Add package name to world file
-    grep -x "$package_name" "$install_root/$INSTALLED" >/dev/null 2>&1 || \
-        echo "$package_name" >> "$install_root/$INSTALLED"
+    grep -x "$_package_name" "$install_root/$INSTALLED" >/dev/null 2>&1 || \
+        echo "$_package_name" >> "$install_root/$INSTALLED"
 
     # Install files
     find . \( -type f -o -type l \) | while IFS= read -r file; do
@@ -459,84 +446,22 @@ install_package() {
         # TODO: If the file is not owned by the package manager, keep it as $target.pkg-new
         mv "$temp_target" "$target"
     done
-}
-
-build_package() {
-    log_debug "In build_package: Building package"
-    mkdir -p "$package_directory/build/package"
-    destdir="$(realpath "$package_directory/build/package")"
-    log_debug "In build_package: DESTDIR is: $destdir"
-    install_files || log_error "In build_package: In $arguments: In install_files"
-    cd "$destdir" || log_error "In build_package: Failed to change directory: $destdir"
-
-    log_debug "In build_package: Creating metadata"
-    cat > "$destdir/PKGINFO" <<- EOF
-		package_name=$package_name
-		package_version=${package_version:-unknown}
-		builddate=$(date +%s)
-		source = $package_source
-	EOF
-
-    find . ! -name '.' ! -name 'PKGFILES' ! -name 'PKGINFO' \
-        \( -type f -o -type l -o -type d \) -printf '%P\n' > PKGFILES
-
-    tar -cpf "../../$package_name.tar" . || log_error "In build_package: Failed to create tar archive: $package_name.tar"
-    xz "../../$package_name.tar" || log_error "In build_package: Failed to compress tar archive: $package_name.tar.xz"
-}
-
-main_install() {
-    change_directory "$1"
-    install_package "$1"
-    echo "Successful!"
-    cd "$pwd" || true
-}
-
-main_build() (
-    _package_to_build="$1"
-    _certificate_check="$2"
-    _checksum_check="$3"
-
-    log_debug "Sourcing $_package_to_build"
-
-    # shellcheck source=/dev/null
-    . "$(realpath "$_package_to_build")"
-
-    change_directory "$_package_to_build"
-
-    _parsed_sources="$(
-        parse_sources "$package_source"
-    )"
-    _sources_list=$(echo "$_parsed_sources" | cut -d '|' -f1)
-    _checksums_list=$(echo "$_parsed_sources" | cut -d '|' -f2)
-
-    # Downloads all sources and returns a list of the downloaded tarballs
-    _tarball_list="$(
-        fetch_source "$_parsed_sources" "$_certificate_check"
-    )"
-
-    verify_checksum_if_needed "$_tarball_list" "$_checksums_list" "$_checksum_check"
-    unpack_source_if_needed
-    move_patches_if_needed "$_package_to_build"
-    compile_source "$_package_to_build"
-    build_package
-    echo "Successful!"
-    cd "$pwd" || true
 )
 
-main_uninstall() {
+main_uninstall() (
     _package_to_uninstall="$1"
 
     log_debug "In main_uninstall: Uninstalling package"
     
-    _found="$install_root/$METADATA_DIR/$_package_to_uninstall"
+    _package_metadata_dir="$install_root/$METADATA_DIR/$_package_to_uninstall"
     
-    [ -z "$_found" ] && log_error "In main_uninstall: Package not found: $_package_to_uninstall"
-    log_debug "In main_uninstall: Found metadata at: $_found"
-    [ -f "$_found/PKGFILES" ] || log_error "In main_uninstall: PKGFILES not found for $_package_to_uninstall"
+    [ -z "$_package_metadata_dir" ] && log_error "In main_uninstall: Package not found: $_package_to_uninstall"
+    log_debug "In main_uninstall: Found metadata at: $_package_metadata_dir"
+    [ -f "$_package_metadata_dir/PKGFILES" ] || log_error "In main_uninstall: PKGFILES not found for $_package_to_uninstall"
     
     # Remove files in reverse order (deepest first)
     log_debug "In main_uninstall: Removing files"
-    sort -r "$_found/PKGFILES" | while IFS= read -r file; do
+    sort -r "$_package_metadata_dir/PKGFILES" | while IFS= read -r file; do
         _full_path="$install_root/$file"
         if [ -f "$_full_path" ]; then
             log_debug "In main_uninstall: Removing file: $_full_path"
@@ -554,24 +479,42 @@ main_uninstall() {
     log_debug "In main_uninstall: Removing package name from world"
     grep -vx "$_package_to_uninstall" "$INSTALLED" > "$INSTALLED.tmp" && mv "$INSTALLED.tmp" "$INSTALLED"
     
-    log_debug "In main_uninstall: Removing metadata: $_found"
-    rm -rf "${_found:?In main_install: _found is unset}"
+    log_debug "In main_uninstall: Removing metadata: $_package_metadata_dir"
+    rm -rf "${_package_metadata_dir:?In main_install: _package_metadata_dir is unset}"
     
     echo "Successfully uninstalled $_package_to_uninstall"
 
-    unset "$_found"
+    unset "$_package_metadata_dir"
 
     cd "$pwd" || true
-}
+)
 
-main_query() {
+main_query() (
     [ "$show_info" = 1 ]   && cat "$install_root/$METADATA_DIR/$1/PKGINFO"
     [ "$list_files" = 1 ]  && cat "$install_root/$METADATA_DIR/$1/PKGFILES"
     [ "$print_world" = 1 ] && cat "$install_root/$INSTALLED"
-}
+)
+
+get_build_order() (
+    _pkgs="$1"
+    _BUILD_ORDER=""
+
+    if [ "$resolve_dependencies" = 0 ]; then
+        log_warn "In get_build_order: Resolution of dependencies is disabled"
+        echo "$_pkgs"
+        return 0
+    fi
+
+    for pkg in $_pkgs; do
+        log_debug "In get_build_order: Resolving dependencies for: $pkg"
+        result=$(get_dependency_graph "$pkg" "" "" "")
+        _BUILD_ORDER="$_BUILD_ORDER $(echo "$result" | cut -d '|' -f3)"
+    done
+
+    echo "$_BUILD_ORDER"
+)
 
 main() {
-    trap cleanup INT TERM EXIT
     log_debug "In main: Parsing arguments"
     parse_arguments "$@"
 
@@ -581,24 +524,17 @@ main() {
     log_debug "In main: arguments are: $arguments"
 
     if [ "$install" = 1 ]; then
-        for arg in $arguments; do
-            _pkg_name="$(basename "$(dirname "$arg")")"
-            if [ "$resolve_dependencies" = 1 ]; then
-                result=$(get_dependency_graph "$_pkg_name" "" "" "")
-                BUILD_ORDER=$(echo "$result" | cut -d '|' -f3)
-            else
-                BUILD_ORDER="$BUILD_ORDER $_pkg_name"
-            fi
-        done
-
+        BUILD_ORDER="$(get_build_order "$arguments")"
         for package_name in $BUILD_ORDER; do
+            trap 'cleanup "$package_name"' INT TERM EXIT
             log_debug "In main: build order is: $BUILD_ORDER"
+            _package_dir="$(get_package_dir "$package_name")"
+            _build_file="$_package_dir/$package_name.build"
+            _built_package="$_package_dir/$package_name.tar.xz"
 
-            _build_dir="$(find_package_dir "$package_name")"
-            _build_file="$_build_dir/$package_name.build"
-            _built_package="$_build_dir/$package_name.tar.xz"
-
-            if [ -e "$_built_package" ]; then
+            if is_installed "$package_name" && [ "$install_force" = 0 ]; then
+                continue
+            elif [ -e "$_built_package" ]; then
                 log_debug "In main: installing $_built_package"
                 main_install "$_built_package"
             elif [ "$build_to_install" = 1 ]; then
@@ -608,28 +544,19 @@ main() {
             else
                 log_error "In main: No package found."
             fi
-
         done && exit 0
     fi
 
     if [ "$create_package" = 1 ]; then
-        for arg in $arguments; do
-            _pkg_name="$(basename "$(dirname "$arg")")"
-            if [ "$resolve_dependencies" = 1 ]; then
-                result=$(get_dependency_graph "$_pkg_name" "" "" "")
-                BUILD_ORDER=$(echo "$result" | cut -d '|' -f3)
-            else
-                BUILD_ORDER="$BUILD_ORDER $_pkg_name"
-            fi
-        done
+        BUILD_ORDER="$(get_build_order "$arguments")"
         for package_name in $BUILD_ORDER; do
+            trap 'cleanup "$package_name"' INT TERM EXIT
             log_debug "In main: build order is: $BUILD_ORDER"
-            _build_dir="$(find_package_dir "$package_name")"
+            _build_dir="$(get_package_dir "$package_name")"
             _build_file="$_build_dir/$package_name.build"
             _built_package="$_build_dir/$package_name.tar.xz"
             if [ ! -e "$_built_package" ]; then
-                log_debug "In main: Building: $package_name"
-                log_debug "In main: Build file is: $_build_file"
+                log_debug "In main: Building: $_build_file"
                 main_build "$_build_file"
             fi
         done && exit 0
