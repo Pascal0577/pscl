@@ -157,7 +157,7 @@ find_package_dir() {
             return 0
         fi
     done
-    log_error "In find_package_build: Could not find build dir for: $_pkg"
+    log_error "In find_package_dir: Could not find build dir for: $_pkg"
 }
 
 # Cleanup is extremely important, so it's very verbose
@@ -567,9 +567,9 @@ main() {
         done
         for package_name in $BUILD_ORDER; do
             log_debug "In main: build order is: $BUILD_ORDER"
-            _build_dir="$(find_package_build "$package_name")"
-            _build_file="$(find_package_build "$package_name").build"
-            _built_package="$(find_package_build "$package_name").tar.xz"
+            _build_dir="$(find_package_dir "$package_name")"
+            _build_file="$(find_package_dir "$package_name").build"
+            _built_package="$(find_package_dir "$package_name").tar.xz"
             [ ! -f "$_built_package" ] && main_build "$_build_file"
         done && exit 0
     fi
