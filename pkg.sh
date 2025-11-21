@@ -370,6 +370,7 @@ unpack_source_if_needed() {
 }
 
 move_patches_if_needed() {
+    log_debug "In move_patches_if_needed: Package directory it $package_directory"
     for patch in "$package_directory"/*.patch; do
         log_debug "In move_patches_if_needed: Moving $arguments to $package_directory/build/"
         cp -a "$patch" "$package_directory/build"

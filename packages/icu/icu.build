@@ -6,7 +6,7 @@ package_description="A mature, widely used set of C/C++ libraries providing Unic
 package_source="https://github.com/unicode-org/icu/releases/download/release-77-1/icu4c-77_1-src.tgz bc0132b4c43db8455d2446c3bae58898"
 package_dependencies=""
 
-source_dir="$package_name-$package_version"
+source_dir="icu"
 
 configure() {
     cd "$source_dir" || log_error "In $package_name.build: Failed to cd to $source_dir"
