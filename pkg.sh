@@ -200,6 +200,7 @@ remove_string_from_list() {
 find_package_build() {
     _pkg="$1"
     for repo in $repository_list; do
+        log_debug "In find_package_build: checking $repo/$_pkg/$_pkg.build"
         if [ -f "$repo/$_pkg/$_pkg.build" ]; then
             echo "$repo/$_pkg/$_pkg.build"
             return 0
