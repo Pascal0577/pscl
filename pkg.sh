@@ -13,6 +13,7 @@ readonly METADATA_DIR="/var/lib/pkg"
 readonly INSTALLED="$METADATA_DIR/installed"
 readonly REPOSITORY_LIST="${REPOSITORY_LIST:-/sources/package-management/packages}"
 readonly LOCKFILE="/var/run/pkg.lock"
+readonly CACHE_DIR="/var/cache/pkg"
 
 verbose=0           # Enable verbose messages
 install=0           # Are we installing a package?
@@ -262,6 +263,7 @@ get_dependency_graph() (
 )
 
 get_download_cmd() (
+    _download_prefix="$1"
     _download_cmd=""
 
     log_debug "In get_download_cmd: Checking for wget, wget2, or curl"
@@ -277,9 +279,11 @@ get_download_cmd() (
 
     case "$_download_cmd" in
         wget|wget2)
+            _download_cmd="$_download_cmd -P $_download_prefix"
             [ "$verbose" = 0 ] && _download_cmd="$_download_cmd -q --show-progress"
             [ "$certificate_check" = 0 ] && _download_cmd="$_download_cmd --no-check-certificate" ;;
         curl)
+            # Fix curl later, it's a pain in the ass to work with
             [ "$certificate_check" = 0 ] && _download_cmd="$_download_cmd -k"
             _download_cmd="$_download_cmd -L -O" ;;
     esac
@@ -292,6 +296,7 @@ download() (
     _download_cmd="$2"
     _job_count=0
     _tarball_list=".tarball_list.$$"
+    mkdir -p "$CACHE_DIR"
 
     # Clone git repos first (can't parallelize easily)
     for source in $_sources_list; do
@@ -301,14 +306,16 @@ download() (
                 _sources_list="$(remove_string_from_list "$source" "$_sources_list")" ;;
         esac
     done
-    
+
     # Download tarballs in parallel
     for source in $_sources_list; do
-        (
-            $_download_cmd "$source" || exit 1
-            _tarball_name="${source##*/}"
-            echo "$_tarball_name" >> "$_tarball_list"
-        ) &
+        _tarball_name="${source##*/}"
+        echo "$_tarball_name" >> "$_tarball_list"
+
+        [ -e "$CACHE_DIR/$_tarball_name" ] && continue
+
+        # This downloads the tarballs to the cache directory
+        ( $_download_cmd "$source" || exit 1 ) &
 
         _job_count=$((_job_count + 1))
 
@@ -325,12 +332,12 @@ download() (
 prepare_sources() (
     _sources_list="$1"
     _checksums_list="$2"
-    
-    _download_cmd="$(get_download_cmd)"
+
     [ -z "$_sources_list" ] && log_error "No sources provided"
-    
+    _download_cmd="$(get_download_cmd "$CACHE_DIR")"
+
     _tarball_list="$(download "$_sources_list" "$_download_cmd")"
-    
+
     # Verify checksums if enabled
     [ "$checksum_check" = 1 ] && {
         for tarball in $_tarball_list; do
@@ -346,7 +353,7 @@ prepare_sources() (
     # Unpack tarballs
     for tarball in $_tarball_list; do
         log_debug "In prepare_sources: Unpacking $tarball"
-        tar -xf "$tarball" || log_error "Failed to unpack: $tarball"
+        tar -xf "$CACHE_DIR/$tarball" || log_error "Failed to unpack: $tarball"
     done
 )
 
