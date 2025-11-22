@@ -18,6 +18,6 @@ build() {
 }
 
 install_files() {
-    make DESTDIR="$destdir" install
-    install -v -Dm644 doc/I18N-HOWTO "$destdir/usr/share/doc/intltool-0.51.0/I18N-HOWTO"
+    make install
+    install -v -Dm644 doc/I18N-HOWTO "$DESTDIR/usr/share/doc/intltool-0.51.0/I18N-HOWTO"
 }

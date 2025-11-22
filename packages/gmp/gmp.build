@@ -28,6 +28,6 @@ build() {
 }
 
 install_files() {
-    make DESTDIR="$destdir" install
-    make DESTDIR="$destdir" install-html
+    make install
+    make install-html
 }

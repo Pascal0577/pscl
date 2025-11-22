@@ -17,6 +17,6 @@ build() {
 }
 
 install_files() {
-    mv usr $destdir
+    mv usr $DESTDIR
 }
 

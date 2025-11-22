@@ -17,7 +17,7 @@ build() {
 }
 
 install_files() {
-    ZONEINFO="$destdir/usr/share/zoneinfo"
+    ZONEINFO="$DESTDIR/usr/share/zoneinfo"
     mkdir -pv "$ZONEINFO/posix"
     mkdir -pv "$ZONEINFO/right"
 

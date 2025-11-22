@@ -17,6 +17,6 @@ build() {
 }
 
 install_files() {
-    make DESTDIR="$destdir" install
-    rm -fv "$destdir/usr/lib/libltdl.a"
+    make install
+    rm -fv "$DESTDIR/usr/lib/libltdl.a"
 }

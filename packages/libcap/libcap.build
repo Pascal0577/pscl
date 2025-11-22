@@ -17,5 +17,5 @@ build() {
 }
 
 install_files() {
-    make DESTDIR="$destdir" prefix=/usr lib=lib install
+    make prefix=/usr lib=lib install
 }

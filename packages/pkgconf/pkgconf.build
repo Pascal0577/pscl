@@ -19,8 +19,8 @@ build() {
 }
 
 install_files() {
-    make DESTDIR="$destdir" install
+    make install
 
-    ln -s pkgconf   "$destdir/usr/bin/pkg-config"
-    ln -s pkgconf.1 "$destdir/usr/share/man/man1/pkg-config.1"
+    ln -s pkgconf   "$DESTDIR/usr/bin/pkg-config"
+    ln -s pkgconf.1 "$DESTDIR/usr/share/man/man1/pkg-config.1"
 }

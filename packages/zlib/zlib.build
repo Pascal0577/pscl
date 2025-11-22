@@ -17,6 +17,6 @@ build() {
 }
 
 install_files() {
-    make DESTDIR="$destdir" install
-    rm -r "$destdir/usr/lib/libz.a"
+    make install
+    rm -r "$DESTDIR/usr/lib/libz.a"
 }

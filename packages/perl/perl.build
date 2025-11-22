@@ -40,6 +40,6 @@ build() {
 }
 
 install_files() {
-    make DESTDIR="$destdir" install
+    make install
     unset BUILD_ZLIB BUILD_BZIP2
 }

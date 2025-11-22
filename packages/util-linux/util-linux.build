@@ -9,7 +9,7 @@ source_dir="$package_name-$package_version"
 
 configure() {
     cd "$source_dir" || log_error "In $package_name.build: Failed to cd to $source_dir"
-    mkdir -pv "$destdir/var/lib/hwclock"
+    mkdir -pv "$DESTDIR/var/lib/hwclock"
     ./configure --bindir=/usr/bin     \
         --libdir=/usr/lib     \
         --runstatedir=/run    \
@@ -33,5 +33,5 @@ build() {
 }
 
 install_files() {
-    make DESTDIR="$destdir" install
+    make install
 }

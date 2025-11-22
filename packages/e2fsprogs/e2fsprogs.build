@@ -26,12 +26,12 @@ build() {
 }
 
 install_files() {
-    make DESTDIR="$destdir" install
+    make install
     rm -fv /usr/lib/libcom_err.a
     rm -fv /usr/lib/libe2p.a
     rm -fv /usr/lib/libext2fs.a
     rm -fv /usr/lib/libss.a
 
-    gunzip -v "$destdir/usr/share/info/libext2fs.info.gz"
-    install-info --dir-file=/usr/share/info/dir "$destdir/usr/share/info/libext2fs.info"
+    gunzip -v "$DESTDIR/usr/share/info/libext2fs.info.gz"
+    install-info --dir-file=/usr/share/info/dir "$DESTDIR/usr/share/info/libext2fs.info"
 }

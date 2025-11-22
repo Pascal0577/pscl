@@ -17,6 +17,6 @@ build() {
 }
 
 install_files() {
-    make DESTDIR="$destdir" install
-    install -vdm755 "$destdir/etc/ssl/local"
+    make install
+    install -vdm755 "$DESTDIR/etc/ssl/local"
 }

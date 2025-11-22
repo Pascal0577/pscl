@@ -18,5 +18,5 @@ build() {
 }
 
 install_files() {
-    make SBINDIR=/usr/sbin DESTDIR="$destdir" install
+    make SBINDIR=/usr/sbin DESTDIR="$DESTDIR" install
 }

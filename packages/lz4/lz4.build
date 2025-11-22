@@ -17,5 +17,5 @@ build() {
 }
 
 install_files() {
-    make BUILD_STATIC=no DESTDIR="$destdir" install
+    make BUILD_STATIC=no DESTDIR="$DESTDIR" install
 }

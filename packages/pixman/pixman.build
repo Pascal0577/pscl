@@ -20,5 +20,5 @@ build() {
 }
 
 install_files() {
-    DESTDIR="$destdir" ninja install
+    ninja install
 }

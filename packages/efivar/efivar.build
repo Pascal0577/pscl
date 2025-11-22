@@ -17,5 +17,5 @@ build() {
 }
 
 install_files() {
-    make DESTDIR="$destdir" ENABLE_DOCS=0 LIBDIR=/usr/lib install
+    make ENABLE_DOCS=0 LIBDIR=/usr/lib install
 }

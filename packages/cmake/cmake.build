@@ -25,5 +25,5 @@ build() {
 }
 
 install_files() {
-    make DESTDIR="$destdir" install
+    make install
 }

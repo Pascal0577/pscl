@@ -38,15 +38,15 @@ build() {
 }
 
 install_files() {
-    make DESTDIR="$destdir" install
+    make install
 
     # So we can remove debugging symbols later
-    chmod 644 "$destdir/usr/lib/libtclstub8.6.a"
-    chmod -v u+w "$destdir/usr/lib/libtcl8.6.so"
+    chmod 644 "$DESTDIR/usr/lib/libtclstub8.6.a"
+    chmod -v u+w "$DESTDIR/usr/lib/libtcl8.6.so"
 
-    make DESTDIR="$destdir" install-private-headers
-    ln -sfv tclsh8.6 "$destdir/usr/bin/tclsh"
+    make install-private-headers
+    ln -sfv tclsh8.6 "$DESTDIR/usr/bin/tclsh"
 
     # Conflicts with some perl docs
-    mv "$destdir/usr/share/man/man3/Thread.3" "$destdir/usr/share/man/man3/Tcl_Thread.3"
+    mv "$DESTDIR/usr/share/man/man3/Thread.3" "$DESTDIR/usr/share/man/man3/Tcl_Thread.3"
 }

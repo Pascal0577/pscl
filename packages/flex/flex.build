@@ -19,8 +19,8 @@ build() {
 }
 
 install_files() {
-    make DESTDIR="$destdir" install
+    make install
 
-    ln -sv flex   "$destdir/usr/bin/lex"
-    ln -sv flex.1 "$destdir/usr/share/man/man1/lex.1"
+    ln -sv flex   "$DESTDIR/usr/bin/lex"
+    ln -sv flex.1 "$DESTDIR/usr/share/man/man1/lex.1"
 }

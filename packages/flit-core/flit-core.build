@@ -17,5 +17,5 @@ build() {
 }
 
 install_files() {
-    pip3 install --no-index --find-links dist --root "$destdir" flit_core
+    pip3 install --no-index --find-links dist --root "$DESTDIR" flit_core
 }

@@ -17,5 +17,5 @@ build() {
 }
 
 install_files() {
-    make DESTDIR="$destdir" EFIDIR=LFS install
+    make EFIDIR=LFS install
 }

@@ -29,16 +29,16 @@ build() {
 }
 
 install_files() {
-    make DESTDIR="$destdir" tooldir=/usr install
+    make tooldir=/usr install
 
-    rm -v "$destdir/usr/lib/libbfd.a" \
-        "$destdir/usr/lib/libbfd.la" \
-        "$destdir/usr/lib/libctf.a" \
-        "$destdir/usr/lib/libctf.la" \
-        "$destdir/usr/lib/libctf-nobfd.a" \
-        "$destdir/usr/lib/libctf-nobfd.la" \
-        "$destdir/usr/lib/libopcodes.a" \
-        "$destdir/usr/lib/libopcodes.la" \
-        "$destdir/usr/lib/libsframe.a" \
-        "$destdir/usr/lib/libsframe.la"
+    rm -v "$DESTDIR/usr/lib/libbfd.a" \
+        "$DESTDIR/usr/lib/libbfd.la" \
+        "$DESTDIR/usr/lib/libctf.a" \
+        "$DESTDIR/usr/lib/libctf.la" \
+        "$DESTDIR/usr/lib/libctf-nobfd.a" \
+        "$DESTDIR/usr/lib/libctf-nobfd.la" \
+        "$DESTDIR/usr/lib/libopcodes.a" \
+        "$DESTDIR/usr/lib/libopcodes.la" \
+        "$DESTDIR/usr/lib/libsframe.a" \
+        "$DESTDIR/usr/lib/libsframe.la"
 }

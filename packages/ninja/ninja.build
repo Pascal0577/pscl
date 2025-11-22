@@ -24,8 +24,8 @@ build() {
 }
 
 install_files() {
-    mkdir -p "$destdir/usr/bin"
-    command install -vm755 ninja "$destdir/usr/bin/"
-    command install -vDm644 misc/bash-completion "$destdir/usr/share/bash-completion/completions/ninja"
-    command install -vDm644 misc/zsh-completion  "$destdir/usr/share/zsh/site-functions/_ninja"
+    mkdir -p "$DESTDIR/usr/bin"
+    command install -vm755 ninja "$DESTDIR/usr/bin/"
+    command install -vDm644 misc/bash-completion "$DESTDIR/usr/share/bash-completion/completions/ninja"
+    command install -vDm644 misc/zsh-completion  "$DESTDIR/usr/share/zsh/site-functions/_ninja"
 }

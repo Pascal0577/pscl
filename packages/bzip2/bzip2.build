@@ -22,18 +22,18 @@ build() {
 }
 
 install_files() {
-    mkdir -p "$destdir/usr/lib"
-    mkdir -p "$destdir/usr/bin"
+    mkdir -p "$DESTDIR/usr/lib"
+    mkdir -p "$DESTDIR/usr/bin"
 
-    make PREFIX="$destdir/usr" install
+    make PREFIX="$DESTDIR/usr" install
 
-    cp -a libbz2.so.* "$destdir/usr/lib"
-    ln -s libbz2.so.1.0.8 "$destdir/usr/lib/libbz2.so"
+    cp -a libbz2.so.* "$DESTDIR/usr/lib"
+    ln -s libbz2.so.1.0.8 "$DESTDIR/usr/lib/libbz2.so"
 
-    cp bzip2-shared "$destdir/usr/bin/bzip2"
+    cp bzip2-shared "$DESTDIR/usr/bin/bzip2"
 
-    ln -sf bzip2 "$destdir/usr/bin/bzcat"
-    ln -sf bzip2 "$destdir/usr/bin/bunzip2"
+    ln -sf bzip2 "$DESTDIR/usr/bin/bzcat"
+    ln -sf bzip2 "$DESTDIR/usr/bin/bunzip2"
 
-    rm -fv "$destdir/usr/lib/libbz2.a"
+    rm -fv "$DESTDIR/usr/lib/libbz2.a"
 }

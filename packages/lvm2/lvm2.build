@@ -21,6 +21,6 @@ build() {
 }
 
 install_files() {
-    make DESTDIR="$destdir" install
-    make DESTDIR="$destdir" install_systemd_units
+    make install
+    make install_systemd_units
 }

@@ -19,7 +19,7 @@ build() {
 }
 
 install_files() {
-    make DESTDIR="$destdir" install
+    make install
     mkdir -p "${destir:?}/usr/share/doc/libpng-1.6.50"
     cp README libpng-manual.txt "${destdir:?}/usr/share/doc/libpng-1.6.50"
 }

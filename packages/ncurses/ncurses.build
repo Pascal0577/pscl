@@ -24,11 +24,11 @@ build() {
 }
 
 install_files() {
-    make DESTDIR="$destdir" install
+    make install
     command install -vm755 dest/usr/lib/libncursesw.so.6.5 /usr/lib
 
     for lib in ncurses form panel menu ; do
-        ln -sfv lib${lib}w.so "$destdir"/usr/lib/lib${lib}.so
-        ln -sfv ${lib}w.pc    "$destdir"/usr/lib/pkgconfig/${lib}.pc
+        ln -sfv lib${lib}w.so "$DESTDIR"/usr/lib/lib${lib}.so
+        ln -sfv ${lib}w.pc    "$DESTDIR"/usr/lib/pkgconfig/${lib}.pc
     done
 }

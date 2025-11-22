@@ -35,13 +35,13 @@ build() {
 }
 
 install_files() {
-    make DESTDIR="$destdir" install || log_error "Destdir is: $destdir"
+    make install || log_error "Destdir is: $DESTDIR"
 
     # Fix a hardcoded path to the executable loader in the ldd script
-    sed '/RTLDLIST=/s@/usr@@g' -i "$destdir/usr/bin/ldd"
-    mkdir -p "$destdir/etc"
+    sed '/RTLDLIST=/s@/usr@@g' -i "$DESTDIR/usr/bin/ldd"
+    mkdir -p "$DESTDIR/etc"
     
-    cat > "$destdir/etc/nsswitch.conf" << "EOF"
+    cat > "$DESTDIR/etc/nsswitch.conf" << "EOF"
 # Begin /etc/nsswitch.conf
 
 passwd: files systemd
@@ -59,7 +59,7 @@ rpc: files
 # End /etc/nsswitch.conf
 EOF
 
-    cat > "$destdir/etc/ld.so.conf" << "EOF"
+    cat > "$DESTDIR/etc/ld.so.conf" << "EOF"
 # Begin /etc/ld.so.conf
 /usr/local/lib
 /opt/lib

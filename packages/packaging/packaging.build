@@ -17,5 +17,5 @@ build() {
 }
 
 install_files() {
-    pip3 install --no-index --find-links dist --root "$destdir" packaging
+    pip3 install --no-index --find-links dist --root "$DESTDIR" packaging
 }

@@ -19,6 +19,6 @@ build() {
 }
 
 install_files() {
-    make DESTDIR="$destdir" install
-    make -C doc install-html docdir="$destdir/usr/share/doc/tar-1.35"
+    make install
+    make -C doc install-html docdir="$DESTDIR/usr/share/doc/tar-1.35"
 }

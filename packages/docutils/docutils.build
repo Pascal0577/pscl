@@ -17,5 +17,5 @@ build() {
 }
 
 install_files() {
-    pip3 install --no-index --find-links dist --no-user --root "$destdir" docutils
+    pip3 install --no-index --find-links dist --no-user --root "$DESTDIR" docutils
 }

@@ -32,6 +32,6 @@ build() {
 }
 
 install_files() {
-    make exec_prefix=/usr DESTDIR="$destdir" install
-    make DESTDIR="$destdir" -C man install-man
+    make exec_prefix=/usr DESTDIR="$DESTDIR" install
+    make -C man install-man
 }

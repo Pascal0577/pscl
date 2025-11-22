@@ -23,7 +23,7 @@ build() {
 }
 
 install_files() {
-    make DESTDIR="$destdir" install
-    mkdir -p "$destdir/usr/share/bash-completion/completions"
-    mv -v "$destdir/etc/bash_completion.d/grub" "$destdir/usr/share/bash-completion/completions"
+    make install
+    mkdir -p "$DESTDIR/usr/share/bash-completion/completions"
+    mv -v "$DESTDIR/etc/bash_completion.d/grub" "$DESTDIR/usr/share/bash-completion/completions"
 }

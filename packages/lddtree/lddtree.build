@@ -17,8 +17,8 @@ build() {
 }
 
 install_files() {
-    mkdir -p "$destdir/usr/bin"
-    cp -a lddtree.sh "$destdir/usr/bin/"
-    ln -s lddtree.sh "$destdir/usr/bin/lddtree"
-    chmod +x "$destdir/usr/bin/lddtree.sh"
+    mkdir -p "$DESTDIR/usr/bin"
+    cp -a lddtree.sh "$DESTDIR/usr/bin/"
+    ln -s lddtree.sh "$DESTDIR/usr/bin/lddtree"
+    chmod +x "$DESTDIR/usr/bin/lddtree.sh"
 }

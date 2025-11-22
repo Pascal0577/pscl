@@ -23,8 +23,8 @@ build() {
 }
 
 install_files() {
-    mkdir -p "$destdir/etc/pam.d"
-    install -v -m755 -d "$destdir/etc/pam.d"
-    DESTDIR="$destdir" ninja install
-    chmod -v 4755 "$destdir/usr/sbin/unix_chkpwd"
+    mkdir -p "$DESTDIR/etc/pam.d"
+    install -v -m755 -d "$DESTDIR/etc/pam.d"
+    ninja install
+    chmod -v 4755 "$DESTDIR/usr/sbin/unix_chkpwd"
 }

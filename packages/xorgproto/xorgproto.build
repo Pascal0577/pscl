@@ -21,6 +21,6 @@ build() {
 }
 
 install_files() {
-    DESTDIR="$destdir" ninja install
-    mv -v "$destdir/usr/share/doc/xorgproto" "$destdir/usr/share/doc/xorgproto-2024.1"
+    ninja install
+    mv -v "$DESTDIR/usr/share/doc/xorgproto" "$DESTDIR/usr/share/doc/xorgproto-2024.1"
 }

@@ -11,7 +11,7 @@ configure() { :; }
     cd "$source_dir" || log_error "In $package_name.build: Failed to cd to $source_dir"
 build() { :; }
 install_files() {
-    mkdir -p "$destdir/etc"
+    mkdir -p "$DESTDIR/etc"
     echo $PWD
-    cp services protocols "$destdir/etc"
+    cp services protocols "$DESTDIR/etc"
 }

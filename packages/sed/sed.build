@@ -18,7 +18,7 @@ build() {
 }
 
 install_files() {
-    make DESTDIR="$destdir" install
-    command install -d -m755           "$destdir"/usr/share/doc/sed-4.9
-    command install -m644 doc/sed.html "$destdir"/usr/share/doc/sed-4.9
+    make install
+    command install -d -m755           "$DESTDIR"/usr/share/doc/sed-4.9
+    command install -m644 doc/sed.html "$DESTDIR"/usr/share/doc/sed-4.9
 }

@@ -44,5 +44,5 @@ build() {
 
 install_files() {
     echo 'NAME="Linux From Scratch"' > /etc/os-release
-    DESTDIR="$destdir" ninja install
+    ninja install
 }

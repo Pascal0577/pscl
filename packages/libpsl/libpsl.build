@@ -12,11 +12,11 @@ configure() {
     mkdir build
     cd build || true
 
-    ../configure --prefix=/usr DESTDIR="$destdir"
+    ../configure --prefix=/usr DESTDIR="$DESTDIR"
 } 
 build() {
     make
 }
 install_files() {
-    make DESTDIR="$destdir" install
+    make install
 }

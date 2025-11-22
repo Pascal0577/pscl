@@ -93,8 +93,8 @@ install_files() {
         (
         cd "$dir" || log_error "Failed to cd to $dir"
         case $dir in
-            libpciaccess*) cd build && DESTDIR="$destdir" ninja install ;;
-            *) make DESTDIR="$destdir" install ;;
+            libpciaccess*) cd build && ninja install ;;
+            *) make install ;;
         esac
         )
     done

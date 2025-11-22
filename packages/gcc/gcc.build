@@ -34,10 +34,10 @@ build() {
 }
 
 install_files() {
-    make DESTDIR="$destdir" install
-    ln -svr gcc "$destdir/usr/bin/cc"
-    ln -sv gcc.1 "$destdir/usr/share/man/man1/cc.1"
-    ln -sfv ../../libexec/gcc/"$(gcc -dumpmachine)"/15.2.0/liblto_plugin.so "$destdir/usr/lib/bfd-plugins/"
+    make install
+    ln -svr gcc "$DESTDIR/usr/bin/cc"
+    ln -sv gcc.1 "$DESTDIR/usr/share/man/man1/cc.1"
+    ln -sfv ../../libexec/gcc/"$(gcc -dumpmachine)"/15.2.0/liblto_plugin.so "$DESTDIR/usr/lib/bfd-plugins/"
 
     ulimit -s -H unlimited
 }

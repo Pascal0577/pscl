@@ -17,5 +17,5 @@ build() {
 }
 
 install_files() {
-    pip3 install --no-index --find-links dist --root "$destdir" setuptools
+    pip3 install --no-index --find-links dist --root "$DESTDIR" setuptools
 }

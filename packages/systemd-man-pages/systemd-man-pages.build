@@ -17,6 +17,6 @@ build() {
 }
 
 install_files() {
-    mkdir -p "$destdir/usr/share/man"
-    cp -r "../$source_dir"/* "$destdir/usr/share/man"
+    mkdir -p "$DESTDIR/usr/share/man"
+    cp -r "../$source_dir"/* "$DESTDIR/usr/share/man"
 }

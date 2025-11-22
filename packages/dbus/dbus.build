@@ -20,6 +20,6 @@ build() {
 }
 
 install_files() {
-    DESTDIR="$destdir" ninja install
-    ln -sfv /etc/machine-id "$destdir/var/lib/dbus"
+    ninja install
+    ln -sfv /etc/machine-id "$DESTDIR/var/lib/dbus"
 }

@@ -19,7 +19,7 @@ build() {
 }
 
 install_files() {
-    mkdir -p "$destdir/usr/bin"
-    make DESTDIR="$destdir" install
-    chmod -v 0755 "$destdir"/usr/lib/preloadable_libintl.so
+    mkdir -p "$DESTDIR/usr/bin"
+    make install
+    chmod -v 0755 "$DESTDIR"/usr/lib/preloadable_libintl.so
 }

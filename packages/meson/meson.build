@@ -17,7 +17,7 @@ build() {
 }
 
 install_files() {
-    pip3 install --no-index --find-links dist --root "$destdir" meson
-    command install -vDm644 data/shell-completions/bash/meson "$destdir/usr/share/bash-completion/completions/meson"
-    command install -vDm644 data/shell-completions/zsh/_meson "$destdir/usr/share/zsh/site-functions/_meson"
+    pip3 install --no-index --find-links dist --root "$DESTDIR" meson
+    command install -vDm644 data/shell-completions/bash/meson "$DESTDIR/usr/share/bash-completion/completions/meson"
+    command install -vDm644 data/shell-completions/zsh/_meson "$DESTDIR/usr/share/zsh/site-functions/_meson"
 }

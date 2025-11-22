@@ -18,5 +18,5 @@ build() {
 }
 
 install_files() {
-    make -R GIT=false DESTDIR="$destdir" prefix=/usr install || log_error "Destdir is: $destdir"
+    make -R GIT=false DESTDIR="$DESTDIR" prefix=/usr install || log_error "Destdir is: $DESTDIR"
 }

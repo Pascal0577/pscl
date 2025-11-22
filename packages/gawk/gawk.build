@@ -18,6 +18,6 @@ build() {
 }
 
 install_files() {
-    make DESTDIR="$destdir" install
-    ln -sv gawk.1 "$destdir/usr/share/man/man1/awk.1"
+    make install
+    ln -sv gawk.1 "$DESTDIR/usr/share/man/man1/awk.1"
 }

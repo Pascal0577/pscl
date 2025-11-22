@@ -355,9 +355,6 @@ build_package() (
     mkdir -p "$_package_directory/build/package"
     export DESTDIR="$(realpath "$_package_directory/build/package")"
 
-    # for compatibility
-    destdir="$DESTDIR"
-
     log_debug "In build_package: DESTDIR is: $DESTDIR"
     install_files || log_error "In build_package: In $_pkg: In install_files"
 

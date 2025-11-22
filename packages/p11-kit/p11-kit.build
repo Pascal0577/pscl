@@ -33,6 +33,6 @@ build() {
 }
 
 install_files() {
-    DESTDIR="$destdir" ninja install
-    ln -sfv /usr/libexec/p11-kit/trust-extract-compat "$destdir/usr/bin/update-ca-certificates"
+    ninja install
+    ln -sfv /usr/libexec/p11-kit/trust-extract-compat "$DESTDIR/usr/bin/update-ca-certificates"
 }

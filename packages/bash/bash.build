@@ -20,6 +20,6 @@ build() {
 }
 
 install_files() {
-    make DESTDIR="$destdir" install
+    make install
     ln -sf bash /bin/sh && log_warn "Symlink /bin/sh overidden"
 }
