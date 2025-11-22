@@ -220,7 +220,7 @@ list_of_dependencies() (
         fi
     done
 
-    echo "$_dependency_list"
+    echo "${_dependency_list:-}"
 )
 
 get_dependency_graph() (
