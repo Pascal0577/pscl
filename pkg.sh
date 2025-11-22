@@ -340,6 +340,8 @@ download() (
         esac
     done
 
+    echo "Parallel downloads set to: $parallel_downloads" >&2  # DEBUG
+
     # Download tarballs in parallel
     for source in $_sources_list; do
         _tarball_name="${source##*/}"
@@ -347,20 +349,26 @@ download() (
 
         [ -e "$CACHE_DIR/$_tarball_name" ] && continue
 
+        echo "Starting download: $_tarball_name (job count: $_job_count)" >&2  # DEBUG
+
         # This downloads the tarballs to the cache directory
         (
-            echo "In download: Downloading $source"
-            $_download_cmd "$source" || exit 1
+            log_debug "In download: Downloading $source"
+            $_download_cmd "$source" >/dev/null 2>&1 || exit 1
+            log_debug "In download: Downloaded $_tarball_name"
         ) &
 
         _job_count=$((_job_count + 1))
+        echo "Job count now: $_job_count" >&2  # DEBUG
 
         if [ "$_job_count" -ge "$parallel_downloads" ]; then
+            echo "Waiting for a job to finish..." >&2  # DEBUG
             wait -n 2>/dev/null || wait
             _job_count=$((_job_count - 1))
         fi
     done
     
+    echo "Waiting for all remaining jobs..." >&2  # DEBUG
     wait
     cat "$_tarball_list"
 )
