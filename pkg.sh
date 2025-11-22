@@ -526,7 +526,7 @@ main() {
     [ -z "$arguments" ] && log_error "In main: No arguments were provided"
     log_debug "In main: arguments are: $arguments"
 
-    trap 'if [ -n "$CURRENT_PACKAGE" ]; then cleanup "$CURRENT_PACKAGE"; fi; exit 1' INT TERM
+    trap 'if [ -n "$CURRENT_PACKAGE" ]; then cleanup "$CURRENT_PACKAGE"; fi; exit 1' INT TERM EXIT
 
     if [ "$install" = 1 ]; then
         BUILD_ORDER="$(get_build_order "$arguments")"
@@ -542,12 +542,12 @@ main() {
                 continue
             elif [ -e "$_built_package" ]; then
                 log_debug "In main: installing $_built_package"
-                main_install "$_built_package"
-                cleanup "$package_name"
+                main_install "$_built_package" || exit 1
+                cleanup "$package_name" || exit 1
             elif [ "$build_to_install" = 1 ]; then
                 log_debug "In main: building: $_build_file"
-                main_build "$_build_file"
-                main_install "$_built_package"
+                main_build "$_build_file" || exit 1
+                main_install "$_built_package" || exit 1
                 cleanup "$package_name"
             else
                 log_error "In main: No package found."
