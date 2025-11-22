@@ -3,7 +3,7 @@
 package_name="libxvmc"
 package_version="1.0.14"
 package_description="X.Org libxvmc library"
-package_source="https://www.x.org/pub/individual/lib/libXvmc-1.0.14.tar.xz a90a5f01102dc445c7decbbd9ef77608"
+package_source="https://www.x.org/pub/individual/lib/libXvMC-1.0.14.tar.xz a90a5f01102dc445c7decbbd9ef77608"
 package_dependencies="libx11 libxext libxv xorgproto xorg-util-macros"
 
 source_dir="libXvmc-$package_version"
