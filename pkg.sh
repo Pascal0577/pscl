@@ -327,7 +327,6 @@ get_download_cmd() (
 download() (
     _sources_list="$1"
     _download_cmd="$2"
-    _pids=""
     mkdir -p "$CACHE_DIR"
     _tarball_list=".tarball_list.$$"
 
