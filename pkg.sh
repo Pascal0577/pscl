@@ -354,7 +354,7 @@ download() (
         # This downloads the tarballs to the cache directory
         (
             echo "In download: Downloading $source" 2>&1
-            $_download_cmd "$source" >/dev/null 2>&1 || exit 1
+            $_download_cmd "$source" || exit 1
             echo "In download: Downloaded $_tarball_name" 2>&1
         ) &
 
