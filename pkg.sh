@@ -324,6 +324,7 @@ prepare_sources() (
     
     # Unpack tarballs
     for tarball in $_tarball_list; do
+        log_debug "In prepare_sources: Unpacking $tarball"
         tar -xf "$tarball" || log_error "Failed to unpack: $tarball"
     done
 )
@@ -332,7 +333,7 @@ move_patches_if_needed() (
     _package="$1"
     _package_directory="$(get_package_dir "$_package")"
 
-    log_debug "In move_patches_if_needed: Package directory it $_package_directory"
+    log_debug "In move_patches_if_needed: Package directory is $_package_directory"
     for patch in "$_package_directory"/*.patch; do
         log_debug "In move_patches_if_needed: Moving $patch to $_package_directory/build/"
         cp -a "$patch" "$_package_directory/build"
