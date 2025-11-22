@@ -160,7 +160,7 @@ get_package_name() (
         _pkg_name_list="$_pkg_name_list $(basename "$pkg" | sed 's/\.build$//' | sed 's/\.tar.*$//')"
     done
 
-    echo "$_pkg_name_list"
+    trim_string "$_pkg_name_list"
 )
 
 # Returns the directory containing the package's build script
@@ -181,7 +181,7 @@ get_package_dir() (
             log_error "In get_package_dir: Could not find build dir for: $pkg"
     done
 
-    echo "$_pkg_dir_list"
+    trim_string "$_pkg_dir_list"
 )
 
 get_package_build() (
@@ -193,7 +193,7 @@ get_package_build() (
         _pkg_build_list="$_pkg_build_list $_pkg_dir/$pkg.build"
     done
 
-    echo "$_pkg_build_list"
+    trim_string "$_pkg_build_list"
 )
 
 cleanup() (
@@ -462,7 +462,7 @@ main_build() (
     for pkg in $_package_list; do
         _pkg_dir="$(get_package_dir "$pkg")"
         _pkg_build="$(get_package_build "$pkg")"
-        log_debug "Sourcing $_pkg_build"
+        log_debug "In main_build: Sourcing $_pkg_build"
 
         # shellcheck source=/dev/null
         . "$(realpath "$_pkg_build")" || log_error "In main_build: Failed to source: $_pkg_build"
