@@ -1,0 +1,26 @@
+#!/bin/sh
+
+package_name="xorg-font-bh-ttf"
+package_version="1.0.4"
+package_description="X.Org xorg-font-bh-ttf library"
+package_source="https://www.x.org/pub/individual/font//font-bh-ttf-1.0.4.tar.xz 063bfa1456c8a68208bf96a33f472bb1"
+package_dependencies="xorg-font-alias xorg-bdftopcf xorg-font-util xorg-mkfontscale xorg-util-macros"
+
+source_dir="font-bh-ttf-$package_version"
+
+configure() {
+    cd "$source_dir" || log_error "Failed to cd to $source_dir"
+    ./configure --prefix=/usr \
+        --sysconfdir=/etc \
+        --localstatedir=/var \
+        --disable-static \
+        --docdir="/usr/share/doc/$package_name-$package_version"
+}
+
+build() {
+    make
+}
+
+install_files() {
+    make DESTDIR="$DESTDIR" install
+}

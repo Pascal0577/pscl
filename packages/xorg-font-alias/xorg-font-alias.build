@@ -1,0 +1,26 @@
+#!/bin/sh
+
+package_name="xorg-font-alias"
+package_version="1.0.5"
+package_description="X.Org xorg-font-alias library"
+package_source="https://www.x.org/pub/individual/font//font-alias-1.0.5.tar.xz 79f4c023e27d1db1dfd90d041ce89835"
+package_dependencies="xorg-util-macros"
+
+source_dir="font-alias-$package_version"
+
+configure() {
+    cd "$source_dir" || log_error "Failed to cd to $source_dir"
+    ./configure --prefix=/usr \
+        --sysconfdir=/etc \
+        --localstatedir=/var \
+        --disable-static \
+        --docdir="/usr/share/doc/$package_name-$package_version"
+}
+
+build() {
+    make
+}
+
+install_files() {
+    make DESTDIR="$DESTDIR" install
+}
