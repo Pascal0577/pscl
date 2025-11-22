@@ -1,6 +1,7 @@
 #!/bin/sh
 
 set -uC
+# shellcheck disable=SC3040
 ( set -o pipefail >/dev/null ) && set -o pipefail
 
 readonly red="\x1b[31m"
@@ -45,90 +46,88 @@ log_debug() {
 }
 
 parse_arguments() {
-    while [ $# -gt 0 ]; do
-        _flag="$1"
-        case "$_flag" in
-            -?*)
-                _flag="${_flag#-}"
-                _action="${_flag%"${_flag#?}"}"
-                _flag="${_flag#?}"
+    _flag="$1"
+    case "$_flag" in
+        -?*)
+            _flag="${_flag#-}"
+            _action="${_flag%"${_flag#?}"}"
+            _flag="${_flag#?}"
 
-                case "$_action" in
-                    B)
-                        create_package=1
-                        while [ -n "$_flag" ]; do
-                            _char="${_flag%"${_flag#?}"}"
-                            _flag="${_flag#?}"
-                            case "$_char" in
-                                k) certificate_check=0 ;;
-                                s) checksum_check=0 ;;
-                                d) resolve_dependencies=0 ;;
-                                c) do_cleanup=0 ;;
-                                v) verbose=1 ;;
-                                *) log_error "Invalid option for -B: -$_char" ;;
-                            esac
-                        done
-                        shift
-                        for arg in "$@"; do
-                            arguments="$arguments $(get_package_name "$arg")"
-                        done
-                        return 0 ;;
-                    I)
-                        install=1
-                        while [ -n "$_flag" ]; do
-                            _char="${_flag%"${_flag#?}"}"
-                            _flag="${_flag#?}"
-                            case "$_char" in
-                                r) install_root="$2"; shift ;;
-                                b) build_to_install=1 ;;
-                                d) resolve_dependencies=0 ;;
-                                f) install_force=1 ;;
-                                c) do_cleanup=0 ;;
-                                v) verbose=1 ;;
-                                *) log_error "Invalid option for -I: -$_char" ;;
-                            esac
-                        done
-                        shift
-                        for arg in "$@"; do
-                            arguments="$arguments $(get_package_name "$arg")"
-                        done
-                        return 0 ;;
-                    U)
-                        uninstall=1
-                        while [ -n "$_flag" ]; do
-                            _char="${_flag%"${_flag#?}"}"
-                            _flag="${_flag#?}"
-                            case "$_char" in
-                                r) install_root="$2"; shift ;;
-                                v) verbose=1 ;;
-                                *) log_error "Invalid option for -U: -$_char" ;;
-                            esac
-                        done
+            case "$_action" in
+                B)
+                    create_package=1
+                    while [ -n "$_flag" ]; do
+                        _char="${_flag%"${_flag#?}"}"
+                        _flag="${_flag#?}"
+                        case "$_char" in
+                            k) certificate_check=0 ;;
+                            s) checksum_check=0 ;;
+                            d) resolve_dependencies=0 ;;
+                            c) do_cleanup=0 ;;
+                            v) verbose=1 ;;
+                            *) log_error "Invalid option for -B: -$_char" ;;
+                        esac
+                    done
+                    shift
+                    for arg in "$@"; do
+                        arguments="$arguments $(get_package_name "$arg")"
+                    done
+                    return 0 ;;
+                I)
+                    install=1
+                    while [ -n "$_flag" ]; do
+                        _char="${_flag%"${_flag#?}"}"
+                        _flag="${_flag#?}"
+                        case "$_char" in
+                            r) install_root="$2"; shift ;;
+                            b) build_to_install=1 ;;
+                            d) resolve_dependencies=0 ;;
+                            f) install_force=1 ;;
+                            c) do_cleanup=0 ;;
+                            v) verbose=1 ;;
+                            *) log_error "Invalid option for -I: -$_char" ;;
+                        esac
+                    done
+                    shift
+                    for arg in "$@"; do
+                        arguments="$arguments $(get_package_name "$arg")"
+                    done
+                    return 0 ;;
+                U)
+                    uninstall=1
+                    while [ -n "$_flag" ]; do
+                        _char="${_flag%"${_flag#?}"}"
+                        _flag="${_flag#?}"
+                        case "$_char" in
+                            r) install_root="$2"; shift ;;
+                            v) verbose=1 ;;
+                            *) log_error "Invalid option for -U: -$_char" ;;
+                        esac
+                    done
 
-                        shift
-                        arguments="$*"
-                        return 0 ;;
-                    Q)
-                        query=1
-                        while [ -n "$_flag" ]; do
-                            _char="${_flag%"${_flag#?}"}"
-                            _flag="${_flag#?}"
-                            case "$_char" in
-                                i) show_info=1 ;;
-                                l) list_files=1 ;;
-                                w) print_world=1 ;;
-                                v) verbose=1 ;;
-                                *) log_error "Invalid option for -Q: -$_char" ;;
-                            esac
-                        done
-                        shift
-                        arguments="$*"
-                        return 0 ;;
-                esac
-                shift ;;
-            *) log_error "Unexpected argument: $1" ;;
-        esac
-    done
+                    shift
+                    arguments="$*"
+                    return 0 ;;
+                Q)
+                    query=1
+                    while [ -n "$_flag" ]; do
+                        _char="${_flag%"${_flag#?}"}"
+                        _flag="${_flag#?}"
+                        case "$_char" in
+                            i) show_info=1 ;;
+                            l) list_files=1 ;;
+                            w) print_world=1 ;;
+                            v) verbose=1 ;;
+                            *) log_error "Invalid option for -Q: -$_char" ;;
+                        esac
+                    done
+                    shift
+                    arguments="$*"
+                    return 0 ;;
+            esac
+            shift ;;
+        *) log_error "Unexpected argument: $1" ;;
+    esac
 }
 
 # Check if a package is already installed
