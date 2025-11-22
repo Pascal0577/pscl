@@ -19,11 +19,9 @@ configure() {
 }
 
 build() {
-    cd "$source_dir" || log_error "Failed to cd to $source_dir"
     make
 }
 
 install_files() {
-    cd "$source_dir" || log_error "Failed to cd to $source_dir"
     make DESTDIR="$DESTDIR" install
 }
