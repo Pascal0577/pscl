@@ -102,8 +102,7 @@ configure() {
 }
 
 build() {
-    for dir in */; do
-        dir="${dir%/}"
+    for dir in $build_order; do
         [ -d "$dir" ] || continue
 
         (
@@ -117,8 +116,7 @@ build() {
 }
 
 install_files() {
-    for dir in */; do
-        dir="${dir%/}"
+    for dir in $build_order; do
         [ -d "$dir" ] || continue
 
         (
