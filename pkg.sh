@@ -1,5 +1,8 @@
 #!/bin/sh
 
+set -euC
+( set -o pipefail >/dev/null ) && set -o pipefail
+
 readonly red="\x1b[31m"
 readonly blue="\x1b[34m"
 readonly yellow="\x1b[33m"
@@ -7,6 +10,8 @@ readonly default="\x1b[39m"
 
 readonly METADATA_DIR="/var/lib/pkg"
 readonly INSTALLED="$METADATA_DIR/installed"
+readonly REPOSITORY_LIST="${REPOSITORY_LIST:-/sources/package-management/packages}"
+readonly LOCKFILE="/var/run/pkg.lock"
 
 verbose=0           # Enable verbose messages
 install=0           # Are we installing a package?
@@ -22,7 +27,6 @@ checksum_check=1    # Whether to download and verify checksums of downloaded tar
 pwd="$PWD"          # Keep track of the directory we ran the command from
 arguments=""        # The argument passed to the script
 install_root=""     # The root of the install. Used for bootstrapping
-repository_list="${repository_list:-/sources/package-management/packages}"
 
 # Used in dependency resolution
 BUILD_ORDER=""
@@ -143,7 +147,7 @@ get_package_dir() (
     _pkg="$(get_package_name "$1")"
     _pkg="${_pkg%.build}"
 
-    for repo in $repository_list; do
+    for repo in $REPOSITORY_LIST; do
         if [ -d "$repo/$_pkg/" ]; then
             echo "$repo/$_pkg/"
             return 0
@@ -155,22 +159,18 @@ get_package_dir() (
 
 # Cleanup is extremely important, so it's very verbose
 cleanup() (
+    set -x
     _pkg="$1"
 
     if [ "$do_cleanup" = 1 ]; then
         log_debug "In cleanup: Running cleanup"
-        cd "$(get_package_dir "$_pkg")" || true
+        _pkg_dir="$(get_package_dir "$_pkg")"
 
         # Tarballs, git repos, and patches were downloaded to build dir
-        if [ -d ./build/ ]; then
-            log_debug "In cleanup: rm -rf $(realpath "build/")"
-            rm -rf ./build/
-        fi
-
-        if [ -d ./install/ ]; then
-            log_debug "In cleanup: rm -rf $(realpath "install/")"
-            rm -rf ./install/
-        fi
+        [ -d "${_pkg_dir:?In cleanup: pkg dir is unset}/build/" ] && \
+            rm -rf "${_pkg_dir:?In cleanup: pkg dir is unset}/build/"
+        [ -d "${_pkg_dir:?In cleanup: pkg dir is unset}/install/" ] && \
+            rm -rf "${_pkg_dir:?In cleanup: pkg dir is unset}/install/"
     else
         log_warn "In cleanup: Cleanup called, but was disabled"
     fi
@@ -205,7 +205,7 @@ remove_string_from_list() (
 list_of_dependencies() (
     _package="$(basename "$1")"
 
-    for repo in $repository_list; do
+    for repo in $REPOSITORY_LIST; do
         if [ -d "$repo/$_package" ]; then
             _dependency_list="$(grep "package_dependencies=" "$repo/$_package/$_package.build" | \
                 sed 's/package_dependencies=//')"
@@ -442,7 +442,7 @@ main_install() (
         
         # Replace. This is an atomic operation
         # TODO: If the file is not owned by the package manager, keep it as $target.pkg-new
-        mv "$temp_target" "$target"
+        mv "${temp_target:?}" "${target:?}"
     done
 )
 
@@ -513,6 +513,9 @@ get_build_order() (
 )
 
 main() {
+    exec 9>"$LOCKFILE"
+    flock -n 9 || log_error "In main: Another instance is running!"
+
     log_debug "In main: Parsing arguments"
     parse_arguments "$@"
 
