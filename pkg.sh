@@ -350,17 +350,6 @@ prepare_sources() (
     done
 )
 
-move_patches_if_needed() (
-    _package="$1"
-    _package_directory="$(get_package_dir "$_package")"
-
-    log_debug "In move_patches_if_needed: Package directory is $_package_directory"
-    for patch in "$_package_directory"/*.patch; do
-        log_debug "In move_patches_if_needed: Moving $patch to $_package_directory/build/"
-        cp -a "$patch" "$_package_directory/build"
-    done
-)
-
 build_package() (
     _pkg="$1"
     _package_directory="$(get_package_dir "$_pkg")"
@@ -369,7 +358,7 @@ build_package() (
 
     log_debug "In build_package: Package directory is: $_package_directory"
     for patch in "$_package_directory"/*.patch; do
-        log_debug "In move_patches_if_needed: Moving $arguments to $_package_directory/build/"
+        log_debug "In build: Moving $patch to $_package_directory/build/"
         cp -a "$patch" "$_package_directory/build"
     done
 
