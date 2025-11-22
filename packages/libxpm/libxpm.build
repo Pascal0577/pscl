@@ -1,0 +1,29 @@
+#!/bin/sh
+
+package_name="libxpm"
+package_version="3.5.17"
+package_description="X.Org libxpm library"
+package_source="https://www.x.org/pub/individual/lib/libxpm-3.5.17.tar.xz 05b5667aadd476d77e9b5ba1a1de213e"
+package_dependencies="libx11 libxext libxt xorg-util-macros"
+
+source_dir="$package_name-$package_version"
+
+configure() {
+    cd "$source_dir" || log_error "Failed to cd to $source_dir"
+    ./configure --prefix=/usr \
+        --sysconfdir=/etc \
+        --localstatedir=/var \
+        --disable-static \
+        --disable-open-zfile \
+        --docdir="/usr/share/doc/$package_name-$package_version"
+}
+
+build() {
+    cd "$source_dir" || log_error "Failed to cd to $source_dir"
+    make
+}
+
+install_files() {
+    cd "$source_dir" || log_error "Failed to cd to $source_dir"
+    make DESTDIR="$DESTDIR" install
+}

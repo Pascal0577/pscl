@@ -1,0 +1,55 @@
+#!/bin/sh
+
+package_name="libxorg"
+package_version=""
+package_description="Libraries for xorg"
+package_source=""
+package_dependencies="libx11
+libxau
+libxaw
+libxcb
+libxcomposite
+libxcrypt
+libxcursor
+libxdamage
+libxdmcp
+libxext
+libxfixes
+libxfont2
+libxft
+libxi
+libxinerama
+libxkbfile
+libxml
+libxmu
+libxorg
+libxpm
+libxpresent
+libxrandr
+libxrender
+libxres
+libxscrnsaver
+libxScrnSaver
+libxshmfence
+libxslt
+libxt
+libxtst
+libxv
+libxvMC
+libxvmc
+libxxf86dga
+libxxf86vm"
+
+source_dir="$package_name-$package_version"
+
+configure() {
+    cd "$source_dir" || log_error "In $package_name.build: Failed to cd to $source_dir"
+}
+
+build() {
+    :
+}
+
+install_files() {
+    :
+}

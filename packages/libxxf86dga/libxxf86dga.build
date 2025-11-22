@@ -1,0 +1,28 @@
+#!/bin/sh
+
+package_name="libxxf86dga"
+package_version="1.1.6"
+package_description="X.Org libxxf86dga library"
+package_source="https://www.x.org/pub/individual/lib/libxxf86dga-1.1.6.tar.xz 74d1acf93b83abeb0954824da0ec400b"
+package_dependencies="libx11 libxext xorgproto xorg-util-macros"
+
+source_dir="$package_name-$package_version"
+
+configure() {
+    cd "$source_dir" || log_error "Failed to cd to $source_dir"
+    ./configure --prefix=/usr \
+        --sysconfdir=/etc \
+        --localstatedir=/var \
+        --disable-static \
+        --docdir="/usr/share/doc/$package_name-$package_version"
+}
+
+build() {
+    cd "$source_dir" || log_error "Failed to cd to $source_dir"
+    make
+}
+
+install_files() {
+    cd "$source_dir" || log_error "Failed to cd to $source_dir"
+    make DESTDIR="$DESTDIR" install
+}

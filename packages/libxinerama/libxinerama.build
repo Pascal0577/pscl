@@ -1,0 +1,28 @@
+#!/bin/sh
+
+package_name="libxinerama"
+package_version="1.1.5"
+package_description="X.Org libxinerama library"
+package_source="https://www.x.org/pub/individual/lib/libxinerama-1.1.5.tar.xz 228c877558c265d2f63c56a03f7d3f21"
+package_dependencies="libx11 libxext xorgproto xorg-util-macros"
+
+source_dir="$package_name-$package_version"
+
+configure() {
+    cd "$source_dir" || log_error "Failed to cd to $source_dir"
+    ./configure --prefix=/usr \
+        --sysconfdir=/etc \
+        --localstatedir=/var \
+        --disable-static \
+        --docdir="/usr/share/doc/$package_name-$package_version"
+}
+
+build() {
+    cd "$source_dir" || log_error "Failed to cd to $source_dir"
+    make
+}
+
+install_files() {
+    cd "$source_dir" || log_error "Failed to cd to $source_dir"
+    make DESTDIR="$DESTDIR" install
+}
