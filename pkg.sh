@@ -347,7 +347,7 @@ download() (
         
         [ -e "$CACHE_DIR/$_tarball_name" ] && continue
 
-        ( $_download_cmd "$source" >/dev/null 2>&1 ) &
+        ( $_download_cmd "$source" ) &
     done
     wait
     cat "$_tarball_list"
