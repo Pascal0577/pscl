@@ -25,6 +25,7 @@ build_to_install=0
 install_force=0
 show_info=""
 print_world=""
+parallel_downloads=5
 certificate_check=1 # Whether to perform cert checks when downloading sources
 checksum_check=1    # Whether to download and verify checksums of downloaded tarballs when building
 pwd="$PWD"          # Keep track of the directory we ran the command from
@@ -65,6 +66,7 @@ parse_arguments() {
                             k) certificate_check=0 ;;
                             s) checksum_check=0 ;;
                             d) resolve_dependencies=0 ;;
+                            j) parallel_downloads="$2"; shift ;;
                             c) do_cleanup=0 ;;
                             v) verbose=1 ;;
                             *) log_error "Invalid option for -B: -$_char" ;;
@@ -85,6 +87,7 @@ parse_arguments() {
                             b) build_to_install=1 ;;
                             d) resolve_dependencies=0 ;;
                             f) install_force=1 ;;
+                            j) parallel_downloads="$2"; shift ;;
                             c) do_cleanup=0 ;;
                             v) verbose=1 ;;
                             *) log_error "Invalid option for -I: -$_char" ;;
@@ -272,6 +275,7 @@ get_download_cmd() (
 
     case "$_download_cmd" in
         wget|wget2)
+            [ "$verbose" = 0 ] && _download_cmd="$_download_cmd -q --show-progress"
             [ "$certificate_check" = 0 ] && _download_cmd="$_download_cmd --no-check-certificate" ;;
         curl)
             [ "$certificate_check" = 0 ] && _download_cmd="$_download_cmd -k"
@@ -282,19 +286,38 @@ get_download_cmd() (
 )
 
 download() (
-    _source="$1"
+    _sources_list="$1"
     _download_cmd="$2"
+    _job_count=0
+    _tarball_list=".tarball_list.$$"
 
-    # If the source is a git repo, then clone it. Otherwise, use the download command
-    case "$_source" in
-        *.git)
-            git clone "$_source" || return 1 ;;
-        *)
-            # We specifically do not want a quoted string
-            $_download_cmd "$_source" || return 1
-            _name_of_downloaded_file="${_source##*/}"
-            echo "$_name_of_downloaded_file"
-    esac
+    # Clone git repos first (can't parallelize easily)
+    for source in $_sources_list; do
+        case "$source" in
+            *.git)
+                git clone "$source" || return 1
+                _sources_list="$(remove_string_from_list "$source" "$_sources_list")" ;;
+        esac
+    done
+    
+    # Download tarballs in parallel
+    for source in $_sources_list; do
+        (
+            $_download_cmd "$source" || exit 1
+            _tarball_name="${source##*/}"
+            echo "$_tarball_name" >> "$_tarball_list"
+        ) &
+
+        _job_count=$((_job_count + 1))
+
+        if [ "$_job_count" -ge "$parallel_downloads" ]; then
+            wait -n 2>/dev/null || wait
+            _job_count=$((_job_count - 1))
+        fi
+    done
+    
+    wait
+    cat "$_tarball_list"
 )
 
 prepare_sources() (
@@ -304,11 +327,7 @@ prepare_sources() (
     _download_cmd="$(get_download_cmd)"
     [ -z "$_sources_list" ] && log_error "No sources provided"
     
-    _tarball_list=""
-    for source in $_sources_list; do
-        _tarball="$(download "$source" "$_download_cmd")"
-        _tarball_list="$_tarball_list $_tarball"
-    done
+    _tarball_list="$(download "$_sources_list" "$_download_cmd")"
     
     # Verify checksums if enabled
     [ "$checksum_check" = 1 ] && {
