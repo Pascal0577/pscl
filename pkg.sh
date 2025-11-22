@@ -349,8 +349,8 @@ download() (
 
         # This downloads the tarballs to the cache directory
         (
+            log_debug "In download: Downloading $source"
             $_download_cmd "$source" || exit 1
-            echo ""
         ) &
 
         _job_count=$((_job_count + 1))
