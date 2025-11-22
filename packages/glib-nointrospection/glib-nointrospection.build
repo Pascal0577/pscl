@@ -1,13 +1,12 @@
 #!/bin/sh
 
-package_name="glib"
+package_name="glib-nointrospection"
 package_version="2.84.4"
 package_description="Contains low-level libraries useful for providing data structure handling for C"
-package_source="https://download.gnome.org/sources/glib/2.84/glib-2.84.4.tar.xz 5655d0ff809b98dd77c02490609fadde
-https://download.gnome.org/sources/gobject-introspection/1.84/gobject-introspection-1.84.0.tar.xz 2a62fb1c584616a8ebcd9dd4d045f27e"
-package_dependencies="docutils libxslt gobject-introspection"
+package_source="https://download.gnome.org/sources/glib/2.84/glib-2.84.4.tar.xz 5655d0ff809b98dd77c02490609fadde"
+package_dependencies="docutils libxslt"
 
-source_dir="$package_name-$package_version"
+source_dir="glib-$package_version"
 
 configure() {
     cd "$source_dir" || log_error "In $package_name.build: Failed to cd to $source_dir"
@@ -17,7 +16,7 @@ configure() {
     meson setup ..                  \
         --prefix=/usr             \
         --buildtype=release       \
-        -D introspection=enabled  \
+        -D introspection=disabled \
         -D glib_debug=disabled    \
         -D man-pages=enabled      \
         -D sysprof=disabled
