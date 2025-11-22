@@ -82,22 +82,22 @@ configure() {
         cd "$dir" || log_error "Failed to cd to $dir"
         docdir="--docdir=/usr/share/doc/$dir"
         case $dir in
-            libXfont2-[0-9]*) ./configure "$CONFIG" "$docdir" --disable-devel-docs ;;
+            libXfont2-[0-9]*) ./configure $CONFIG $docdir --disable-devel-docs ;;
 
             libXt-[0-9]*)
                 ./configure "$CONFIG" "$docdir" \
                     --with-appdefaultdir=/etc/X11/app-defaults ;;
 
-            libXpm-[0-9]*) ./configure "$CONFIG" "$docdir" --disable-open-zfile ;;
+            libXpm-[0-9]*) ./configure $CONFIG $docdir --disable-open-zfile ;;
           
             libpciaccess*)
                 mkdir build
                 cd build || true
                 meson setup --prefix=/usr --buildtype=release .. ;;
 
-            *) ./configure "$CONFIG" "$docdir" ;;
+            *) ./configure $CONFIG $docdir ;;
         esac
-        ) || exit 1
+        ) || return 1
     done
 }
 
@@ -111,7 +111,7 @@ build() {
             libpciaccess*) cd build && ninja ;;
             *) make ;;
         esac
-        ) || exit 1
+        ) || return 1
     done
 }
 
@@ -125,6 +125,6 @@ install_files() {
             libpciaccess*) cd build && ninja install ;;
             *) make install ;;
         esac
-        ) || exit 1
+        ) || return 1
     done
 }
