@@ -232,7 +232,7 @@ get_dependency_graph() (
 
     # Errors if there's a circular dependency
     if string_is_in_list "$_node" "$_visiting"; then
-        log_error "Circular dependency involving: $_node"
+        log_error "In get_dependency_graph: Circular dependency involving: $_node"
     fi
 
     if string_is_in_list "$_node" "$_resolved"; then
@@ -563,12 +563,12 @@ main() {
                 continue
             elif [ -e "$_built_package" ]; then
                 log_debug "In main: installing $_built_package"
-                main_install "$_built_package" || exit 1
-                cleanup "$package_name" || exit 1
+                main_install "$_built_package" || log_error "In main: Failed to install: $_built_package"
+                cleanup "$package_name"
             elif [ "$build_to_install" = 1 ]; then
                 log_debug "In main: building: $_build_file"
-                main_build "$_build_file" || exit 1
-                main_install "$_built_package" || exit 1
+                main_build "$_build_file" || log_error "In main: Failed to build: $_build_file"
+                main_install "$_built_package" || log_error "In main: Failed to install: $_built_package"
                 cleanup "$package_name"
             else
                 log_error "In main: No package found."
@@ -587,7 +587,7 @@ main() {
             _built_package="$_build_dir/$package_name.tar.xz"
             if [ ! -e "$_built_package" ]; then
                 log_debug "In main: Building: $_build_file"
-                main_build "$_build_file"
+                main_build "$_build_file" || log_error "In main: Failed to build: $_build_file"
                 cleanup "$package_name"
             fi
             CURRENT_PACKAGE=""
