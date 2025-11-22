@@ -521,11 +521,13 @@ main() {
     [ -z "$arguments" ] && log_error "In main: No arguments were provided"
     log_debug "In main: arguments are: $arguments"
 
+    trap 'if [ -n "$CURRENT_PACKAGE" ]; then cleanup "$CURRENT_PACKAGE"; fi; exit 1' INT TERM
+
     if [ "$install" = 1 ]; then
         BUILD_ORDER="$(get_build_order "$arguments")"
         for package_name in $BUILD_ORDER; do
-            trap 'cleanup "$package_name"' INT TERM EXIT
             log_debug "In main: build order is: $BUILD_ORDER"
+            CURRENT_PACKAGE="$package_name"
             _package_dir="$(get_package_dir "$package_name")"
             _build_file="$_package_dir/$package_name.build"
             _built_package="$_package_dir/$package_name.tar.xz"
@@ -539,17 +541,19 @@ main() {
             elif [ "$build_to_install" = 1 ]; then
                 log_debug "In main: building: $_build_file"
                 main_build "$_build_file"
+                cleanup "$package_name"
                 main_install "$_built_package"
             else
                 log_error "In main: No package found."
             fi
+            CURRENT_PACKAGE=""
         done && exit 0
     fi
 
     if [ "$create_package" = 1 ]; then
         BUILD_ORDER="$(get_build_order "$arguments")"
         for package_name in $BUILD_ORDER; do
-            trap 'cleanup "$package_name"' INT TERM EXIT
+            CURRENT_PACKAGE="$package_name"
             log_debug "In main: build order is: $BUILD_ORDER"
             _build_dir="$(get_package_dir "$package_name")"
             _build_file="$_build_dir/$package_name.build"
@@ -557,7 +561,9 @@ main() {
             if [ ! -e "$_built_package" ]; then
                 log_debug "In main: Building: $_build_file"
                 main_build "$_build_file"
+                cleanup "$package_name"
             fi
+            CURRENT_PACKAGE=""
         done && exit 0
     fi
 
