@@ -584,7 +584,7 @@ get_build_order() (
         _BUILD_ORDER="$_BUILD_ORDER $(echo "$result" | cut -d '|' -f3)"
     done
 
-    echo "$_BUILD_ORDER"
+    trim_string "$_BUILD_ORDER"
 )
 
 main() {
