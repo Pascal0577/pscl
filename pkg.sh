@@ -1,6 +1,6 @@
 #!/bin/sh
 
-set -euC
+set -uC
 ( set -o pipefail >/dev/null ) && set -o pipefail
 
 readonly red="\x1b[31m"
@@ -370,10 +370,10 @@ build_package() (
 		source = $package_source
 	EOF
 
+    cd "$DESTDIR" || log_error "In build_package: Failed to change directory: $DESTDIR"
     find . ! -name '.' ! -name 'PKGFILES' ! -name 'PKGINFO' \
         \( -type f -o -type l -o -type d \) -printf '%P\n' > PKGFILES
 
-    cd "$DESTDIR" || log_error "In build_package: Failed to change directory: $DESTDIR"
     tar -Jcpf "$_package_directory/$_package_name.tar.xz" . \
         || log_error "In build_package: Failed to create tar archive: $_package_name.tar"
 )
