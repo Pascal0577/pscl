@@ -327,11 +327,10 @@ get_download_cmd() (
 download() (
     _sources_list="$1"
     _download_cmd="$2"
-    _job_count=0
-    _tarball_list=".tarball_list.$$"
     mkdir -p "$CACHE_DIR"
+    _tarball_list=".tarball_list.$$"
 
-    # Clone git repos first (can't parallelize easily)
+    # Clone git repos first
     for source in $_sources_list; do
         case "$source" in
             *.git)
@@ -340,35 +339,21 @@ download() (
         esac
     done
 
-    echo "Parallel downloads set to: $parallel_downloads" >&2  # DEBUG
-
-    # Download tarballs in parallel
+    # Download all in parallel (no limiting)
     for source in $_sources_list; do
         _tarball_name="${source##*/}"
         echo "$_tarball_name" >> "$_tarball_list"
-
+        
         [ -e "$CACHE_DIR/$_tarball_name" ] && continue
 
-        echo "Starting download: $_tarball_name (job count: $_job_count)" >&2  # DEBUG
-
-        # This downloads the tarballs to the cache directory
-        (
-            echo "In download: Downloading $source" 2>&1
-            $_download_cmd "$source" || exit 1
-            echo "In download: Downloaded $_tarball_name" 2>&1
-        ) &
-
-        _job_count=$((_job_count + 1))
-        echo "Job count now: $_job_count" >&2  # DEBUG
-
-        if [ "$_job_count" -ge "$parallel_downloads" ]; then
-            echo "Waiting for a job to finish..." >&2  # DEBUG
-            wait -n 2>/dev/null || wait
-            _job_count=$((_job_count - 1))
-        fi
+        ( $_download_cmd "$source" >/dev/null 2>&1 ) &
+        
+        # Crude rate limiting: count running jobs
+        while [ "$(jobs -r | wc -l)" -ge "$parallel_downloads" ]; do
+            sleep 0.1
+        done
     done
     
-    echo "Waiting for all remaining jobs..." >&2  # DEBUG
     wait
     cat "$_tarball_list"
 )
