@@ -370,9 +370,11 @@ prepare_sources() (
     _checksums_list="$2"
 
     [ -z "$_sources_list" ] && log_error "No sources provided"
-    _download_cmd="$(get_download_cmd "$CACHE_DIR")"
+    _download_cmd="$(get_download_cmd "$CACHE_DIR")" || \
+        log_error "Failed to get download command"
 
-    _tarball_list="$(download "$_sources_list" "$_download_cmd")"
+    _tarball_list="$(download "$_sources_list" "$_download_cmd")" || \
+        log_error "Failed to get tarball list"
 
     # Verify checksums if enabled
     [ "$checksum_check" = 1 ] && {
