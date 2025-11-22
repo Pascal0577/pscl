@@ -3,7 +3,7 @@
 package_name="libxfont2"
 package_version="2.0.7"
 package_description="X.Org libxfont2 library"
-package_source="https://www.x.org/pub/individual/lib/libxfont2-2.0.7.tar.xz 66e03e3405d923dfaf319d6f2b47e3da"
+package_source="https://www.x.org/pub/individual/lib/libXfont2-2.0.7.tar.xz 66e03e3405d923dfaf319d6f2b47e3da"
 package_dependencies="libfontenc freetype xorgproto zlib xtrans xorg-util-macros"
 
 source_dir="libXfont2-$package_version"

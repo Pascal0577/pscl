@@ -3,7 +3,7 @@
 package_name="libxcursor"
 package_version="1.2.3"
 package_description="X.Org libxcursor library"
-package_source="https://www.x.org/pub/individual/lib/libxcursor-1.2.3.tar.xz 5ce55e952ec2d84d9817169d5fdb7865"
+package_source="https://www.x.org/pub/individual/lib/libXcursor-1.2.3.tar.xz 5ce55e952ec2d84d9817169d5fdb7865"
 package_dependencies="libx11 libxfixes libxrender xorgproto xorg-util-macros"
 
 source_dir="libXcursor-$package_version"

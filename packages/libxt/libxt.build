@@ -3,7 +3,7 @@
 package_name="libxt"
 package_version="1.3.1"
 package_description="X.Org libxt library"
-package_source="https://www.x.org/pub/individual/lib/libxt-1.3.1.tar.xz 9acd189c68750b5028cf120e53c68009"
+package_source="https://www.x.org/pub/individual/lib/libXt-1.3.1.tar.xz 9acd189c68750b5028cf120e53c68009"
 package_dependencies="libx11 libsm libice xorgproto xorg-util-macros"
 
 source_dir="libXt-$package_version"

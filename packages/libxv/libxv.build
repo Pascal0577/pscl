@@ -3,7 +3,7 @@
 package_name="libxv"
 package_version="1.0.13"
 package_description="X.Org libxv library"
-package_source="https://www.x.org/pub/individual/lib/libxv-1.0.13.tar.xz 8a26503185afcb1bbd2c65e43f775a67"
+package_source="https://www.x.org/pub/individual/lib/libXv-1.0.13.tar.xz 8a26503185afcb1bbd2c65e43f775a67"
 package_dependencies="libx11 libxext xorgproto xorg-util-macros"
 
 source_dir="libXv-$package_version"

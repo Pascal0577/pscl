@@ -3,7 +3,7 @@
 package_name="libxres"
 package_version="1.2.2"
 package_description="X.Org libxres library"
-package_source="https://www.x.org/pub/individual/lib/libxres-1.2.2.tar.xz 66c9e9e01b0b53052bb1d02ebf8d7040"
+package_source="https://www.x.org/pub/individual/lib/libXres-1.2.2.tar.xz 66c9e9e01b0b53052bb1d02ebf8d7040"
 package_dependencies="libx11 libxext xorgproto xorg-util-macros"
 
 source_dir="libXres-$package_version"
