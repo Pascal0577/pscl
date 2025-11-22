@@ -9,8 +9,11 @@ package_dependencies="docutils libxslt"
 
 source_dir="$package_name-$package_version"
 
-build() {
+configure() {
     cd "$source_dir" || log_error "In $package_name.build: Failed to cd to $source_dir"
+}
+
+build() {
     patch -Np1 -i ../glib-skip_warnings-1.patch
     mkdir build
     cd build || true
@@ -34,11 +37,6 @@ build() {
     meson configure -D introspection=enabled
     ninja
     ninja install
-}
-
-configure() {
-    cd "$source_dir" || log_error "In $package_name.build: Failed to cd to $source_dir"
-    :
 }
 
 install_files() {
