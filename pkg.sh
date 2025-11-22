@@ -341,7 +341,10 @@ download() (
         [ -e "$CACHE_DIR/$_tarball_name" ] && continue
 
         # This downloads the tarballs to the cache directory
-        ( $_download_cmd "$source" || exit 1 ) &
+        (
+            $_download_cmd "$source" || exit 1
+            echo ""
+        ) &
 
         _job_count=$((_job_count + 1))
 
