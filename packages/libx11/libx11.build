@@ -6,7 +6,7 @@ package_description="X.Org libx11 library"
 package_source="https://www.x.org/pub/individual/lib/libx11-1.8.12.tar.xz 146d770e564812e00f97e0cbdce632b7"
 package_dependencies="xtrans libxcb xorgproto xorg-util-macros"
 
-source_dir="$package_name-$package_version"
+source_dir="libX11-$package_version"
 
 configure() {
     cd "$source_dir" || log_error "Failed to cd to $source_dir"

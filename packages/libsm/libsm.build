@@ -6,7 +6,7 @@ package_description="X.Org libsm library"
 package_source="https://www.x.org/pub/individual/lib/libsm-1.2.6.tar.xz 3aeeea05091db1c69e6f768e0950a431"
 package_dependencies="libice util-linux xorgproto xorg-util-macros xtrans"
 
-source_dir="$package_name-$package_version"
+source_dir="libSM-$package_version"
 
 configure() {
     cd "$source_dir" || log_error "Failed to cd to $source_dir"

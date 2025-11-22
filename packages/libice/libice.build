@@ -6,7 +6,7 @@ package_description="X.Org libice library"
 package_source="https://www.x.org/pub/individual/lib/libice-1.1.2.tar.xz d1ffde0a07709654b20bada3f9abdd16"
 package_dependencies="xtrans xorgproto xorg-util-macros"
 
-source_dir="$package_name-$package_version"
+source_dir="libICE-$package_version"
 
 configure() {
     cd "$source_dir" || log_error "Failed to cd to $source_dir"

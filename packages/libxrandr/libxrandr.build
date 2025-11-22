@@ -6,7 +6,7 @@ package_description="X.Org libxrandr library"
 package_source="https://www.x.org/pub/individual/lib/libxrandr-1.5.4.tar.xz 24e0b72abe16efce9bf10579beaffc27"
 package_dependencies="libx11 libxext libxrender xorgproto xorg-util-macros"
 
-source_dir="$package_name-$package_version"
+source_dir="libXrandr-$package_version"
 
 configure() {
     cd "$source_dir" || log_error "Failed to cd to $source_dir"

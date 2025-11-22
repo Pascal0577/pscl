@@ -6,7 +6,7 @@ package_description="X.Org libxscrnsaver library"
 package_source="https://www.x.org/pub/individual/lib/libxscrnsaver-1.2.4.tar.xz e613751d38e13aa0d0fd8e0149cec057"
 package_dependencies="libx11 libxext xorgproto xorg-util-macros"
 
-source_dir="$package_name-$package_version"
+source_dir="libXScrnSaver-$package_version"
 
 configure() {
     cd "$source_dir" || log_error "Failed to cd to $source_dir"

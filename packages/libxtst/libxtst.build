@@ -6,7 +6,7 @@ package_description="X.Org libxtst library"
 package_source="https://www.x.org/pub/individual/lib/libxtst-1.2.5.tar.xz b62dc44d8e63a67bb10230d54c44dcb7"
 package_dependencies="libx11 libxext libxi xorgproto xorg-util-macros"
 
-source_dir="$package_name-$package_version"
+source_dir="libXtst-$package_version"
 
 configure() {
     cd "$source_dir" || log_error "Failed to cd to $source_dir"

@@ -6,7 +6,7 @@ package_description="X.Org libxinerama library"
 package_source="https://www.x.org/pub/individual/lib/libxinerama-1.1.5.tar.xz 228c877558c265d2f63c56a03f7d3f21"
 package_dependencies="libx11 libxext xorgproto xorg-util-macros"
 
-source_dir="$package_name-$package_version"
+source_dir="libXinerama-$package_version"
 
 configure() {
     cd "$source_dir" || log_error "Failed to cd to $source_dir"
