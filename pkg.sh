@@ -24,6 +24,7 @@ resolve_dependencies=1
 build_to_install=0
 install_force=0
 show_info=""
+print_world=""
 certificate_check=1 # Whether to perform cert checks when downloading sources
 checksum_check=1    # Whether to download and verify checksums of downloaded tarballs when building
 pwd="$PWD"          # Keep track of the directory we ran the command from
