@@ -334,7 +334,7 @@ move_patches_if_needed() (
 
     log_debug "In move_patches_if_needed: Package directory it $_package_directory"
     for patch in "$_package_directory"/*.patch; do
-        log_debug "In move_patches_if_needed: Moving $arguments to $_package_directory/build/"
+        log_debug "In move_patches_if_needed: Moving $patch to $_package_directory/build/"
         cp -a "$patch" "$_package_directory/build"
     done
 )
@@ -345,11 +345,13 @@ build_package() (
     _package_name="$(get_package_name "$_pkg")"
     _package_version="${package_version:-unknown}"
 
-    log_debug "In build_package: Package directory it $_package_directory"
+    log_debug "In build_package: Package directory is: $_package_directory"
     for patch in "$_package_directory"/*.patch; do
         log_debug "In move_patches_if_needed: Moving $arguments to $_package_directory/build/"
         cp -a "$patch" "$_package_directory/build"
     done
+
+    log_debug "In build_package: Starting build. Current dir is $PWD"
 
     configure || log_error "In compile_source: In $arguments: In configure: "
     build || log_error "In compile_source: In $arguments: In build: "
