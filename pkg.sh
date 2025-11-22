@@ -241,6 +241,7 @@ get_dependency_graph() (
     log_debug "In get_dependency_graph: Dependencies for $_node are: $_deps"
 
     for child in $_deps; do
+        ( is_installed "$child" ) && continue
         result=$(get_dependency_graph "$child" "$_visiting" "$_resolved" "$_order") || return 1
         _visiting=$(echo "$result" | cut -d '|' -f1)
         _resolved=$(echo "$result" | cut -d '|' -f2)
