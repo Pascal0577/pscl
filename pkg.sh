@@ -327,10 +327,11 @@ get_download_cmd() (
 download() (
     _sources_list="$1"
     _download_cmd="$2"
-    mkdir -p "$CACHE_DIR"
+    _job_count=0
     _tarball_list=".tarball_list.$$"
+    mkdir -p "$CACHE_DIR"
 
-    # Clone git repos first
+    # Clone git repos first (can't parallelize easily)
     for source in $_sources_list; do
         case "$source" in
             *.git)
@@ -343,11 +344,23 @@ download() (
     for source in $_sources_list; do
         _tarball_name="${source##*/}"
         echo "$_tarball_name" >> "$_tarball_list"
-        
+
         [ -e "$CACHE_DIR/$_tarball_name" ] && continue
 
-        ( $_download_cmd "$source" ) &
+        # This downloads the tarballs to the cache directory
+        (
+            $_download_cmd "$source" || exit 1
+            echo ""
+        ) &
+
+        _job_count=$((_job_count + 1))
+
+        if [ "$_job_count" -ge "$parallel_downloads" ]; then
+            wait -n 2>/dev/null || wait
+            _job_count=$((_job_count - 1))
+        fi
     done
+    
     wait
     cat "$_tarball_list"
 )
