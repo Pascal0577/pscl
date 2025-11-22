@@ -145,39 +145,65 @@ is_installed() (
     return 1
 )
 
-get_package_name() ( basename "$1" | sed 's/\.build$//' | sed 's/\.tar.*$//' )
+get_package_name() (
+    _pkg_list="$1"
+    _pkg_name_list=""
+
+    for pkg in $_pkg_list; do
+        _pkg_name_list="$_pkg_name_list $(basename "$pkg" | sed 's/\.build$//' | sed 's/\.tar.*$//')"
+    done
+
+    echo "$_pkg_name_list"
+)
 
 # Returns the directory containing the package's build script
 # Takes in the package to find as the first argument and the list of respositories as the second
 # Package can be either a path to a build script, path to the package directory, or just the package name
 get_package_dir() (
-    _pkg="$(get_package_name "$1")"
-    _pkg="${_pkg%.build}"
+    _pkg_list="$(get_package_name "$1")"
+    _pkg_dir_list=""
 
-    for repo in $REPOSITORY_LIST; do
-        if [ -d "$repo/$_pkg/" ]; then
-            echo "$repo/$_pkg/"
-            return 0
-        fi
+    for pkg in $_pkg_list; do
+        _to_test_against="$_pkg_dir_list"
+        for repo in $REPOSITORY_LIST; do
+            if [ -d "$repo/$pkg/" ]; then
+                _pkg_dir_list="$_pkg_dir_list $repo/$pkg/"
+            fi
+        done
+        [ "$_pkg_dir_list" = "$_to_test_against" ] && \
+            log_error "In get_package_dir: Could not find build dir for: $pkg"
     done
 
-    log_error "In get_package_dir: Could not find build dir for: $_pkg"
+    echo "$_pkg_dir_list"
 )
 
-# Cleanup is extremely important, so it's very verbose
+get_package_build() (
+    _pkg_list="$(get_package_name "$1")"
+    _pkg_build_list=""
+
+    for pkg in $_pkg_list; do
+        _pkg_dir="$(get_package_dir "$pkg")"
+        _pkg_build_list="$_pkg_build_list $_pkg_dir/$pkg.build"
+    done
+
+    echo "$_pkg_build_list"
+)
+
 cleanup() (
-    set -x
-    _pkg="$1"
+    [ "$verbose" = 1 ] && set -x
+    _pkg_list="$1"
 
     if [ "$do_cleanup" = 1 ]; then
-        log_debug "In cleanup: Running cleanup"
-        _pkg_dir="$(get_package_dir "$_pkg")"
+        for _pkg in $_pkg_list; do
+            log_debug "In cleanup: Running cleanup"
+            _pkg_dir="$(get_package_dir "$_pkg")"
 
-        # Tarballs, git repos, and patches were downloaded to build dir
-        [ -d "${_pkg_dir:?In cleanup: pkg dir is unset}/build/" ] && \
-            rm -rf "${_pkg_dir:?In cleanup: pkg dir is unset}/build/"
-        [ -d "${_pkg_dir:?In cleanup: pkg dir is unset}/install/" ] && \
-            rm -rf "${_pkg_dir:?In cleanup: pkg dir is unset}/install/"
+            # Tarballs, git repos, and patches were downloaded to build dir
+            [ -d "${_pkg_dir:?In cleanup: pkg dir is unset}/build/" ] && \
+                rm -rf "${_pkg_dir:?In cleanup: pkg dir is unset}/build/"
+            [ -d "${_pkg_dir:?In cleanup: pkg dir is unset}/install/" ] && \
+                rm -rf "${_pkg_dir:?In cleanup: pkg dir is unset}/install/"
+        done
     else
         log_warn "In cleanup: Cleanup called, but was disabled"
     fi
@@ -397,71 +423,91 @@ build_package() (
         || log_error "In build_package: Failed to create tar archive: $_package_name.tar"
 )
 
+collect_all_sources() (
+    _package_list="$1"
+    
+    for pkg in $_package_list; do
+        _pkg_dir="$(get_package_dir "$pkg")"
+        _pkg_build="$_pkg_dir/$pkg.build"
+        (
+            # shellcheck source=/dev/null
+            . "$_pkg_build"
+            echo "$package_source"
+        )
+    done
+)
+
 main_build() (
-    _package_to_build="$1"
-    _package_dir="$(get_package_dir "$_package_to_build")"
+    _package_list="$1"
 
-    log_debug "Sourcing $_package_to_build"
-
-    # shellcheck source=/dev/null
-    . "$(realpath "$_package_to_build")"
-
-    mkdir -p "$_package_dir/build"
-    cd "$_package_dir/build" || log_error "In main_build: Failed to change directory: $_package_dir/build"
-
-    _sources_list="$(echo "$package_source" | awk '{print $1}')"
-    _checksums_list="$(echo "$package_source" | awk '{print $2}')"
+    _all_source_data="$(collect_all_sources "$_package_list")"
+    _sources_list="$(echo "$_all_source_data" | awk '{print $1}')"
+    _checksums_list="$(echo "$_all_source_data" | awk '{print $2}')"
 
     prepare_sources "$_sources_list" "$_checksums_list" || log_error "In main_build: Failed to prepare sources"
-    build_package "$_package_to_build" || log_error "In main_build: Failed to build package"
-    echo "Successful!"
+
+    for pkg in $_package_list; do
+        _pkg_dir="$(get_package_dir "$pkg")"
+        _pkg_build="$(get_package_build "$pkg")"
+        log_debug "Sourcing $_pkg_build"
+
+        # shellcheck source=/dev/null
+        . "$(realpath "$_pkg_build")"
+
+        mkdir -p "$_pkg_dir/build"
+        cd "$_pkg_dir/build" || log_error "In main_build: Failed to change directory: $_package_dir/build"
+
+        build_package "$_pkg_build" || log_error "In main_build: Failed to build package"
+        echo "Successfully built: $pkg"
+    done
 )
 
 main_install() (
-    _pkg="$1"
+    _pkg_list="$1"
+    for _pkg in $_pkg_list; do
+        # Guarantee that no matter the input, _package_to_install always points to a compressed tar archive
+        _package_directory="$(get_package_dir "$_pkg")"
+        _package_name="$(get_package_name "$_pkg")"
+        _package_to_install="$_package_directory/$_package_name.tar.xz"
 
-    # Guarantee that no matter the input, _package_to_install always points to a compressed tar archive
-    _package_directory="$(get_package_dir "$_pkg")"
-    _package_name="$(get_package_name "$_pkg")"
-    _package_to_install="$_package_directory/$_package_name.tar.xz"
+        log_debug "In install_package: Installing package"
+        mkdir -p "${_package_directory:?}/install"
+        cd "$_package_directory/install" || log_error "In install_package: Failed to change directory: $_package_directory/install"
 
-    log_debug "In install_package: Installing package"
-    mkdir -p "${_package_directory:?}/install"
-    cd "$_package_directory/install" || log_error "In install_package: Failed to change directory: $_package_directory/install"
-
-    log_debug "In install_package: Current directory: $PWD"
-    log_debug "In install_package: Extracting: $_package_to_install"
-    
-    tar -xpf "$_package_to_install" || log_error "In install_package: Failed to extract tar archive: $_package_to_install"
-
-    _data_dir="$install_root/$METADATA_DIR/$_package_name"
-    log_debug "In install_package: data dir is: $_data_dir"
-
-    # Create it if it doesn't exist already
-    mkdir -p "$_data_dir" || \
-        log_error "In install_package: Failed to create directory: $_data_dir"
-
-    [ -f ./PKGFILES ] && mv ./PKGFILES "$_data_dir"
-    [ -f ./PKGINFO ]  && mv ./PKGINFO  "$_data_dir"
-
-    # Add package name to world file
-    grep -x "$_package_name" "$install_root/$INSTALLED" >/dev/null 2>&1 || \
-        echo "$_package_name" >> "$install_root/$INSTALLED"
-
-    # Install files
-    find . \( -type f -o -type l \) | while IFS= read -r file; do
-        target="$install_root/${file#./}"
-        targetdir="$(dirname "$target")"
+        log_debug "In install_package: Current directory: $PWD"
+        log_debug "In install_package: Extracting: $_package_to_install"
         
-        mkdir -p "$targetdir"
-        
-        # Install to temp location first
-        temp_target="${target}.pkg-new"
-	    cp -a "$file" "$temp_target"
-        
-        # Replace. This is an atomic operation
-        # TODO: If the file is not owned by the package manager, keep it as $target.pkg-new
-        mv "${temp_target:?}" "${target:?}"
+        tar -xpf "$_package_to_install" || log_error "In install_package: Failed to extract tar archive: $_package_to_install"
+
+        _data_dir="$install_root/$METADATA_DIR/$_package_name"
+        log_debug "In install_package: data dir is: $_data_dir"
+
+        # Create it if it doesn't exist already
+        mkdir -p "$_data_dir" || \
+            log_error "In install_package: Failed to create directory: $_data_dir"
+
+        [ -f ./PKGFILES ] && mv ./PKGFILES "$_data_dir"
+        [ -f ./PKGINFO ]  && mv ./PKGINFO  "$_data_dir"
+
+        # Add package name to world file
+        grep -x "$_package_name" "$install_root/$INSTALLED" >/dev/null 2>&1 || \
+            echo "$_package_name" >> "$install_root/$INSTALLED"
+
+        # Install files
+        find . \( -type f -o -type l \) | while IFS= read -r file; do
+            target="$install_root/${file#./}"
+            targetdir="$(dirname "$target")"
+            
+            mkdir -p "$targetdir"
+            
+            # Install to temp location first
+            temp_target="${target}.pkg-new"
+            cp -a "$file" "$temp_target"
+            
+            # Replace. This is an atomic operation
+            # TODO: If the file is not owned by the package manager, keep it as $target.pkg-new
+            mv "${temp_target:?}" "${target:?}"
+        done
     done
 )
 
@@ -547,30 +593,29 @@ main() {
 
     if [ "$install" = 1 ]; then
         BUILD_ORDER="$(get_build_order "$arguments")"
-        for package_name in $BUILD_ORDER; do
-            log_debug "In main: build order is: $BUILD_ORDER"
-            CURRENT_PACKAGE="$package_name"
-            _package_dir="$(get_package_dir "$package_name")"
-            _build_file="$_package_dir/$package_name.build"
-            _built_package="$_package_dir/$package_name.tar.xz"
+        log_debug "In main: build order is: $BUILD_ORDER"
+        _package_list="$BUILD_ORDER"
 
-            if is_installed "$package_name" && [ "$install_force" = 0 ]; then
-                log_warn "$package_name is already installed. Set -If to force install it"
-                continue
-            elif [ -e "$_built_package" ]; then
-                log_debug "In main: installing $_built_package"
-                main_install "$_built_package" || log_error "In main: Failed to install: $_built_package"
-                cleanup "$package_name"
-            elif [ "$build_to_install" = 1 ]; then
-                log_debug "In main: building: $_build_file"
-                main_build "$_build_file" || log_error "In main: Failed to build: $_build_file"
-                main_install "$_built_package" || log_error "In main: Failed to install: $_built_package"
-                cleanup "$package_name"
-            else
-                log_error "In main: No package found."
+        for pkg in $_package_list; do
+            _package_dir="$(get_package_dir "$pkg")"
+            if is_installed "$pkg" && [ "$install_force" = 0 ]; then
+                log_warn "In main: $pkg is installed already. Use -If to force install it"
+                BUILD_ORDER="$(remove_string_from_list "$pkg" "$BUILD_ORDER")"
+            elif [ -e "$_package_dir/$pkg.tar.xz" ]; then
+                main_install "$pkg" || log_error "In main: Failed to install: $pkg"
+                cleanup "$pkg"
+                BUILD_ORDER="$(remove_string_from_list "$pkg" "$BUILD_ORDER")"
             fi
-            CURRENT_PACKAGE=""
-        done && exit 0
+        done
+
+        if [ -n "$BUILD_ORDER" ]; then if [ "$build_to_install" = 1 ]; then
+            main_build "$BUILD_ORDER" || log_error "In main: Failed to build packages"
+            main_install "$BUILD_ORDER" || log_error "In main: Failed to install packages"
+            cleanup "$BUILD_ORDER"
+        else
+            log_error "Packages not built and -Ib not specified: $BUILD_ORDER"
+        fi fi
+        exit 0
     fi
 
     if [ "$create_package" = 1 ]; then
