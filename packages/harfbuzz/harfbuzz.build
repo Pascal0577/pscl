@@ -4,7 +4,7 @@ package_name="harfbuzz"
 package_version="11.4.1"
 package_description="An OpenType text shaping engine"
 package_source="https://github.com/harfbuzz/harfbuzz/releases/download/11.4.1/harfbuzz-11.4.1.tar.xz 0f2f8fe443032019b5ca9598c8e2b912"
-package_dependencies="freetype"
+package_dependencies="freetype glib"
 
 source_dir="$package_name-$package_version"
 
