@@ -6,7 +6,7 @@ package_description="Contains a library implementing the X11 Authorization Proto
 package_source="https://www.x.org/pub/individual/lib/libXau-1.0.12.tar.xz 4c9f81acf00b62e5de56a912691bd737"
 package_dependencies="xorgproto"
 
-source_dir="$package_name-$package_version"
+source_dir="libXau-$package_version"
 
 configure() {
     cd "$source_dir" || log_error "In $package_name.build: Failed to cd to $source_dir"
