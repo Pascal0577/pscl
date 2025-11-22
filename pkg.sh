@@ -370,14 +370,12 @@ prepare_sources() (
     _checksums_list="$2"
 
     [ -z "$_sources_list" ] && log_error "No sources provided"
-    _download_cmd="$(get_download_cmd "$CACHE_DIR")" || \
-        log_error "Failed to get download command"
-
-    _tarball_list="$(download "$_sources_list" "$_download_cmd")" || \
-        log_error "Failed to get tarball list"
-
+    
+    _download_cmd="$(get_download_cmd "$CACHE_DIR")"
+    _tarball_list="$(download "$_sources_list" "$_download_cmd")"
+    
     # Verify checksums if enabled
-    [ "$checksum_check" = 1 ] && {
+    if [ "$checksum_check" = 1 ]; then
         for tarball in $_tarball_list; do
             _md5sum="$(md5sum "$CACHE_DIR/$tarball" | awk '{print $1}')"
             _verified=0
@@ -386,7 +384,7 @@ prepare_sources() (
             done
             [ "$_verified" = 0 ] && log_error "Checksum failed: $tarball"
         done
-    }    
+    fi
 )
 
 build_package() (
