@@ -384,13 +384,7 @@ prepare_sources() (
             done
             [ "$_verified" = 0 ] && log_error "Checksum failed: $tarball"
         done
-    }
-    
-    # Unpack tarballs
-    for tarball in $_tarball_list; do
-        log_debug "In prepare_sources: Unpacking $tarball"
-        tar -xf "$CACHE_DIR/$tarball" || log_error "Failed to unpack: $tarball"
-    done
+    }    
 )
 
 build_package() (
@@ -398,6 +392,15 @@ build_package() (
     _package_directory="$(get_package_dir "$_pkg")"
     _package_name="$(get_package_name "$_pkg")"
     _package_version="${package_version:-unknown}"
+
+    _needed_tarballs="$(echo "$package_source" | awk '{print $1}')"
+    _needed_tarballs="${_needed_tarballs##*/}"
+
+    # Unpack tarballs
+    for tarball in $_needed_tarballs; do
+        log_debug "In prepare_sources: Unpacking $tarball"
+        tar -xf "$CACHE_DIR/$tarball" || log_error "Failed to unpack: $tarball"
+    done
 
     log_debug "In build_package: Package directory is: $_package_directory"
     for patch in "$_package_directory"/*.patch; do
@@ -441,7 +444,7 @@ collect_all_sources() (
         _pkg_build="$(trim_string "$_pkg_dir"/"$pkg".build)"
         (
             # shellcheck source=/dev/null
-            . "$_pkg_build"
+            . "$_pkg_build" || log_error "In collect_all_sources: Failed to source: $_pkg_build"
             echo "$package_source"
         )
     done
@@ -462,7 +465,7 @@ main_build() (
         log_debug "Sourcing $_pkg_build"
 
         # shellcheck source=/dev/null
-        . "$(realpath "$_pkg_build")"
+        . "$(realpath "$_pkg_build")" || log_error "In main_build: Failed to source: $_pkg_build"
 
         mkdir -p "$_pkg_dir/build"
         cd "$_pkg_dir/build" || log_error "In main_build: Failed to change directory: $_package_dir/build"
