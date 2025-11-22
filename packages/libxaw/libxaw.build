@@ -3,7 +3,7 @@
 package_name="libxaw"
 package_version="1.0.16"
 package_description="X.Org libxaw library"
-package_source="https://www.x.org/pub/individual/lib/libxaw-1.0.16.tar.xz 2a9793533224f92ddad256492265dd82"
+package_source="https://www.x.org/pub/individual/lib/libXaw-1.0.16.tar.xz 2a9793533224f92ddad256492265dd82"
 package_dependencies="libx11 libxext libxt libxmu libxpm xorgproto xorg-util-macros"
 
 source_dir="libXaw-$package_version"

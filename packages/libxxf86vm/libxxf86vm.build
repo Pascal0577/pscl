@@ -3,7 +3,7 @@
 package_name="libxxf86vm"
 package_version="1.1.6"
 package_description="X.Org libxxf86vm library"
-package_source="https://www.x.org/pub/individual/lib/libxxf86vm-1.1.6.tar.xz d3db4b6dc924dc151822f5f7e79ae873"
+package_source="https://www.x.org/pub/individual/lib/libXxf86vm-1.1.6.tar.xz d3db4b6dc924dc151822f5f7e79ae873"
 package_dependencies="libx11 libxext xorgproto xorg-util-macros"
 
 source_dir="libXxf86vm-$package_version"

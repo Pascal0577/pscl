@@ -3,7 +3,7 @@
 package_name="libxrender"
 package_version="0.9.12"
 package_description="X.Org libxrender library"
-package_source="https://www.x.org/pub/individual/lib/libxrender-0.9.12.tar.xz 4c54dce455d96e3bdee90823b0869f89"
+package_source="https://www.x.org/pub/individual/lib/libXrender-0.9.12.tar.xz 4c54dce455d96e3bdee90823b0869f89"
 package_dependencies="libx11 xorgproto"
 
 source_dir="libXrender-$package_version"

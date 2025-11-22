@@ -3,7 +3,7 @@
 package_name="libxft"
 package_version="2.3.9"
 package_description="X.Org libxft library"
-package_source="https://www.x.org/pub/individual/lib/libxft-2.3.9.tar.xz d378be0fcbd1f689f9a132e0d642bc4b"
+package_source="https://www.x.org/pub/individual/lib/libXft-2.3.9.tar.xz d378be0fcbd1f689f9a132e0d642bc4b"
 package_dependencies="libx11 libxrender fontconfig freetype xorgproto"
 
 source_dir="libXft-$package_version"

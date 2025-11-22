@@ -3,7 +3,7 @@
 package_name="libxdamage"
 package_version="1.1.6"
 package_description="X.Org libxdamage library"
-package_source="https://www.x.org/pub/individual/lib/libxdamage-1.1.6.tar.xz ca55d29fa0a8b5c4a89f609a7952ebf8"
+package_source="https://www.x.org/pub/individual/lib/libXdamage-1.1.6.tar.xz ca55d29fa0a8b5c4a89f609a7952ebf8"
 package_dependencies="libx11 libxfixes xorgproto"
 
 source_dir="libXdamage-$package_version"

@@ -3,7 +3,7 @@
 package_name="libxrandr"
 package_version="1.5.4"
 package_description="X.Org libxrandr library"
-package_source="https://www.x.org/pub/individual/lib/libxrandr-1.5.4.tar.xz 24e0b72abe16efce9bf10579beaffc27"
+package_source="https://www.x.org/pub/individual/lib/libXrandr-1.5.4.tar.xz 24e0b72abe16efce9bf10579beaffc27"
 package_dependencies="libx11 libxext libxrender xorgproto xorg-util-macros"
 
 source_dir="libXrandr-$package_version"

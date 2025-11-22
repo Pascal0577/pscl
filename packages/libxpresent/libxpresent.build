@@ -3,7 +3,7 @@
 package_name="libxpresent"
 package_version="1.0.1"
 package_description="X.Org libxpresent library"
-package_source="https://www.x.org/pub/individual/lib/libxpresent-1.0.1.tar.xz bdd3ec17c6181fd7b26f6775886c730d"
+package_source="https://www.x.org/pub/individual/lib/libXpresent-1.0.1.tar.xz bdd3ec17c6181fd7b26f6775886c730d"
 package_dependencies="libx11 libxext libxfixes libxrandr xorgproto xorg-util-macros"
 
 source_dir="libxpresent-$package_version"
