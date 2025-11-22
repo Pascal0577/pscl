@@ -4,7 +4,7 @@ package_name="xorgproto"
 package_version="2024.1"
 package_description="Provides the header files required to build the X Window system"
 package_source="https://xorg.freedesktop.org/archive/individual/proto/xorgproto-2024.1.tar.xz 12374d29fb5ae642cfa872035e401640"
-package_dependencies="util-macros"
+package_dependencies="xorg-util-macros"
 
 source_dir="$package_name-$package_version"
 
