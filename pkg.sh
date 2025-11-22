@@ -341,7 +341,7 @@ prepare_sources() (
     # Verify checksums if enabled
     [ "$checksum_check" = 1 ] && {
         for tarball in $_tarball_list; do
-            _md5sum="$(md5sum "$tarball" | awk '{print $1}')"
+            _md5sum="$(md5sum "$CACHE_DIR/$tarball" | awk '{print $1}')"
             _verified=0
             for checksum in $_checksums_list; do
                 [ "$_md5sum" = "$checksum" ] && _verified=1 && break
@@ -412,8 +412,8 @@ main_build() (
     _sources_list="$(echo "$package_source" | awk '{print $1}')"
     _checksums_list="$(echo "$package_source" | awk '{print $2}')"
 
-    prepare_sources "$_sources_list" "$_checksums_list"
-    build_package "$_package_to_build"
+    prepare_sources "$_sources_list" "$_checksums_list" || log_error "In main_build: Failed to prepare sources"
+    build_package "$_package_to_build" || log_error "In main_build: Failed to build package"
     echo "Successful!"
 )
 
