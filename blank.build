@@ -7,9 +7,9 @@ package_source=""
 package_dependencies=""
 
 source_dir="$package_name-$package_version"
-cd "$source_dir" || log_error "In $package_name.build: Failed to cd to $source_dir"
 
 configure() {
+    cd "$source_dir" || log_error "In $package_name.build: Failed to cd to $source_dir"
 }
 
 build() {
@@ -17,5 +17,5 @@ build() {
 }
 
 install_files() {
-    make DESTDIR="$destdir" install
+    make install
 }
