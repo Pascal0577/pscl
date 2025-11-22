@@ -513,7 +513,7 @@ get_build_order() (
 )
 
 main() {
-    exec 9>"$LOCKFILE"
+    exec 9>|"$LOCKFILE"
     flock -n 9 || log_error "In main: Another instance is running!"
 
     log_debug "In main: Parsing arguments"
