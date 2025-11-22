@@ -3,7 +3,7 @@
 package_name="libice"
 package_version="1.1.2"
 package_description="X.Org libice library"
-package_source="https://www.x.org/pub/individual/lib/libice-1.1.2.tar.xz d1ffde0a07709654b20bada3f9abdd16"
+package_source="https://www.x.org/pub/individual/lib/libICE-1.1.2.tar.xz d1ffde0a07709654b20bada3f9abdd16"
 package_dependencies="xtrans xorgproto xorg-util-macros"
 
 source_dir="libICE-$package_version"
