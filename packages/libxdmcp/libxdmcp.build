@@ -6,7 +6,7 @@ package_description="Contains a library implementing the X Display Manager Contr
 package_source="https://www.x.org/pub/individual/lib/libXdmcp-1.1.5.tar.xz ce0af51de211e4c99a111e64ae1df290"
 package_dependencies="xorgproto"
 
-source_dir="$package_name-$package_version"
+source_dir="libXdmcp-$package_version"
 
 configure() {
     cd "$source_dir" || log_error "In $package_name.build: Failed to cd to $source_dir"
