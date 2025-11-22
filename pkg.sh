@@ -313,7 +313,7 @@ get_download_cmd() (
     case "$_download_cmd" in
         wget|wget2)
             _download_cmd="$_download_cmd -P $_download_prefix"
-            [ "$verbose" = 0 ] && _download_cmd="$_download_cmd -q --show-progress"
+            [ "$verbose" = 0 ] && _download_cmd="$_download_cmd -q --show-progress=dot"
             [ "$certificate_check" = 0 ] && _download_cmd="$_download_cmd --no-check-certificate" ;;
         curl)
             # Fix curl later, it's a pain in the ass to work with
@@ -385,6 +385,8 @@ prepare_sources() (
             [ "$_verified" = 0 ] && log_error "Checksum failed: $tarball"
         done
     fi
+
+    return 0
 )
 
 build_package() (
