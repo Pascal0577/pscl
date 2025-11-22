@@ -138,6 +138,13 @@ parse_arguments() {
     esac
 }
 
+trim_string() (
+    trim=${1#${1%%[![:space:]]*}}
+    trim=${trim%${trim##*[![:space:]]}}
+    
+    printf '%s\n' "$trim" | sed 's/\/\//\/g/'
+)
+
 # Check if a package is already installed
 is_installed() (
     _pkg_name="$1"
@@ -167,7 +174,7 @@ get_package_dir() (
         _to_test_against="$_pkg_dir_list"
         for repo in $REPOSITORY_LIST; do
             if [ -d "$repo/$pkg/" ]; then
-                _pkg_dir_list="$_pkg_dir_list $repo/$pkg/"
+                _pkg_dir_list="$_pkg_dir_list $repo/$pkg"
             fi
         done
         [ "$_pkg_dir_list" = "$_to_test_against" ] && \
@@ -232,7 +239,7 @@ remove_string_from_list() (
         fi
     done
     # Trim leading space
-    echo "$_result" | sed 's/^ //'
+    trim_string "$_result"
 )
 
 list_of_dependencies() (
@@ -248,7 +255,7 @@ list_of_dependencies() (
         fi
     done
 
-    echo "${_dependency_list:-}"
+    trim_string "${_dependency_list:-}"
 )
 
 get_dependency_graph() (
@@ -285,7 +292,7 @@ get_dependency_graph() (
     _order="$_order $_node"
     log_debug "In get_dependency_graph: Adding $_node to dependency graph"
 
-    echo "$_visiting|$_resolved|$_order"
+    trim_string "$_visiting|$_resolved|$_order"
 )
 
 get_download_cmd() (
@@ -314,7 +321,7 @@ get_download_cmd() (
             _download_cmd="$_download_cmd -L -O" ;;
     esac
 
-    echo "$_download_cmd"
+    trim_string "$_download_cmd"
 )
 
 download() (
@@ -431,7 +438,7 @@ collect_all_sources() (
     
     for pkg in $_package_list; do
         _pkg_dir="$(get_package_dir "$pkg")"
-        _pkg_build="$_pkg_dir/$pkg.build"
+        _pkg_build="$(trim_string "$_pkg_dir"/"$pkg".build)"
         (
             # shellcheck source=/dev/null
             . "$_pkg_build"
