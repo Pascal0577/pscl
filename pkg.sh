@@ -34,6 +34,7 @@ install_root=""     # The root of the install. Used for bootstrapping
 
 # Used in dependency resolution
 BUILD_ORDER=""
+CURRENT_PACKAGE=""
 
 log_error() {
     printf "%b[ERROR]%b: %s\n" "$red" "$default" "$1" >&2

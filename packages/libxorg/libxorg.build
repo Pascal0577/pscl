@@ -65,7 +65,7 @@ configure() {
 
             *) ./configure "$CONFIG" "$docdir" ;;
         esac
-        )
+        ) || exit 1
     done
 }
 
@@ -80,7 +80,7 @@ build() {
             libpciaccess*) cd build && ninja ;;
             *) make ;;
         esac
-        )
+        ) || exit 1
     done
 }
 
@@ -95,6 +95,6 @@ install_files() {
             libpciaccess*) cd build && ninja install ;;
             *) make install ;;
         esac
-        )
+        ) || exit 1
     done
 }
