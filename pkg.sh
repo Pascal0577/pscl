@@ -327,6 +327,7 @@ get_download_cmd() (
 download() (
     _sources_list="$1"
     _download_cmd="$2"
+    _pids=""
     mkdir -p "$CACHE_DIR"
     _tarball_list=".tarball_list.$$"
 
@@ -339,7 +340,7 @@ download() (
         esac
     done
 
-    # Download all in parallel (no limiting)
+    # Download tarballs in parallel
     for source in $_sources_list; do
         _tarball_name="${source##*/}"
         echo "$_tarball_name" >> "$_tarball_list"
@@ -347,13 +348,7 @@ download() (
         [ -e "$CACHE_DIR/$_tarball_name" ] && continue
 
         ( $_download_cmd "$source" >/dev/null 2>&1 ) &
-        
-        # Crude rate limiting: count running jobs
-        while [ "$(jobs -r | wc -l)" -ge "$parallel_downloads" ]; do
-            sleep 0.1
-        done
     done
-    
     wait
     cat "$_tarball_list"
 )
