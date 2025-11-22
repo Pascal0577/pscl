@@ -1,0 +1,28 @@
+#!/bin/sh
+
+package_name="libxv"
+package_version="1.0.13"
+package_description="X.Org libxv library"
+package_source="https://www.x.org/pub/individual/lib/libxv-1.0.13.tar.xz 8a26503185afcb1bbd2c65e43f775a67"
+package_dependencies="libx11 libxext xorgproto xorg-util-macros"
+
+source_dir="$package_name-$package_version"
+
+configure() {
+    cd "$source_dir" || log_error "Failed to cd to $source_dir"
+    ./configure --prefix=/usr \
+        --sysconfdir=/etc \
+        --localstatedir=/var \
+        --disable-static \
+        --docdir="/usr/share/doc/$package_name-$package_version"
+}
+
+build() {
+    cd "$source_dir" || log_error "Failed to cd to $source_dir"
+    make
+}
+
+install_files() {
+    cd "$source_dir" || log_error "Failed to cd to $source_dir"
+    make DESTDIR="$DESTDIR" install
+}

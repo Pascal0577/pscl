@@ -1,0 +1,28 @@
+#!/bin/sh
+
+package_name="libx11"
+package_version="1.8.12"
+package_description="X.Org libx11 library"
+package_source="https://www.x.org/pub/individual/lib/libx11-1.8.12.tar.xz 146d770e564812e00f97e0cbdce632b7"
+package_dependencies="xtrans libxcb xorgproto xorg-util-macros"
+
+source_dir="$package_name-$package_version"
+
+configure() {
+    cd "$source_dir" || log_error "Failed to cd to $source_dir"
+    ./configure --prefix=/usr \
+        --sysconfdir=/etc \
+        --localstatedir=/var \
+        --disable-static \
+        --docdir="/usr/share/doc/$package_name-$package_version"
+}
+
+build() {
+    cd "$source_dir" || log_error "Failed to cd to $source_dir"
+    make
+}
+
+install_files() {
+    cd "$source_dir" || log_error "Failed to cd to $source_dir"
+    make DESTDIR="$DESTDIR" install
+}

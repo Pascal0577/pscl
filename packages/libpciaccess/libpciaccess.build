@@ -1,0 +1,26 @@
+#!/bin/sh
+
+package_name="libpciaccess"
+package_version="0.18.1"
+package_description="X.Org libpciaccess library"
+package_source="https://www.x.org/pub/individual/lib/libpciaccess-0.18.1.tar.xz 57c7efbeceedefde006123a77a7bc825"
+package_dependencies="zlib meson xorg-util-macros"
+
+source_dir="$package_name-$package_version"
+
+configure() {
+    cd "$source_dir" || log_error "Failed to cd to $source_dir"
+    mkdir -p build
+    cd build || log_error "Failed to cd to build"
+    meson setup --prefix=/usr --buildtype=release ..
+}
+
+build() {
+    cd "$source_dir/build" || log_error "Failed to cd to build"
+    ninja
+}
+
+install_files() {
+    cd "$source_dir/build" || log_error "Failed to cd to build"
+    DESTDIR="$DESTDIR" ninja install
+}

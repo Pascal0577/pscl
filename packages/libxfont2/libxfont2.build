@@ -1,0 +1,29 @@
+#!/bin/sh
+
+package_name="libxfont2"
+package_version="2.0.7"
+package_description="X.Org libxfont2 library"
+package_source="https://www.x.org/pub/individual/lib/libxfont2-2.0.7.tar.xz 66e03e3405d923dfaf319d6f2b47e3da"
+package_dependencies="libfontenc freetype xorgproto zlib xtrans xorg-util-macros"
+
+source_dir="$package_name-$package_version"
+
+configure() {
+    cd "$source_dir" || log_error "Failed to cd to $source_dir"
+    ./configure --prefix=/usr \
+        --sysconfdir=/etc \
+        --localstatedir=/var \
+        --disable-static \
+        --disable-devel-docs \
+        --docdir="/usr/share/doc/$package_name-$package_version"
+}
+
+build() {
+    cd "$source_dir" || log_error "Failed to cd to $source_dir"
+    make
+}
+
+install_files() {
+    cd "$source_dir" || log_error "Failed to cd to $source_dir"
+    make DESTDIR="$DESTDIR" install
+}

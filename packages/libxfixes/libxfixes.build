@@ -1,0 +1,28 @@
+#!/bin/sh
+
+package_name="libxfixes"
+package_version="6.0.1"
+package_description="X.Org libxfixes library"
+package_source="https://www.x.org/pub/individual/lib/libxfixes-6.0.1.tar.xz 65b9ba1e9ff3d16c4fa72915d4bb585a"
+package_dependencies="libx11 xorgproto xorg-util-macros"
+
+source_dir="$package_name-$package_version"
+
+configure() {
+    cd "$source_dir" || log_error "Failed to cd to $source_dir"
+    ./configure --prefix=/usr \
+        --sysconfdir=/etc \
+        --localstatedir=/var \
+        --disable-static \
+        --docdir="/usr/share/doc/$package_name-$package_version"
+}
+
+build() {
+    cd "$source_dir" || log_error "Failed to cd to $source_dir"
+    make
+}
+
+install_files() {
+    cd "$source_dir" || log_error "Failed to cd to $source_dir"
+    make DESTDIR="$DESTDIR" install
+}
