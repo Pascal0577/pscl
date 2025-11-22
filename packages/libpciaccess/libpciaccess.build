@@ -16,11 +16,9 @@ configure() {
 }
 
 build() {
-    cd "$source_dir/build" || log_error "Failed to cd to build"
     ninja
 }
 
 install_files() {
-    cd "$source_dir/build" || log_error "Failed to cd to build"
     DESTDIR="$DESTDIR" ninja install
 }
