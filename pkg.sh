@@ -482,7 +482,7 @@ collect_all_sources() (
     done
 
     echo ""
-    log_debug "In collect_all_sources: _all_sources"
+    log_debug "In collect_all_sources: $_all_sources"
     echo ""
 
     _sources="$(echo "$_all_sources" | awk '{print $1}')"
