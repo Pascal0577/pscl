@@ -481,6 +481,8 @@ collect_all_sources() (
         _all_sources="$_all_sources $package_source"
     done
 
+    log_debug "In collect_all_sources: $_all_sources"
+
     _sources="$(echo "$_all_sources" | awk '{print $1}')"
     _checksums="$(echo "$_all_sources" | awk '{print $2}')"
     download_sources "$_sources" "$_checksums" || \
