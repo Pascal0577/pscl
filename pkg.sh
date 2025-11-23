@@ -694,18 +694,25 @@ get_build_order() (
 # Basic stuff to check before doing anything gnarly
 sanity_checks() {
     [ -z "$arguments" ] && log_error "In sanity_checks: No arguments were provided"
+
     case "$parallel_downloads" in
         ''|*[!0-9]*) log_error "In sanity_checks: Invalid parallel_downloads value: $parallel_downloads" ;;
     esac
+
     mkdir -p "$CACHE_DIR" || log_error "Cannot create cache directory: $CACHE_DIR"
     [ -w "$CACHE_DIR" ] || log_error "In sanity_checks: Cache directory: $CACHE_DIR is not writable"
+
     for arg in $arguments; do
         if ( is_installed "$arg" ); then
             log_warn "$arg is already installed!"
             arguments="$(remove_string_from_list "$arg" "$arguments")"
         fi
     done
-    [ -z "$arguments" ] && echo "Nothing to do."
+
+    if [ -z "$arguments" ]; then 
+        echo "Nothing to do."
+        exit 0
+    fi
 }
 
 main() {
