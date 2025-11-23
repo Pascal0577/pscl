@@ -705,6 +705,7 @@ sanity_checks() {
             arguments="$(remove_string_from_list "$arg" "$arguments")"
         fi
     done
+    [ -z "$arguments" ] && echo "Nothing to do."
 }
 
 main() {
