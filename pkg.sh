@@ -162,8 +162,9 @@ parse_arguments() {
 # removes duplicate slashes, and prints the resulting string
 trim_string_and_return() (
     set -f
-    set -- "$*"
-    printf '%s\n' "$*" | sed 's/\/\//\/g/'
+    set -- $*
+    var="$(printf '%s\n' "$*")"
+    echo "$var" | sed 's/\/\//\//g'
 )
 
 # Check if a package is already installed
