@@ -697,11 +697,11 @@ sanity_checks() {
         ''|*[!0-9]*) log_error "In sanity_checks: Invalid parallel_downloads value: $parallel_downloads" ;;
     esac
 
-    mkdir -p "$CACHE_DIR" || log_error "Cannot create cache directory: $CACHE_DIR"
+    must mkdir -p "$CACHE_DIR"
     [ -w "$CACHE_DIR" ] || log_error "In sanity_checks: Cache directory: $CACHE_DIR is not writable"
 
     for arg in $arguments; do
-        if ( is_installed "$arg" ) && [ "$install_force" = 0 ]; then
+        if ( is_installed "$arg" ) && [ "$install_force" = 0 ] && [ "$uninstall" = 0 ]; then
             log_warn "$arg is already installed! Use -If to force install it"
             arguments="$(remove_string_from_list "$arg" "$arguments")"
         fi
