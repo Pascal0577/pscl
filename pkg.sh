@@ -468,7 +468,8 @@ download_sources() (
 # Used so downloads can be easily parallelized.
 collect_all_sources() (
     _package_list="$1"
-    _all_sources=""
+    _sources=""
+    _checksums=""
     
     for pkg in $_package_list; do
         _pkg_dir="$(get_package_dir "$pkg")" ||
