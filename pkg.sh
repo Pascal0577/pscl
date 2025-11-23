@@ -332,7 +332,7 @@ download() (
     _pids=""
     mkdir -p "$CACHE_DIR"
 
-    trap "for p in $_pids; do kill \$p 2>/dev/null; done; exit 1" INT TERM EXIT
+    trap "for p in $_pids; do kill $p 2>/dev/null; done; exit 1" INT TERM EXIT
 
     # Clone git repos first (can't parallelize easily)
     for source in $_sources_list; do
@@ -340,30 +340,28 @@ download() (
             *.git)
                 git clone "$source" || return 1
                 _sources_list="$(remove_string_from_list "$source" "$_sources_list")" ;;
+
+            *)
+                _tarball_name="${source##*/}"
+                _tarball_list="$_tarball_list $_tarball_name"
+
+                [ -e "$CACHE_DIR/$_tarball_name" ] && continue
+
+                # This downloads the tarballs to the cache directory
+                (
+                    trap 'rm "${CACHE_DIR:?}/${_tarball_name:?}"; exit 1' INT TERM
+                    $_download_cmd "$source" || exit 1
+                    echo ""
+                ) &
+
+                _pids="$_pids $!"
+                _job_count=$((_job_count + 1))
+
+                if [ "$_job_count" -ge "$parallel_downloads" ]; then
+                    wait -n 2>/dev/null || wait
+                    _job_count=$((_job_count - 1))
+                fi ;;
         esac
-    done
-
-    # Download tarballs in parallel
-    for source in $_sources_list; do
-        _tarball_name="${source##*/}"
-        _tarball_list="$_tarball_list $_tarball_name"
-
-        [ -e "$CACHE_DIR/$_tarball_name" ] && continue
-
-        # This downloads the tarballs to the cache directory
-        (
-            trap 'rm "${CACHE_DIR:?}/${_tarball_name:?}"; exit 1' INT TERM
-            $_download_cmd "$source" || exit 1
-            echo ""
-        ) &
-
-        _pids="$_pids $!"
-        _job_count=$((_job_count + 1))
-
-        if [ "$_job_count" -ge "$parallel_downloads" ]; then
-            wait -n 2>/dev/null || wait
-            _job_count=$((_job_count - 1))
-        fi
     done
     
     wait
@@ -634,6 +632,7 @@ main() {
         download_sources "$_sources" "$_checksums"
 
         for pkg in $BUILD_ORDER; do
+            trap 'cleanup "$pkg"' INT TERM EXIT
             main_build "$pkg"
             main_install "$pkg"
             cleanup "$pkg"
@@ -641,7 +640,7 @@ main() {
         exit 0
     fi
 
-    if [ "$install" = 1 ]; then
+    if [ "$create_package" = 1 ]; then
         BUILD_ORDER="$(get_build_order "$arguments")"
         log_debug "Build order: $BUILD_ORDER"
         [ -z "$BUILD_ORDER" ] && exit 0
