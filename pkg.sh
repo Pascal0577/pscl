@@ -699,6 +699,12 @@ sanity_checks() {
     esac
     mkdir -p "$CACHE_DIR" || log_error "Cannot create cache directory: $CACHE_DIR"
     [ -w "$CACHE_DIR" ] || log_error "In sanity_checks: Cache directory: $CACHE_DIR is not writable"
+    for arg in $arguments; do
+        if ( is_installed "$arg" ); then
+            log_warn "$arg is already installed!"
+            arguments="$(remove_string_from_list "$arg" "$arguments")"
+        fi
+    done
 }
 
 main() {
