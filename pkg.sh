@@ -332,7 +332,7 @@ download() (
     _pids=""
     mkdir -p "$CACHE_DIR"
 
-    trap "for p in $_pids; do kill $p 2>/dev/null; done; exit 1" INT TERM EXIT
+    trap "for p in $_pids; do kill \$p 2>/dev/null; done; exit 1" INT TERM EXIT
 
     # Clone git repos first (can't parallelize easily)
     for source in $_sources_list; do
