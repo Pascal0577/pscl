@@ -481,6 +481,10 @@ collect_all_sources() (
         _all_sources="$_all_sources $package_source"
     done
 
+    echo ""
+    log_debug "In collect_all_sources: _all_sources"
+    echo ""
+
     _sources="$(echo "$_all_sources" | awk '{print $1}')"
     log_debug "In collect_all_sources: Sources are $_sources"
 
