@@ -174,7 +174,7 @@ get_package_name() (
         for repo in $REPOSITORY_LIST; do
             [ -e "$repo/$pkg/$pkg.build" ] && _found=1 && break
         done
-        [ "$_found" = 0 ] && \
+        [ "${_found:-0}" = 0 ] && \
             log_error "In get_package_name: Package does not exist: $pkg"
     done
 
