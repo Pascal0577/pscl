@@ -410,10 +410,11 @@ download() (
                     # affecting what is removed by the trap. The trap ensures that no tarballs are
                     # partially downloaded to the cache
                     _file="$_tarball_name"
-                    trap 'rm -f "${CACHE_DIR:?}/${_file:?}" 2>/dev/null; exit 1' INT TERM
+                    trap 'rm -f "${CACHE_DIR:?}/${_file:?}" 2>/dev/null; exit 1' INT TERM EXIT
                     $_download_cmd "$source" || \
                         log_error "In download: Failed to download: $source"
                     echo ""
+                    trap - INT TERM EXIT
                 ) &
 
                 # Keep track of PIDs so we can kill the subshells if we recieve an interrupt.
@@ -447,7 +448,7 @@ download_sources() (
     _download_cmd="$(get_download_cmd "$CACHE_DIR")" || \
         log_error "In download_sources: Failed to deduce available download tool"
     _tarball_list="$(download "$_sources_list" "$_download_cmd")" || \
-        log_error "In download_sources: Failed to download at least one of: $_sources_list"
+        log_error "In download_sources: Failed to download one of: $_sources_list"
     
     # Verify checksums if enabled. Compares every checksum to every tarball
     if [ "$checksum_check" = 1 ]; then
