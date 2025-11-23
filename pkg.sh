@@ -308,10 +308,10 @@ list_of_dependencies() (
 # When calling this, only use the first argument. Leave all others empty
 # i.e. get_dependency_graph "$package" "" "" ""
 get_dependency_graph() (
-    _node=$1
-    _visiting=$2
-    _resolved=$3
-    _order=$4
+    _node="$1"
+    _visiting="$2"
+    _resolved="$3"
+    _order="$4"
 
     # Errors if there's a circular dependency
     if string_is_in_list "$_node" "$_visiting"; then
