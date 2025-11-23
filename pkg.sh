@@ -77,7 +77,8 @@ parse_arguments() {
                     done
                     shift
                     for arg in "$@"; do
-                        arguments="$arguments $(get_package_name "$arg")"
+                        arguments="$arguments $(get_package_name "$arg")" || \
+                            log_error "In parse_arguments: Pacakge name failed: $arg"
                     done
                     return 0 ;;
                 I)
@@ -708,33 +709,38 @@ main() {
     trap 'if [ -n "$CURRENT_PACKAGE" ]; then cleanup "$CURRENT_PACKAGE"; fi; exit 1' INT TERM EXIT
 
     if [ "$install" = 1 ]; then
-        BUILD_ORDER="$(get_build_order "$arguments")"
+        BUILD_ORDER="$(get_build_order "$arguments")" || \
+            log_error "In main: Failed to get build order"
         log_debug "Build order: $BUILD_ORDER"
 
         # Install already-built packages and remove from build list
         for pkg in $BUILD_ORDER; do
-            _package_dir="$(get_package_dir "$pkg")"
+            CURRENT_PACKAGE="$pkg"
+            _package_dir="$(get_package_dir "$pkg")" || \
+                log_error "In main: Failed to get package dir for: $pkg"
             if is_installed "$pkg" && [ "$install_force" = 0 ]; then
                 log_warn "$pkg already installed. Use -If to force"
                 BUILD_ORDER="$(remove_string_from_list "$pkg" "$BUILD_ORDER")"
                 continue
             elif [ -e "$_package_dir/$pkg.tar.xz" ]; then
-                main_install "$pkg"
-                cleanup "$pkg"
+                main_install "$pkg" || \
+                    log_error "In main: Failed to install: $pkg"
                 BUILD_ORDER="$(remove_string_from_list "$pkg" "$BUILD_ORDER")"
             fi
+            CURRENT_PACKAGE=""
         done
 
         [ -z "$BUILD_ORDER" ] && exit 0
-        [ "$build_to_install" = 0 ] && log_error "Packages not built and -Ib not specified: $BUILD_ORDER"
-        collect_all_sources "$BUILD_ORDER"
+        [ "$build_to_install" = 0 ] && \
+            log_error "Packages not built and -Ib not specified: $BUILD_ORDER"
+        collect_all_sources "$BUILD_ORDER" || \
+            log_error "In main: Failed to collect sources for one of: $BUILD_ORDER"
 
         # We need to set CURRENT_PACKAGE for the trap
         for pkg in $BUILD_ORDER; do
             CURRENT_PACKAGE="$pkg"
-            main_build "$pkg"
-            main_install "$pkg"
-            cleanup "$pkg"
+            main_build "$pkg"   || log_error "In main: Failed to build: $pkg"
+            main_install "$pkg" || log_error "In main: Failed to install: $pkg"
             CURRENT_PACKAGE=""
         done
         exit 0
@@ -746,12 +752,12 @@ main() {
             log_error "In main: Failed to get build order"
         log_debug "In main: Build order is: $BUILD_ORDER"
         [ -z "$BUILD_ORDER" ] && exit 0
-        collect_all_sources "$BUILD_ORDER"
+        collect_all_sources "$BUILD_ORDER" || \
+            log_error "In main: Failed to collect sources for one of: $BUILD_ORDER"
 
         for pkg in $BUILD_ORDER; do
             CURRENT_PACKAGE="$pkg"
-            main_build "$pkg"
-            cleanup "$pkg"
+            main_build "$pkg" || log_error "In main: Failed to build: $pkg"
             CURRENT_PACKAGE=""
         done
         exit 0
@@ -759,12 +765,14 @@ main() {
 
     if [ "$uninstall" = 1 ]; then
         for arg in $arguments; do
-            main_uninstall "$arg"
+            main_uninstall "$arg" || \
+                log_error "In main: Failed to uninstall: $arg"
         done && exit 0
     fi
 
     [ "$query" = 1 ] && for arg in $arguments; do
-        main_query "$arg"
+        main_query "$arg" || \
+            log_error "In main: Failed to query: $arg"
     done && exit 0
 }
 
