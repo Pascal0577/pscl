@@ -444,12 +444,12 @@ download_sources() (
     _checksums_list="$2"
 
     [ -z "$_sources_list" ] && log_error "No sources provided"
-    
+
     _download_cmd="$(get_download_cmd "$CACHE_DIR")" || \
         log_error "In download_sources: Failed to deduce available download tool"
     _tarball_list="$(download "$_sources_list" "$_download_cmd")" || \
         log_error "In download_sources: Failed to download one of: $_sources_list"
-    
+
     # Verify checksums if enabled. Compares every checksum to every tarball
     if [ "$checksum_check" = 1 ]; then
         for tarball in $_tarball_list; do
@@ -478,7 +478,7 @@ collect_all_sources() (
         # shellcheck source=/dev/null
         . "$_pkg_build" || \
             log_error "In collect_all_sources: Failed to source: $_pkg_build"
-        _all_sources="$_all_sources $package_source"
+        _all_sources="$(printf "%s %s\n" "$_all_sources" "$package_source")"
     done
 
     echo ""
