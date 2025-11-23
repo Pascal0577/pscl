@@ -665,9 +665,9 @@ main_uninstall() (
 
 # Simple
 main_query() (
-    [ "$show_info" = 1 ]   && cat "$install_root/$METADATA_DIR/$1/PKGINFO"
-    [ "$list_files" = 1 ]  && cat "$install_root/$METADATA_DIR/$1/PKGFILES"
-    [ "$print_world" = 1 ] && cat "$install_root/$INSTALLED"
+    [ "$print_world" = 1 ] && must cat "$install_root/$INSTALLED" && exit 0
+    [ "$show_info" = 1 ]   && must cat "$install_root/$METADATA_DIR/$1/PKGINFO"
+    [ "$list_files" = 1 ]  && must cat "$install_root/$METADATA_DIR/$1/PKGFILES"
 )
 
 # Takes in a full list of packages and uses get_dependency_graph to get the final build order
@@ -693,8 +693,6 @@ get_build_order() (
 
 # Basic stuff to check before doing anything gnarly
 sanity_checks() {
-    [ -z "$arguments" ] && log_error "In sanity_checks: No arguments were provided"
-
     case "$parallel_downloads" in
         ''|*[!0-9]*) log_error "In sanity_checks: Invalid parallel_downloads value: $parallel_downloads" ;;
     esac
@@ -703,13 +701,13 @@ sanity_checks() {
     [ -w "$CACHE_DIR" ] || log_error "In sanity_checks: Cache directory: $CACHE_DIR is not writable"
 
     for arg in $arguments; do
-        if ( is_installed "$arg" ); then
-            log_warn "$arg is already installed!"
+        if ( is_installed "$arg" ) && [ "$install_force" = 0 ]; then
+            log_warn "$arg is already installed! Use -If to force install it"
             arguments="$(remove_string_from_list "$arg" "$arguments")"
         fi
     done
 
-    if [ -z "$arguments" ]; then 
+    if [ -z "$arguments" ] && [ "$print_world" = 0 ]; then 
         echo "Nothing to do."
         exit 0
     fi
@@ -784,8 +782,7 @@ main() {
     fi
 
     [ "$query" = 1 ] && for arg in $arguments; do
-        main_query "$arg" || \
-            log_error "In main: Failed to query: $arg"
+        main_query "$arg" || log_error "In main: Failed to query: $arg"
     done && exit 0
 }
 
