@@ -148,8 +148,8 @@ parse_arguments() {
                     shift
                     arguments="$*"
                     return 0 ;;
-            esac
-            shift ;;
+                *) log_error "Unexpected operation: $1" ;;
+            esac ;;
         *) log_error "Unexpected argument: $1" ;;
     esac
 }
