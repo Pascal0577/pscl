@@ -307,6 +307,7 @@ list_of_dependencies() (
 # When calling this, only use the first argument. Leave all others empty
 # i.e. get_dependency_graph "$package" "" "" ""
 get_dependency_graph() (
+    set -e
     _node="$1"
     _visiting="$2"
     _resolved="$3"
