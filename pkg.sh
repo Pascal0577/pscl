@@ -389,7 +389,7 @@ download() (
 
     # Kill all child processes if we recieve an interrupt
     # shellcheck disable=SC2154
-    trap 'for p in $_pids; do kill \$p 2>/dev/null; done; exit 1' INT TERM
+    trap 'for p in $_pids; do kill \$p 2>/dev/null; done; exit 1' INT TERM EXIT
 
     for source in $_sources_list; do
         case "$source" in
@@ -404,7 +404,7 @@ download() (
                 [ -e "$CACHE_DIR/$_tarball_name" ] && continue
 
                 # This downloads the tarballs to the cache directory
-                (
+                if ! (
                     # Make a variable in this subshell to prevent _tarball_name's modification from
                     # affecting what is removed by the trap. The trap ensures that no tarballs are
                     # partially downloaded to the cache
@@ -414,7 +414,9 @@ download() (
                         log_error "In download: Failed to download: $source"
                     echo ""
                     trap - INT TERM EXIT
-                ) &
+                ) & then
+                    exit 1
+                fi
 
                 # Keep track of PIDs so we can kill the subshells if we recieve an interrupt.
                 _pids="$_pids $!"
@@ -432,7 +434,7 @@ download() (
 
     # Wait for the child processes to complete then remove the trap
     wait
-    trap - INT TERM
+    trap - INT TERM EXIT
     trim_string_and_return "$_tarball_list"
 )
 
