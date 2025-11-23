@@ -336,6 +336,7 @@ get_dependency_graph() (
         # Get the dependency graph of all the children recursively until there
         # are no more childen. At that point we are in the deepest part of the
         # tree and can append the child to the build order.
+        log_debug "get_dependency_graph [$child] [$_visiting] [$_resolved] [$_order]"
         result=$(must get_dependency_graph "$child" "$_visiting" "$_resolved" "$_order")
         _visiting=$(echo "$result" | cut -d '|' -f1)
         _resolved=$(echo "$result" | cut -d '|' -f2)
