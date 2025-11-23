@@ -170,12 +170,21 @@ get_package_name() (
         _pkg_name_list="$_pkg_name_list $(basename "$pkg" | sed 's/\.build$//' | sed 's/\.tar.*$//')"
     done
 
+    for pkg in $_pkg_name_list; do
+        for repo in $REPOSITORY_LIST; do
+            [ -e "$repo/$pkg/$pkg.build" ] && _found=1 && break
+        done
+        [ "$_found" = 0 ] && \
+            log_error "In get_package_name: Package does not exist: $pkg"
+    done
+
     trim_string_and_return "$_pkg_name_list"
 )
 
 # Returns the directory containing a package's build script
 get_package_dir() (
-    _pkg_list="$(get_package_name "$1")"
+    _pkg_list="$(get_package_name "$1")" || \
+        log_error "In get_package_dir: Failed to get package name: $1"
     _pkg_dir_list=""
 
     for pkg in $_pkg_list; do
@@ -196,11 +205,13 @@ get_package_dir() (
 
 # Returns the path to the build file for a package
 get_package_build() (
-    _pkg_list="$(get_package_name "$1")"
+    _pkg_list="$(get_package_name "$1")" || \
+        log_error "In get_package_build: Failed to get package name: $1"
     _pkg_build_list=""
 
     for pkg in $_pkg_list; do
-        _pkg_dir="$(get_package_dir "$pkg")"
+        _pkg_dir="$(get_package_dir "$pkg")" || \
+            log_error "In get_package_build: Failed to get package dir: $pkg"
         _pkg_build_list="$_pkg_build_list $_pkg_dir/$pkg.build"
     done
 
@@ -215,7 +226,7 @@ cleanup() (
     if [ "$do_cleanup" = 1 ]; then
         for _pkg in $_pkg_list; do
             log_debug "In cleanup: Running cleanup"
-            _pkg_dir="$(get_package_dir "$_pkg")"
+            _pkg_dir="$(get_package_dir "$_pkg")" || continue
 
             # These direcorites contain build artifacts and such
             [ -d "${_pkg_dir:?In cleanup: pkg dir is unset}/build/" ] && \
@@ -263,11 +274,13 @@ remove_string_from_list() (
 
 # Takes in a package as its argument and outputs its dependencies according to its build script
 list_of_dependencies() (
-    _package="$(get_package_name "$1")"
-    _package_build="$(get_package_build "$_package")"
+    _pkg="$(get_package_name "$1")" || \
+        log_error "In list_of_dependencies: Failed to get package name: $_pkg"
+    _pkg_build="$(get_package_build "$_pkg")" || \
+        log_error "In list_of_dependencies: Failed to get package build: $_pkg"
 
     # shellcheck source=/dev/null
-    . "$_package_build" || log_error "In list_of_dependencies: Failed to source: $_package_build"
+    . "$_pkg_build" || log_error "In list_of_dependencies: Failed to source: $_package_build"
 
     # package_dependencies is a variable defined in the package's build script
     trim_string_and_return "${package_dependencies:-}"
@@ -310,9 +323,11 @@ get_dependency_graph() (
         # If a package is installed we don't need to resolve it
         ( is_installed "$child" ) && continue
 
-        # Get the dependency graph of all the children recursively until there are no more childen.
-        # At that point we are in the deepest part of the tree and can append the child to the build order.
-        result=$(get_dependency_graph "$child" "$_visiting" "$_resolved" "$_order") || return 1
+        # Get the dependency graph of all the children recursively until there
+        # are no more childen. At that point we are in the deepest part of the
+        # tree and can append the child to the build order.
+        result=$(get_dependency_graph "$child" "$_visiting" "$_resolved" "$_order") || \
+            log_error "In get_dependency_graph: Failed to get dependency graph for: $child"
         _visiting=$(echo "$result" | cut -d '|' -f1)
         _resolved=$(echo "$result" | cut -d '|' -f2)
         _order=$(echo "$result" | cut -d '|' -f3)
@@ -370,7 +385,6 @@ download() (
     _job_count=0
     _tarball_list=""
     _pids=""
-    mkdir -p "$CACHE_DIR"
 
     # Kill all child processes if we recieve an interrupt
     # shellcheck disable=SC2154
@@ -395,7 +409,8 @@ download() (
                     # partially downloaded to the cache
                     _file="$_tarball_name"
                     trap 'rm -f "${CACHE_DIR:?}/${_file:?}" 2>/dev/null; exit 1' INT TERM
-                    $_download_cmd "$source" || exit 1
+                    $_download_cmd "$source" || \
+                        log_error "In download: Failed to download: $source"
                     echo ""
                 ) &
 
@@ -427,8 +442,10 @@ download_sources() (
 
     [ -z "$_sources_list" ] && log_error "No sources provided"
     
-    _download_cmd="$(get_download_cmd "$CACHE_DIR")"
-    _tarball_list="$(download "$_sources_list" "$_download_cmd")"
+    _download_cmd="$(get_download_cmd "$CACHE_DIR")" || \
+        log_error "In download_sources: Failed to deduce available download tool"
+    _tarball_list="$(download "$_sources_list" "$_download_cmd")" || \
+        log_error "In download_sources: Failed to download at least one of: $_sources_list"
     
     # Verify checksums if enabled. Compares every checksum to every tarball
     if [ "$checksum_check" = 1 ]; then
@@ -438,7 +455,8 @@ download_sources() (
             for checksum in $_checksums_list; do
                 [ "$_md5sum" = "$checksum" ] && _verified=1 && break
             done
-            [ "$_verified" = 0 ] && log_error "Checksum failed: $tarball"
+            [ "${_verified:?}" = 0 ] && \
+                log_error "In download_sources: Checksum failed: $tarball"
         done
     fi
 )
@@ -450,16 +468,20 @@ collect_all_sources() (
     _all_sources=""
     
     for pkg in $_package_list; do
-        _pkg_dir="$(get_package_dir "$pkg")"
+        _pkg_dir="$(get_package_dir "$pkg")" ||
+            log_error "In collect_all_sources: Failed to get package dir for: $_pkg_dir"
         _pkg_build="$(trim_string_and_return "$_pkg_dir"/"$pkg".build)"
+
         # shellcheck source=/dev/null
-        . "$_pkg_build" || log_error "In collect_all_sources: Failed to source: $_pkg_build"
+        . "$_pkg_build" || \
+            log_error "In collect_all_sources: Failed to source: $_pkg_build"
         _all_sources="$_all_sources $package_source"
     done
 
     _sources="$(echo "$_all_sources" | awk '{print $1}')"
     _checksums="$(echo "$_all_sources" | awk '{print $2}')"
-    download_sources "$_sources" "$_checksums"
+    download_sources "$_sources" "$_checksums" || \
+        log_error "In collect_all_sources: Failed to download needed source code"
 )
 
 ##############################
@@ -469,8 +491,14 @@ collect_all_sources() (
 # First argument is a package to compile and turn into an installable tarball
 main_build() (
     _pkg="$1"
-    _pkg_dir="$(get_package_dir "$_pkg")"
-    _pkg_build="$(get_package_build "$pkg")"
+    _pkg_dir="$(get_package_dir "$_pkg")" || \
+        log_error "In main_build: Failed to get package directory for: $_pkg"
+    _pkg_build="$(get_package_build "$_pkg")" || \
+        log_error "In main_build: Failed to get build script for: $_pkg"
+
+    # shellcheck source=/dev/null
+    . "$(realpath "$_pkg_build")" || \
+        log_error "In main_build: Failed to source: $_pkg_build"
 
     # These come from the packages build script
     _pkg_name="${package_name:?}"
@@ -479,12 +507,10 @@ main_build() (
 
     log_debug "In main_build: Sourcing $_pkg_build"
 
-    # shellcheck source=/dev/null
-    . "$(realpath "$_pkg_build")" || log_error "In main_build: Failed to source: $_pkg_build"
-
     # Create build directory and cd to it
     mkdir -p "$_pkg_dir/build"
-    cd "$_pkg_dir/build" || log_error "In main_build: Failed to change directory: $_package_dir/build"
+    cd "$_pkg_dir/build" \
+        || log_error "In main_build: Failed to change directory: $_package_dir/build"
 
     # Unpack tarballs
     for tarball in $_needed_tarballs; do
@@ -535,22 +561,27 @@ main_build() (
 main_install() (
     _pkg="$1"
 
-    # Guarantee that no matter the input, _package_to_install always points to a compressed tar archive
-    _package_directory="$(get_package_dir "$_pkg")"
-    _package_name="$(get_package_name "$_pkg")"
+    # Guarantee that no matter the input, 
+    # _package_to_install always points to a compressed tar archive
+    _package_directory="$(get_package_dir "$_pkg")" || \
+        log_error "In main_install: Failed to get package directory for: $_pkg"
+    _package_name="$(get_package_name "$_pkg")" || \
+        log_error "In main_install: Failed to get package name for: $_pkg"
     _package_to_install="$_package_directory/$_package_name.tar.xz"
 
     # If the installation fails we don't want the metadata to persist
-    trap 'rm -rf ${$install_root/$METADATA_DIR/$_package_name:?}' INT TERM EXIT
+    trap 'rm -rf "${install_root:?}/${METADATA_DIR:?}/${_package_name:?}"' INT TERM EXIT
 
     log_debug "In install_package: Installing package"
     mkdir -p "${_package_directory:?}/install"
-    cd "$_package_directory/install" || log_error "In install_package: Failed to change directory: $_package_directory/install"
+    cd "$_package_directory/install" || \
+        log_error "In install_package: Failed to change directory: $_package_directory/install"
 
     log_debug "In install_package: Current directory: $PWD"
     log_debug "In install_package: Extracting: $_package_to_install"
     
-    tar -xpf "$_package_to_install" || log_error "In install_package: Failed to extract tar archive: $_package_to_install"
+    tar -xpf "$_package_to_install" \
+        || log_error "In install_package: Failed to extract tar archive: $_package_to_install"
 
     _data_dir="$install_root/$METADATA_DIR/$_package_name"
     log_debug "In install_package: data dir is: $_data_dir"
@@ -580,6 +611,8 @@ main_install() (
         # TODO: If the file is not owned by the package manager, keep it as $target.pkg-new
         mv "${temp_target:?}" "${target:?}"
     done
+
+    trap - INT TERM EXIT
 )
 
 # First argument is the name of the package we want to uninstall
@@ -596,7 +629,7 @@ main_uninstall() (
     [ -z "$_package_metadata_dir" ] && log_error "In main_uninstall: Package not found: $_package_to_uninstall"
     log_debug "In main_uninstall: Found metadata at: $_package_metadata_dir"
     [ -f "$_package_metadata_dir/PKGFILES" ] || \
-        \log_error "In main_uninstall: PKGFILES not found for $_package_to_uninstall. Is it installed properly?"
+        log_error "In main_uninstall: PKGFILES not found for $_package_to_uninstall. Is it installed properly?"
     
     # Remove files in reverse order (deepest first)
     log_debug "In main_uninstall: Removing files"
@@ -637,13 +670,14 @@ get_build_order() (
 
     if [ "$resolve_dependencies" = 0 ]; then
         log_warn "In get_build_order: Resolution of dependencies is disabled"
-        echo "$_pkgs"
+        trim_string_and_return "$_pkg_list"
         return 0
     fi
 
     for pkg in $_pkg_list; do
         log_debug "In get_build_order: Resolving dependencies for: $pkg"
-        result=$(get_dependency_graph "$pkg" "" "" "")
+        result=$(get_dependency_graph "$pkg" "" "" "") \
+            || log_error "In get_build_order: Failed to create dependency graph for: $pkg"
         _BUILD_ORDER="$_BUILD_ORDER $(echo "$result" | cut -d '|' -f3)"
     done
 
@@ -651,13 +685,14 @@ get_build_order() (
 )
 
 # Basic stuff to check before doing anything gnarly
-sanity_checks() (
+sanity_checks() {
     [ -z "$arguments" ] && log_error "In sanity_checks: No arguments were provided"
     case "$parallel_downloads" in
         ''|*[!0-9]*) log_error "In sanity_checks: Invalid parallel_downloads value: $parallel_downloads" ;;
     esac
+    mkdir -p "$CACHE_DIR" || log_error "Cannot create cache directory: $CACHE_DIR"
     [ -w "$CACHE_DIR" ] || log_error "In sanity_checks: Cache directory: $CACHE_DIR is not writable"
-)
+}
 
 main() {
     exec 9>|"$LOCKFILE"
@@ -665,6 +700,7 @@ main() {
 
     log_debug "In main: Parsing arguments"
     parse_arguments "$@"
+    sanity_checks
 
     log_debug "In main: arguments are: $arguments"
 
@@ -690,7 +726,7 @@ main() {
 
         [ -z "$BUILD_ORDER" ] && exit 0
         [ "$build_to_install" = 0 ] && log_error "Packages not built and -Ib not specified: $BUILD_ORDER"
-        collect_all_sources "$B"
+        collect_all_sources "$BUILD_ORDER"
 
         # We need to set CURRENT_PACKAGE for the trap
         for pkg in $BUILD_ORDER; do
