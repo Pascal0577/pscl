@@ -479,8 +479,8 @@ collect_all_sources() (
         # shellcheck source=/dev/null
         . "$_pkg_build" || \
             log_error "In collect_all_sources: Failed to source: $_pkg_build"
-        _sources="$_sources $("$package_source" | awk '{print $1}')"
-        _checksums="$_checksums $("$package_source" | awk '{print $2}')"
+        _sources="$_sources $(echo "$package_source" | awk '{print $1}')"
+        _checksums="$_checksums $(echo "$package_source" | awk '{print $2}')"
     done
 
 
