@@ -328,7 +328,7 @@ download() (
     _sources_list="$1"
     _download_cmd="$2"
     _job_count=0
-    _tarball_list=".tarball_list.$$"
+    _tarball_list=""
     _pids=""
     mkdir -p "$CACHE_DIR"
 
@@ -346,17 +346,18 @@ download() (
     # Download tarballs in parallel
     for source in $_sources_list; do
         _tarball_name="${source##*/}"
-        echo "$_tarball_name" >> "$_tarball_list"
+        _tarball_list="$_tarball_list $_tarball_name"
 
         [ -e "$CACHE_DIR/$_tarball_name" ] && continue
 
         # This downloads the tarballs to the cache directory
         (
-            trap 'rm "${CACHE_DIR:?}/${_tarball_name:?}" exit 1' INT TERM
-            $_download_cmd "$source" || exit 1; echo ""
+            trap 'rm "${CACHE_DIR:?}/${_tarball_name:?}"; exit 1' INT TERM
+            $_download_cmd "$source" || exit 1
+            echo ""
         ) &
-        _pids="$_pids $!"
 
+        _pids="$_pids $!"
         _job_count=$((_job_count + 1))
 
         if [ "$_job_count" -ge "$parallel_downloads" ]; then
@@ -367,7 +368,7 @@ download() (
     
     wait
     trap - INT TERM EXIT
-    cat "$_tarball_list"
+    trim_string "$_tarball_list"
 )
 
 download_sources() (
