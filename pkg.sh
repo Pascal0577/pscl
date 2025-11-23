@@ -146,11 +146,10 @@ parse_arguments() {
 # Takes in a string, removes all leading and trailing whitespace, 
 # removes duplicate slashes, and prints the resulting string
 trim_string_and_return() (
-    # shellcheck disable=SC2295
-    trim=${1#${1%%[![:space:]]*}}
-    # shellcheck disable=SC2295
-    trim=${trim%${trim##*[![:space:]]}}
-    printf '%s\n' "$trim" | sed 's/\/\//\/g/'
+    set -f
+    set -- $*
+    var="$(printf '%s\n' "$*")"
+    echo "$var" | sed 's/\/\//\//g'
 )
 
 # Check if a package is already installed
