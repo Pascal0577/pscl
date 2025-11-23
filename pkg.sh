@@ -738,7 +738,8 @@ main() {
                 BUILD_ORDER="$(remove_string_from_list "$pkg" "$BUILD_ORDER")"
                 continue
             elif [ -e "$_package_dir/$pkg.tar.xz" ]; then
-                must main_install "$pkg"
+                main_install "$pkg" || log_error "Failed to install: $pkg"
+                must cleanup "$pkg"
                 BUILD_ORDER="$(remove_string_from_list "$pkg" "$BUILD_ORDER")"
             fi
             CURRENT_PACKAGE=""
@@ -754,6 +755,7 @@ main() {
             CURRENT_PACKAGE="$pkg"
             main_build "$pkg"   || log_error "In main: Failed to build: $pkg"
             main_install "$pkg" || log_error "In main: Failed to install: $pkg"
+            mut cleanup "$pkg"
             CURRENT_PACKAGE=""
         done
         exit 0
@@ -769,6 +771,7 @@ main() {
         for pkg in $BUILD_ORDER; do
             CURRENT_PACKAGE="$pkg"
             main_build "$pkg" || log_error "In main: Failed to build: $pkg"
+            must cleanup "$pkg"
             CURRENT_PACKAGE=""
         done
         exit 0
