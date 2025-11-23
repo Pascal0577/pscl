@@ -331,6 +331,8 @@ download() (
     _tarball_list=".tarball_list.$$"
     mkdir -p "$CACHE_DIR"
 
+    trap "for p in $_pids; do kill \$p 2>/dev/null; done; rm -f '$_tarball_list'; exit 1" INT TERM EXIT
+
     # Clone git repos first (can't parallelize easily)
     for source in $_sources_list; do
         case "$source" in
@@ -348,10 +350,8 @@ download() (
         [ -e "$CACHE_DIR/$_tarball_name" ] && continue
 
         # This downloads the tarballs to the cache directory
-        (
-            $_download_cmd "$source" || exit 1
-            echo ""
-        ) &
+        ( $_download_cmd "$source" || exit 1; echo "" ) &
+        pids="$pids $!"
 
         _job_count=$((_job_count + 1))
 
@@ -362,6 +362,7 @@ download() (
     done
     
     wait
+    trap - INT TERM EXIT
     cat "$_tarball_list"
 )
 
