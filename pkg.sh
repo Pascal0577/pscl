@@ -352,7 +352,7 @@ download() (
 
         # This downloads the tarballs to the cache directory
         (
-            trap 'exit 1' INT TERM
+            trap 'rm "${CACHE_DIR:?}/${_tarball_name:?}" exit 1' INT TERM
             $_download_cmd "$source" || exit 1; echo ""
         ) &
         _pids="$_pids $!"
