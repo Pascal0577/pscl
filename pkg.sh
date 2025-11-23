@@ -401,7 +401,7 @@ build_package() (
 
     # Unpack tarballs
     for tarball in $_needed_tarballs; do
-        log_debug "In prepare_sources: Unpacking $tarball"
+        log_debug "In build_package: Unpacking $tarball"
         tar -xf "$CACHE_DIR/$tarball" || log_error "Failed to unpack: $tarball"
     done
 
@@ -413,8 +413,8 @@ build_package() (
 
     log_debug "In build_package: Starting build. Current dir is $PWD"
 
-    configure || log_error "In compile_source: In $arguments: In configure: "
-    build || log_error "In compile_source: In $arguments: In build: "
+    configure || log_error "In build_package: In $arguments: In configure: "
+    build || log_error "In build_package: In $arguments: In build: "
 
     log_debug "In build_package: Building package"
     mkdir -p "$_package_directory/build/package"
@@ -626,7 +626,7 @@ main() {
         _all_sources="$(collect_all_sources "$BUILD_ORDER")"
         _sources="$(echo "$_all_sources" | awk '{print $1}')"
         _checksums="$(echo "$_all_sources" | awk '{print $2}')"
-        prepare_sources "$_sources" "$_checksums"
+        download_sources "$_sources" "$_checksums"
 
         for pkg in $BUILD_ORDER; do
             main_build "$pkg"
@@ -644,7 +644,7 @@ main() {
         _all_sources="$(collect_all_sources "$BUILD_ORDER")"
         _sources="$(echo "$_all_sources" | awk '{print $1}')"
         _checksums="$(echo "$_all_sources" | awk '{print $2}')"
-        prepare_sources "$_sources" "$_checksums"
+        download_sources "$_sources" "$_checksums"
 
         for pkg in $BUILD_ORDER; do
             main_build "$pkg"
