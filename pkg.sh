@@ -478,17 +478,12 @@ collect_all_sources() (
         # shellcheck source=/dev/null
         . "$_pkg_build" || \
             log_error "In collect_all_sources: Failed to source: $_pkg_build"
-        _all_sources="$(printf "%s %s\n" "$_all_sources" "$package_source")"
+        _sources="$_sources $("$package_source" | awk '{print $1}')"
+        _checksums="$_checksums $("$package_source" | awk '{print $2}')"
     done
 
-    echo ""
-    log_debug "In collect_all_sources: $_all_sources"
-    echo ""
 
-    _sources="$(echo "$_all_sources" | awk '{print $1}')"
     log_debug "In collect_all_sources: Sources are $_sources"
-
-    _checksums="$(echo "$_all_sources" | awk '{print $2}')"
     log_debug "In collect_all_sources: Sums are $_checksums"
 
     download_sources "$_sources" "$_checksums" || \
