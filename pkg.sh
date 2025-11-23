@@ -257,6 +257,10 @@ remove_string_from_list() (
     trim_string_and_return "$_result"
 )
 
+#########################
+# Dependency Management #
+#########################
+
 # Takes in a package as its argument and outputs its dependencies according to its build script
 list_of_dependencies() (
     _package="$(get_package_name "$1")"
@@ -321,6 +325,10 @@ get_dependency_graph() (
 
     trim_string_and_return "$_visiting|$_resolved|$_order"
 )
+
+######################
+# Download Functions #
+######################
 
 # This function figures out what tool to use to download tarballs.
 # It checks for the availability of wget and curl.
@@ -435,63 +443,6 @@ download_sources() (
     fi
 )
 
-# First argument is the package to compile and turn into an installable tarball
-build_package() (
-    _pkg="$1"
-    _package_directory="$(get_package_dir "$_pkg")"
-
-    # These come from the packages build script, which we sourced in main_build
-    _package_name="${package_name:?}"
-    _package_version="${package_version:-unknown}"
-    _needed_tarballs="$(echo "$package_source" | awk '{print $1}')"
-    _needed_tarballs="${_needed_tarballs##*/}"
-
-    # Unpack tarballs
-    for tarball in $_needed_tarballs; do
-        log_debug "In build_package: Unpacking $tarball"
-        tar -xf "$CACHE_DIR/$tarball" || log_error "Failed to unpack: $tarball"
-    done
-
-    # Move patches to the expected directory so the build script can apply them
-    log_debug "In build_package: Package directory is: $_package_directory"
-    for patch in "$_package_directory"/*.patch; do
-        log_debug "In build: Moving $patch to $_package_directory/build/"
-        cp -a "$patch" "$_package_directory/build"
-    done
-
-    log_debug "In build_package: Starting build. Current dir is $PWD"
-
-    # These commands are provided by the build script which was sourced in main_build
-    configure || log_error "In build_package: In $arguments: In configure: "
-    build || log_error "In build_package: In $arguments: In build: "
-
-    log_debug "In build_package: Building package"
-    mkdir -p "$_package_directory/build/package"
-
-    # So make and ninja and the like install the files to where we can easily make a tarball
-    export DESTDIR="$(realpath "$_package_directory/build/package")"
-
-    log_debug "In build_package: DESTDIR is: $DESTDIR"
-    install_files || log_error "In build_package: In $_pkg: In install_files"
-
-    # Metadata about the package
-    log_debug "In build_package: Creating metadata"
-    cat > "$DESTDIR/PKGINFO" <<- EOF
-		package_name=$_package_name
-		package_version=${_package_version:-unknown}
-		builddate=$(date +%s)
-		source="$package_source"
-	EOF
-
-    log_debug "In build_package: Creating package"
-    cd "$DESTDIR" || log_error "In build_package: Failed to change directory: $DESTDIR"
-    find . ! -name '.' ! -name 'PKGFILES' ! -name 'PKGINFO' \
-        \( -type f -o -type l -o -type d \) -printf '%P\n' > PKGFILES
-
-    tar -Jcpf "$_package_directory/$_package_name.tar.xz" . \
-        || log_error "In build_package: Failed to create tar archive: $_package_name.tar"
-)
-
 # Takes in a list of packages and outputs a combined list of sources that they all need.
 # Used so downloads can be easily parallelized.
 collect_all_sources() (
@@ -511,22 +462,74 @@ collect_all_sources() (
     download_sources "$_sources" "$_checksums"
 )
 
-# Takes in one package build (NOT a list) and builds it
+##############################
+# Package Building Functions #
+##############################
+
+# First argument is a package to compile and turn into an installable tarball
 main_build() (
     _pkg="$1"
-    _pkg_dir="$(get_package_dir "$pkg")"
+    _pkg_dir="$(get_package_dir "$_pkg")"
     _pkg_build="$(get_package_build "$pkg")"
+
+    # These come from the packages build script
+    _pkg_name="${package_name:?}"
+    _needed_tarballs="$(echo "$package_source" | awk '{print $1}')"
+    _needed_tarballs="${_needed_tarballs##*/}"
 
     log_debug "In main_build: Sourcing $_pkg_build"
 
     # shellcheck source=/dev/null
     . "$(realpath "$_pkg_build")" || log_error "In main_build: Failed to source: $_pkg_build"
 
+    # Create build directory and cd to it
     mkdir -p "$_pkg_dir/build"
     cd "$_pkg_dir/build" || log_error "In main_build: Failed to change directory: $_package_dir/build"
 
-    build_package "$_pkg_build" || log_error "In main_build: Failed to build package"
-    echo "Successfully built: $pkg"
+    # Unpack tarballs
+    for tarball in $_needed_tarballs; do
+        log_debug "In main_build: Unpacking $tarball"
+        tar -xf "$CACHE_DIR/$tarball" || log_error "Failed to unpack: $tarball"
+    done
+
+    # Move patches to the expected directory so the build script can apply them
+    log_debug "In main_build: Package directory is: $_pkg_dir"
+    for patch in "$_pkg_dir"/*.patch; do
+        log_debug "In build: Moving $patch to $_pkg_dir/build/"
+        cp -a "$patch" "$_pkg_dir/build"
+    done
+
+    log_debug "In main_build: Starting build. Current dir is $PWD"
+
+    # These commands are provided by the build script which was sourced in main_build
+    configure || log_error "In main_build: In $arguments: In configure: "
+    build || log_error "In main_build: In $arguments: In build: "
+
+    log_debug "In main_build: Building package"
+    mkdir -p "$_pkg_dir/build/package"
+
+    # So make and ninja and the like install the files to where we can easily make a tarball
+    export DESTDIR="$(realpath "$_pkg_dir/build/package")"
+
+    log_debug "In main_build: DESTDIR is: $DESTDIR"
+    install_files || log_error "In main_build: In $_pkg: In install_files"
+
+    # Metadata about the package
+    log_debug "In main_build: Creating metadata"
+    cat > "$DESTDIR/PKGINFO" <<- EOF
+		package_name=${package_name:?}
+		package_version=${package_version:-unknown}
+		builddate=$(date +%s)
+		source="$package_source"
+	EOF
+
+    log_debug "In main_build: Creating package"
+    cd "$DESTDIR" || log_error "In main_build: Failed to change directory: $DESTDIR"
+    find . ! -name '.' ! -name 'PKGFILES' ! -name 'PKGINFO' \
+        \( -type f -o -type l -o -type d \) -printf '%P\n' > PKGFILES
+
+    tar -Jcpf "$_pkg_dir/$_pkg_name.tar.xz" . \
+        || log_error "In main_build: Failed to create compressed tar archive: $_pkg_name.tar.xz"
 )
 
 main_install() (
