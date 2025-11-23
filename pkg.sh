@@ -602,54 +602,54 @@ main() {
 
     if [ "$install" = 1 ]; then
         BUILD_ORDER="$(get_build_order "$arguments")"
-        log_debug "In main: build order is: $BUILD_ORDER"
-        _package_list="$BUILD_ORDER"
+        log_debug "Build order: $BUILD_ORDER"
 
-        for pkg in $_package_list; do
+        # Install already-built packages and remove from build list
+        for pkg in $BUILD_ORDER; do
             _package_dir="$(get_package_dir "$pkg")"
+            
             if is_installed "$pkg" && [ "$install_force" = 0 ]; then
-                log_warn "In main: $pkg is installed already. Use -If to force install it"
+                log_warn "$pkg already installed. Use -If to force"
                 BUILD_ORDER="$(remove_string_from_list "$pkg" "$BUILD_ORDER")"
+                continue
             elif [ -e "$_package_dir/$pkg.tar.xz" ]; then
-                main_install "$pkg" || log_error "In main: Failed to install: $pkg"
+                main_install "$pkg"
                 cleanup "$pkg"
                 BUILD_ORDER="$(remove_string_from_list "$pkg" "$BUILD_ORDER")"
             fi
         done
 
-        if [ -n "$BUILD_ORDER" ]; then if [ "$build_to_install" = 1 ]; then
-            _all_source_data="$(collect_all_sources "$_package_list")"
-            _sources_list="$(echo "$_all_source_data" | awk '{print $1}')"
-            _checksums_list="$(echo "$_all_source_data" | awk '{print $2}')"
+        [ -z "$BUILD_ORDER" ] && exit 0
+        [ "$build_to_install" = 0 ] && log_error "Packages not built and -Ib not specified: $BUILD_ORDER"
 
-            download_sources "$_sources_list" "$_checksums_list" || log_error "In main_build: Failed to prepare sources"
-            
-            for pkg in $BUILD_ORDER; do
-                main_build "$pkg" || log_error "In main: Failed to build packages"
-                main_install "$pkg" || log_error "In main: Failed to install packages"
-                cleanup "$pkg"
-            done
-        else
-            log_error "Packages not built and -Ib not specified: $BUILD_ORDER"
-        fi fi
+        _all_sources="$(collect_all_sources "$BUILD_ORDER")"
+        _sources="$(echo "$_all_sources" | awk '{print $1}')"
+        _checksums="$(echo "$_all_sources" | awk '{print $2}')"
+        prepare_sources "$_sources" "$_checksums"
+
+        for pkg in $BUILD_ORDER; do
+            main_build "$pkg"
+            main_install "$pkg"
+            cleanup "$pkg"
+        done
         exit 0
     fi
 
-    if [ "$create_package" = 1 ]; then
+    if [ "$install" = 1 ]; then
         BUILD_ORDER="$(get_build_order "$arguments")"
-        for package_name in $BUILD_ORDER; do
-            CURRENT_PACKAGE="$package_name"
-            log_debug "In main: build order is: $BUILD_ORDER"
-            _build_dir="$(get_package_dir "$package_name")"
-            _build_file="$_build_dir/$package_name.build"
-            _built_package="$_build_dir/$package_name.tar.xz"
-            if [ ! -e "$_built_package" ]; then
-                log_debug "In main: Building: $_build_file"
-                main_build "$_build_file" || log_error "In main: Failed to build: $_build_file"
-                cleanup "$package_name"
-            fi
-            CURRENT_PACKAGE=""
-        done && exit 0
+        log_debug "Build order: $BUILD_ORDER"
+        [ -z "$BUILD_ORDER" ] && exit 0
+
+        _all_sources="$(collect_all_sources "$BUILD_ORDER")"
+        _sources="$(echo "$_all_sources" | awk '{print $1}')"
+        _checksums="$(echo "$_all_sources" | awk '{print $2}')"
+        prepare_sources "$_sources" "$_checksums"
+
+        for pkg in $BUILD_ORDER; do
+            main_build "$pkg"
+            cleanup "$pkg"
+        done
+        exit 0
     fi
 
     if [ "$uninstall" = 1 ]; then
