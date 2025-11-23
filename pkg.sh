@@ -316,7 +316,8 @@ get_dependency_graph() (
     _visiting="$_visiting $_node"
 
     # The dependencies of a package are the children
-    _deps=$(list_of_dependencies "$_node")
+    _deps=$(list_of_dependencies "$_node") || \
+        log_error "In get_dependency_graph: Failed to get dependencies for: $_node"
     log_debug "In get_dependency_graph: Dependencies for $_node are: $_deps"
 
     for child in $_deps; do
