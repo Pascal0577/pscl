@@ -462,6 +462,7 @@ download_sources() (
                 log_error "In download_sources: Checksum failed: $tarball"
         done
     fi
+    return 0
 )
 
 # Takes in a list of packages and outputs a combined list of sources that they all need.
@@ -483,6 +484,8 @@ collect_all_sources() (
         _checksums="$_checksums $(echo "$package_source" | awk '{print $2}')"
     done
 
+    _sources="$(trim_string_and_return "$_sources")"
+    _checksums="$(trim_string_and_return "$_checksums")"
 
     log_debug "In collect_all_sources: Sources are $_sources"
     log_debug "In collect_all_sources: Sums are $_checksums"
