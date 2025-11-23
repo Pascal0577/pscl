@@ -329,6 +329,7 @@ download() (
     _download_cmd="$2"
     _job_count=0
     _tarball_list=".tarball_list.$$"
+    _pids=""
     mkdir -p "$CACHE_DIR"
 
     trap "for p in $_pids; do kill \$p 2>/dev/null; done; rm -f '$_tarball_list'; exit 1" INT TERM EXIT
@@ -351,7 +352,7 @@ download() (
 
         # This downloads the tarballs to the cache directory
         ( $_download_cmd "$source" || exit 1; echo "" ) &
-        pids="$pids $!"
+        _pids="$_pids $!"
 
         _job_count=$((_job_count + 1))
 
