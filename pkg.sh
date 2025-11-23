@@ -365,7 +365,7 @@ download() (
     cat "$_tarball_list"
 )
 
-prepare_sources() (
+download_sources() (
     _sources_list="$1"
     _checksums_list="$2"
 
@@ -454,12 +454,6 @@ collect_all_sources() (
 
 main_build() (
     _package_list="$1"
-
-    _all_source_data="$(collect_all_sources "$_package_list")"
-    _sources_list="$(echo "$_all_source_data" | awk '{print $1}')"
-    _checksums_list="$(echo "$_all_source_data" | awk '{print $2}')"
-
-    prepare_sources "$_sources_list" "$_checksums_list" || log_error "In main_build: Failed to prepare sources"
 
     for pkg in $_package_list; do
         _pkg_dir="$(get_package_dir "$pkg")"
@@ -624,9 +618,17 @@ main() {
         done
 
         if [ -n "$BUILD_ORDER" ]; then if [ "$build_to_install" = 1 ]; then
-            main_build "$BUILD_ORDER" || log_error "In main: Failed to build packages"
-            main_install "$BUILD_ORDER" || log_error "In main: Failed to install packages"
-            cleanup "$BUILD_ORDER"
+            _all_source_data="$(collect_all_sources "$_package_list")"
+            _sources_list="$(echo "$_all_source_data" | awk '{print $1}')"
+            _checksums_list="$(echo "$_all_source_data" | awk '{print $2}')"
+
+            download_sources "$_sources_list" "$_checksums_list" || log_error "In main_build: Failed to prepare sources"
+            
+            for pkg in $BUILD_ORDER; do
+                main_build "$pkg" || log_error "In main: Failed to build packages"
+                main_install "$pkg" || log_error "In main: Failed to install packages"
+                cleanup "$pkg"
+            done
         else
             log_error "Packages not built and -Ib not specified: $BUILD_ORDER"
         fi fi
