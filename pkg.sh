@@ -632,10 +632,11 @@ main() {
         download_sources "$_sources" "$_checksums"
 
         for pkg in $BUILD_ORDER; do
-            trap 'cleanup "$pkg"' INT TERM EXIT
+            CURRENT_PACKAGE="$pkg"
             main_build "$pkg"
             main_install "$pkg"
             cleanup "$pkg"
+            CURRENT_PACKAGE=""
         done
         exit 0
     fi
