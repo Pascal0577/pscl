@@ -481,10 +481,12 @@ collect_all_sources() (
         _all_sources="$_all_sources $package_source"
     done
 
-    log_debug "In collect_all_sources: $_all_sources"
-
     _sources="$(echo "$_all_sources" | awk '{print $1}')"
+    log_debug "In collect_all_sources: Sources are $_sources"
+
     _checksums="$(echo "$_all_sources" | awk '{print $2}')"
+    log_debug "In collect_all_sources: Sums are $_checksums"
+
     download_sources "$_sources" "$_checksums" || \
         log_error "In collect_all_sources: Failed to download needed source code"
 )
