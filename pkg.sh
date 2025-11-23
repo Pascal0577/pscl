@@ -741,8 +741,9 @@ main() {
 
     # Same logic as install, but simpler
     if [ "$create_package" = 1 ]; then
-        BUILD_ORDER="$(get_build_order "$arguments")"
-        log_debug "Build order: $BUILD_ORDER"
+        BUILD_ORDER="$(get_build_order "$arguments")" || \
+            log_error "In main: Failed to get build order"
+        log_debug "In main: Build order is: $BUILD_ORDER"
         [ -z "$BUILD_ORDER" ] && exit 0
         collect_all_sources "$BUILD_ORDER"
 
