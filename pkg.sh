@@ -7,6 +7,7 @@ set -uC
 readonly red="\x1b[31m"
 readonly blue="\x1b[34m"
 readonly yellow="\x1b[33m"
+readonly green="\x1b[32m"
 readonly default="\x1b[39m"
 
 readonly METADATA_DIR="/var/lib/pkg"
@@ -567,26 +568,36 @@ main_build() (
 
     tar -Jcpf "$_pkg_dir/$_pkg_name.tar.xz" . \
         || log_error "In main_build: Failed to create compressed tar archive: $_pkg_name.tar.xz"
+
+    printf "%b[SUCCESS]%b: %b" "$green" "$default" "Successfully built $_pkg_name!"
 )
 
 main_install() (
     _pkg="$1"
+    _installed_files=""
+    _pids=""
+    _job_count=""
+    _max_jobs="$(nproc)"
 
     # Guarantee that no matter the input, 
     # _package_to_install always points to a compressed tar archive
-    _package_directory="$(get_package_dir "$_pkg")" || \
+    _pkg_dir="$(get_package_dir "$_pkg")" || \
         log_error "In main_install: Failed to get package directory for: $_pkg"
-    _package_name="$(get_package_name "$_pkg")" || \
+    _pkg_name="$(get_package_name "$_pkg")" || \
         log_error "In main_install: Failed to get package name for: $_pkg"
-    _package_to_install="$_package_directory/$_package_name.tar.xz"
+    _package_to_install="$_pkg_dir/$_pkg_name.tar.xz"
 
-    # If the installation fails we don't want the metadata to persist
-    trap 'rm -rf "${install_root:?}/${METADATA_DIR:?}/${_package_name:?}"' INT TERM EXIT
+    # shellcheck disable=SC2154
+    trap '
+    for f in $_installed_files; do rm "$f"; done
+    for p in $_pids; do kill "$p"; done
+    rm -rf "${install_root:?}/${METADATA_DIR:?}/${_pkg_name:?}"
+    log_error "In main_install: Something went wrong. Cleaning up files..."' INT TERM EXIT
 
     log_debug "In install_package: Installing package"
-    mkdir -p "${_package_directory:?}/install"
-    cd "$_package_directory/install" || \
-        log_error "In install_package: Failed to change directory: $_package_directory/install"
+    mkdir -p "${_pkg_dir:?}/install"
+    cd "$_pkg_dir/install" || \
+        log_error "In install_package: Failed to change directory: $_pkg_dir/install"
 
     log_debug "In install_package: Current directory: $PWD"
     log_debug "In install_package: Extracting: $_package_to_install"
@@ -594,7 +605,7 @@ main_install() (
     tar -xpf "$_package_to_install" \
         || log_error "In install_package: Failed to extract tar archive: $_package_to_install"
 
-    _data_dir="$install_root/$METADATA_DIR/$_package_name"
+    _data_dir="$install_root/$METADATA_DIR/$_pkg_name"
     log_debug "In install_package: data dir is: $_data_dir"
 
     # Create it if it doesn't exist already
@@ -604,26 +615,59 @@ main_install() (
     [ -f ./PKGINFO ]  && mv ./PKGINFO  "$_data_dir"
 
     # Add package name to world file if it's not in there already
-    grep -x "$_package_name" "$install_root/$INSTALLED" >/dev/null 2>&1 || \
-        echo "$_package_name" >> "$install_root/$INSTALLED"
+    grep -x "$_pkg_name" "$install_root/$INSTALLED" >/dev/null 2>&1 || \
+        echo "$_pkg_name" >> "$install_root/$INSTALLED"
 
-    # Install files
-    find . \( -type f -o -type l \) | while IFS= read -r file; do
-        target="$install_root/${file#./}"
-        targetdir="$(dirname "$target")"
-        
-        mkdir -p "$targetdir"
-        
-        # Install to temp location first
-        temp_target="${target}.pkg-new"
-        mv "${file:?}" "${temp_target:?}"
-        
-        # Replace. This is an atomic operation
-        # TODO: If the file is not owned by the package manager, keep it as $target.pkg-new
-        mv "${temp_target:?}" "${target:?}"
+    IFS='
+    '
+    set -f
+
+    _files_to_install="$(find . \( -type f -o -type l \))"
+
+    for file in $_files_to_install; do
+        target="$install_root/${file#./}.pkg-new"
+        _installed_files="$_installed_files $target"
+        if ! (
+            _temp_target="$target"
+            _targetdir="$(dirname "$target")"
+
+            # Install to temp location first, then replace
+            # TODO: If the file is not owned by the package manager, keep it as $target.pkg-new
+            mkdir -p "$_targetdir" || \
+                log_error "In main_install: Failed to make dir: $_targetdir"
+            mv "${file:?}" "${_temp_target:?}" || \
+                log_error "In main_install: Failed to install temporary file: $_temp_target"
+        ) & then
+            exit 1
+        fi
+
+        _pids="$_pids $!"
+        _job_count=$((_job_count + 1))
+
+        if [ "$_job_count" -ge "$_max_jobs" ]; then
+            wait -n 2>/dev/null || wait
+            _job_count=$((_job_count - 1))
+        fi
     done
 
+    wait
+    _pids=""
+    _job_count=0
+
+    for file in $_installed_files; do
+        if ! ( mv "${file:?}" "${file%.pkg-new}" ) & then exit 1; fi
+        _pids="$_pids $!"
+        _job_count=$((_job_count + 1))
+
+        if [ "$_job_count" -ge "$_max_jobs" ]; then
+            wait -n 2>/dev/null || wait
+            _job_count=$((_job_count - 1))
+        fi
+    done
+    wait
+
     trap - INT TERM EXIT
+    printf "%b[SUCCESS]%b: %b" "$green" "$default" "Successfully installed $_pkg_name!"
 )
 
 # First argument is the name of the package we want to uninstall
@@ -641,7 +685,7 @@ main_uninstall() (
     log_debug "In main_uninstall: Found metadata at: $_package_metadata_dir"
     [ -f "$_package_metadata_dir/PKGFILES" ] || \
         log_error "In main_uninstall: PKGFILES not found for $_package_to_uninstall. Is it installed properly?"
-    
+
     # Remove files in reverse order (deepest first)
     log_debug "In main_uninstall: Removing files"
     sort -r "$_package_metadata_dir/PKGFILES" | while IFS= read -r file; do
@@ -665,6 +709,8 @@ main_uninstall() (
  
     log_debug "In main_uninstall: Removing metadata: $_package_metadata_dir"
     rm -rf "${_package_metadata_dir:?In main_install: _package_metadata_dir is unset}"
+
+    printf "%b[SUCCESS]%b: %b" "$green" "$default" "Successfully uninstalled $_package_to_uninstall!"
 )
 
 # Simple
@@ -699,10 +745,14 @@ get_build_order() (
 sanity_checks() {
     [ -z "$arguments" ] && log_error "In sanity_checks: No arguments were provided"
     case "$parallel_downloads" in
-        ''|*[!0-9]*) log_error "In sanity_checks: Invalid parallel_downloads value: $parallel_downloads" ;;
+        ''|*[!0-9]*)
+            log_error "In sanity_checks: Invalid parallel downloads value: $parallel_downloads"
+            ;;
     esac
-    mkdir -p "$CACHE_DIR" || log_error "Cannot create cache directory: $CACHE_DIR"
-    [ -w "$CACHE_DIR" ] || log_error "In sanity_checks: Cache directory: $CACHE_DIR is not writable"
+    mkdir -p "$CACHE_DIR" || \
+        log_error "Cannot create cache directory: $CACHE_DIR"
+    [ -w "$CACHE_DIR" ] || \
+        log_error "In sanity_checks: Cache directory: $CACHE_DIR is not writable"
 }
 
 main() {

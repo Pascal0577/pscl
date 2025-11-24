@@ -4,6 +4,7 @@ package_name="wget"
 package_version="1.25.0"
 package_description="A utility useful for non-interactive downloading of files from the web"
 package_source="https://ftp.gnu.org/gnu/wget/wget-1.25.0.tar.gz c70ba58b36f944e8ba1d655ace552881"
+package_dependencies="make-ca libpsl"
 
 source_dir="wget-1.25.0"
 
