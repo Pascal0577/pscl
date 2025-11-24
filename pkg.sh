@@ -579,7 +579,7 @@ main_install() (
         log_error "In main_install: Failed to get package directory for: $_pkg"
     _pkg_name="$(get_package_name "$_pkg")" || \
         log_error "In main_install: Failed to get package name for: $_pkg"
-    _package_archive="$_pkg_dir/$_pkg_name.tar.zst"
+    _package_archive="$PACKAGE_CACHE/$_pkg_name.tar.zst"
 
     _data_dir="${INSTALL_ROOT:-}/${METADATA_DIR:?}/$_pkg_name"
     log_debug "In install_package: data dir is: $_data_dir"
