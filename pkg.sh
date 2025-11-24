@@ -638,7 +638,7 @@ main_install() (
             mv "${file:?}" "${_temp_target:?}" || \
                 log_error "In main_install: Failed to install temporary file: $_temp_target"
         ) & then
-            exit 1
+            log_error "In main_install: Failed to install temporary files"
         fi
 
         _pids="$_pids $!"
@@ -655,7 +655,9 @@ main_install() (
     _job_count=0
 
     for file in $_installed_files; do
-        if ! ( mv "${file:?}" "${file%.pkg-new}" ) & then exit 1; fi
+        if ! ( mv "${file:?}" "${file%.pkg-new}" ) & then
+            log_error "In main_install: Failed to install files"
+        fi
         _pids="$_pids $!"
         _job_count=$((_job_count + 1))
 
