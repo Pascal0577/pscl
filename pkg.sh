@@ -81,7 +81,7 @@ parse_arguments() {
                     shift
                     for arg in "$@"; do
                         ARGUMENTS="$ARGUMENTS $(get_package_name "$arg")" || \
-                            log_error "In parse_arguments: Pacakge name failed: $arg"
+                            log_error "In parse_arguments: Package name failed: $arg"
                     done
                     return 0 ;;
                 I)
@@ -174,6 +174,7 @@ get_package_name() (
     done
 
     for pkg in $_pkg_name_list; do
+        _found=0
         for repo in $REPOSITORY_LIST; do
             [ -e "$repo/$pkg/$pkg.build" ] && _found=1 && break
         done
@@ -560,7 +561,7 @@ main_build() (
         \( -type f -o -type l -o -type d \) -printf '%P\n' > PKGFILES
 
     tar -Jcpf "${INSTALL_ROOT:-}/${PACKAGE_CACHE:?}/$_pkg_name.tar.zst" . \
-        || log_error "In main_build: Failed to create compressed tar archive: $_pkg_name.tar.xz"
+        || log_error "In main_build: Failed to create compressed tar archive: $_pkg_name.tar.zst"
 
     printf "%b[SUCCESS]%b: %b" "$green" "$default" "Successfully built $_pkg_name!"
 )
@@ -578,7 +579,7 @@ main_install() (
         log_error "In main_install: Failed to get package directory for: $_pkg"
     _pkg_name="$(get_package_name "$_pkg")" || \
         log_error "In main_install: Failed to get package name for: $_pkg"
-    _package_archive="$_pkg_dir/$_pkg_name.tar.xz"
+    _package_archive="$_pkg_dir/$_pkg_name.tar.zst"
 
     _data_dir="${INSTALL_ROOT:-}/${METADATA_DIR:?}/$_pkg_name"
     log_debug "In install_package: data dir is: $_data_dir"
@@ -711,6 +712,7 @@ main_query() (
     [ "$SHOW_INFO" = 1 ]   && cat "${INSTALL_ROOT:-}/${METADATA_DIR:?}/$1/PKGINFO"
     [ "$LIST_FILES" = 1 ]  && cat "${INSTALL_ROOT:-}/${METADATA_DIR:?}/$1/PKGFILES"
     [ "$PRINT_WORLD" = 1 ] && cat "${INSTALL_ROOT:-}/${INSTALLED:?}"
+    return 0
 )
 
 # Takes in a full list of packages and uses get_dependency_graph to get the final build order
@@ -774,16 +776,16 @@ main() {
                 log_warn "$pkg already installed. Use -If to force"
                 BUILD_ORDER="$(remove_string_from_list "$pkg" "$BUILD_ORDER")"
                 continue
-            elif [ -e "$_package_dir/$pkg.tar.xz" ]; then
+            elif [ -e "$PACKAGE_CACHE/$pkg.tar.zst" ]; then
                 main_install "$pkg" || \
-                    log_error "In main: Failed to INSTALL: $pkg"
+                    log_error "In main: Failed to install: $pkg"
                 BUILD_ORDER="$(remove_string_from_list "$pkg" "$BUILD_ORDER")"
             fi
         done
 
         [ -z "$BUILD_ORDER" ] && echo "Nothing to do." && exit 0
         [ "$CREATE_PACKAGE" = 0 ] && \
-            log_error "Packages not built and -Ib not specified: $BUILD_ORDER"
+            log_error "No pre-built package available. Use -Ib to build package before installing"
 
         collect_all_sources "$BUILD_ORDER" || \
             log_error "In main: Failed to collect sources for one of: $BUILD_ORDER"
