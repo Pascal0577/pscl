@@ -643,7 +643,7 @@ main_install() (
     _job_count=0
 
     while read -r file; do
-        ( mv "${file:?}" "${file%.pkg-new}" ) &
+        ( [ -e "$file" ] && mv "${file:?}" "${file%.pkg-new}" ) &
         _pids="$_pids $!"
         _job_count=$((_job_count + 1))
 
