@@ -603,7 +603,7 @@ main_install() (
     log_debug "In install_package: Current directory: $PWD"
     log_debug "In install_package: Extracting: $_package_archive"
 
-    tar -xpvf "$_package_archive" | sed 's/\.\///' > "$_data_dir/PKGFILES" \
+    tar -xpvf "$_package_archive" | sed 's/\.\///' > "$_data_dir/PKGFILES.pkg-new" \
         || log_error "In install_package: Failed to extract archive: $_package_archive"
 
     IFS='
@@ -636,7 +636,7 @@ main_install() (
             wait -n 2>/dev/null || wait
             _job_count=$((_job_count - 1))
         fi
-    done < "$_data_dir/PKGFILES"
+    done < "$_data_dir/PKGFILES.pkg-new"
     wait || log_error "In main_install: Failed to INSTALL temporary files"
 
     _pids=""
@@ -652,10 +652,12 @@ main_install() (
             wait -n 2>/dev/null || wait
             _job_count=$((_job_count - 1))
         fi
-    done < "$_data_dir/PKGFILES"
+    done < "$_data_dir/PKGFILES.pkg-new"
     wait || log_error "In main_install: Failed to INSTALL files"
 
     [ -f ./PKGINFO ] && mv ./PKGINFO "$_data_dir"
+    [ -f "$_data_dir/PKGFILES.pkg-new" ] && \
+        mv "$_data_dir/PKGFILES.pkg-new" "$_data_dir/PKGFILES"
 
     # Add package name to world file if it's not in there already
     grep -x "$_pkg_name" "${INSTALL_ROOT:-}/${INSTALLED:?}" >/dev/null 2>&1 || \
