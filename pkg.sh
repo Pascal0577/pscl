@@ -589,9 +589,9 @@ main_install() (
 
     # shellcheck disable=SC2154
     trap '
-    for f in $_installed_files; do rm "$f"; done
-    for p in $_pids; do kill "$p"; done
-    rm -rf "${install_root}/${METADATA_DIR:?}/${_pkg_name:?}"
+    for f in $_installed_files; do rm "$f" 2>/dev/null ; done
+    for p in $_pids; do kill "$p" 2>/dev/null ; done
+    rm -rf "${install_root}/${METADATA_DIR:?}/${_pkg_name:?}" 2>/dev/null
     log_error "In main_install: Something went wrong. Cleaning up files..."' INT TERM EXIT
 
     log_debug "In install_package: Installing package"
