@@ -1,6 +1,7 @@
 #!/bin/sh
 
 set -uC
+# Set pipefail if the shell supports it
 # shellcheck disable=SC3040
 ( set -o pipefail >/dev/null ) && set -o pipefail
 
@@ -10,34 +11,35 @@ readonly yellow="\x1b[33m"
 readonly green="\x1b[32m"
 readonly default="\x1b[39m"
 
-readonly METADATA_DIR="/var/lib/pkg"
+readonly METADATA_DIR="/var/pkg/metadata"
 readonly INSTALLED="$METADATA_DIR/installed"
-readonly REPOSITORY_LIST="${REPOSITORY_LIST:-/sources/package-management/packages}"
-readonly LOCKFILE="/var/run/pkg.lock"
-readonly CACHE_DIR="/var/cache/pkg"
+readonly REPOSITORY_LIST="${REPOSITORY_LIST:-/var/pkg/repositories/*}"
+readonly LOCKFILE="/var/pkg/pkg.lock"
+readonly CACHE_DIR="${CACHE_DIR:-/var/pkg/source_cache}"
+readonly PACKAGE_CACHE="${PACKAGE_CACHE:-/var/pkg/package_cache}"
 
-verbose=0              # Enable verbose messages
-install=0              # Are we installing a package?
-create_package=0       # Are we building a package?
-uninstall=0            # Are we uninstalling a package?
-query=0                # Are we querying a package's info?
-do_cleanup=1           # Whether to cleanup the build directory when building packages
-resolve_dependencies=1 # Do we want to resolve dependencies while installing?
-build_to_install=0     # If there's not a package ready to install, do we build one?
-install_force=0        # Do we install the package even though it's already installed?
-show_info=0            # Shows package metadata
-print_world=0          # Prints all the packages installed
-list_files=0           # Lists files installed by a package
-parallel_downloads=5   # How many source tarballs to download at the same time
-certificate_check=1    # Whether to perform cert checks when downloading sources
-checksum_check=1       # Whether to download and verify checksums of downloaded tarballs when building
-pwd="$PWD"             # Keep track of the directory we ran the command from
-arguments=""           # The argument passed to the script
-install_root=""        # The root of the install. Used for bootstrapping
+VERBOSE=0              # Enable verbose messages
+DO_CLEANUP=1           # Whether to cleanup the build directory when building packages
+PARALLEL_DOWNLOADS=5   # How many source tarballs to download at the same time
+CERTIFICATE_CHECK=1    # Whether to perform cert checks when downloading sources
+CHECKSUM_CHECK=1       # Whether to download and verify checksums of downloaded tarballs when building
+
+INSTALL=0              # Are we installing a package?
+CREATE_PACKAGE=0       # If there's not a package ready to INSTALL, do we build one?
+RESOLVE_DEPENDENCIES=1 # Do we want to resolve dependencies while installing?
+INSTALL_FORCE=0        # Do we INSTALL the package even though it's already installed?
+
+UNINSTALL=0            # Are we uninstalling a package?
+BUILD_ORDER=""
+
+QUERY=0                # Are we querying a package's info?
+SHOW_INFO=0            # Shows package metadata
+PRINT_WORLD=0          # Prints all the packages installed
+LIST_FILES=0           # Lists files installed by a package
+
+ARGUMENTS=""           # The argument passed to the script
 
 # Used in dependency resolution
-BUILD_ORDER=""
-CURRENT_PACKAGE=""
 
 log_error() {
     printf "%b[ERROR]%b: %s\n" "$red" "$default" "$1" >&2
@@ -49,7 +51,7 @@ log_warn() {
 }
 
 log_debug() {
-    [ "$verbose" = 1 ] && printf "%b[DEBUG]%b: %s\n" "$blue" "$default" "$1" >&2
+    [ "$VERBOSE" = 1 ] && printf "%b[DEBUG]%b: %s\n" "$blue" "$default" "$1" >&2
 }
 
 parse_arguments() {
@@ -62,77 +64,77 @@ parse_arguments() {
 
             case "$_action" in
                 B)
-                    create_package=1
+                    CREATE_PACKAGE=1
                     while [ -n "$_flag" ]; do
                         _char="${_flag%"${_flag#?}"}"
                         _flag="${_flag#?}"
                         case "$_char" in
-                            k) certificate_check=0 ;;
-                            s) checksum_check=0 ;;
-                            d) resolve_dependencies=0 ;;
-                            j) parallel_downloads="$2"; shift ;;
-                            c) do_cleanup=0 ;;
-                            v) verbose=1 ;;
+                            k) CERTIFICATE_CHECK=0 ;;
+                            s) CHECKSUM_CHECK=0 ;;
+                            d) RESOLVE_DEPENDENCIES=0 ;;
+                            j) PARALLEL_DOWNLOADS="$2"; shift ;;
+                            c) DO_CLEANUP=0 ;;
+                            v) VERBOSE=1 ;;
                             *) log_error "Invalid option for -B: -$_char" ;;
                         esac
                     done
                     shift
                     for arg in "$@"; do
-                        arguments="$arguments $(get_package_name "$arg")" || \
+                        ARGUMENTS="$ARGUMENTS $(get_package_name "$arg")" || \
                             log_error "In parse_arguments: Pacakge name failed: $arg"
                     done
                     return 0 ;;
                 I)
-                    install=1
+                    INSTALL=1
                     while [ -n "$_flag" ]; do
                         _char="${_flag%"${_flag#?}"}"
                         _flag="${_flag#?}"
                         case "$_char" in
-                            r) install_root="$2"; shift ;;
-                            b) build_to_install=1 ;;
-                            d) resolve_dependencies=0 ;;
-                            f) install_force=1 ;;
-                            j) parallel_downloads="$2"; shift ;;
-                            c) do_cleanup=0 ;;
-                            v) verbose=1 ;;
+                            r) readonly INSTALL_ROOT="$2"; shift ;;
+                            b) CREATE_PACKAGE=1 ;;
+                            d) RESOLVE_DEPENDENCIES=0 ;;
+                            f) INSTALL_FORCE=1 ;;
+                            j) PARALLEL_DOWNLOADS="$2"; shift ;;
+                            c) DO_CLEANUP=0 ;;
+                            v) VERBOSE=1 ;;
                             *) log_error "Invalid option for -I: -$_char" ;;
                         esac
                     done
                     shift
                     for arg in "$@"; do
-                        arguments="$arguments $(get_package_name "$arg")"
+                        ARGUMENTS="$ARGUMENTS $(get_package_name "$arg")"
                     done
                     return 0 ;;
                 U)
-                    uninstall=1
+                    UNINSTALL=1
                     while [ -n "$_flag" ]; do
                         _char="${_flag%"${_flag#?}"}"
                         _flag="${_flag#?}"
                         case "$_char" in
-                            r) install_root="$2"; shift ;;
-                            v) verbose=1 ;;
+                            r) readonly INSTALL_ROOT="$2"; shift ;;
+                            v) VERBOSE=1 ;;
                             *) log_error "Invalid option for -U: -$_char" ;;
                         esac
                     done
 
                     shift
-                    arguments="$*"
+                    ARGUMENTS="$*"
                     return 0 ;;
                 Q)
-                    query=1
+                    QUERY=1
                     while [ -n "$_flag" ]; do
                         _char="${_flag%"${_flag#?}"}"
                         _flag="${_flag#?}"
                         case "$_char" in
-                            i) show_info=1 ;;
-                            l) list_files=1 ;;
-                            w) print_world=1 ;;
-                            v) verbose=1 ;;
+                            i) SHOW_INFO=1 ;;
+                            l) LIST_FILES=1 ;;
+                            w) PRINT_WORLD=1 ;;
+                            v) VERBOSE=1 ;;
                             *) log_error "Invalid option for -Q: -$_char" ;;
                         esac
                     done
                     shift
-                    arguments="$*"
+                    ARGUMENTS="$*"
                     return 0 ;;
             esac
             shift ;;
@@ -157,7 +159,7 @@ trim_string_and_return() (
 # Returns 0 is it's installled, 1 if it's not
 is_installed() (
     _pkg_name="$1"
-    [ -d "$install_root/$METADATA_DIR/$_pkg_name" ] && return 0
+    [ -d "${INSTALL_ROOT:-}/${METADATA_DIR:?}/$_pkg_name" ] && return 0
     return 1
 )
 
@@ -219,12 +221,12 @@ get_package_build() (
     trim_string_and_return "$_pkg_build_list"
 )
 
-# Takes in a package name and removes its build and install directories
+# Takes in a package name and removes its build and INSTALL directories
 cleanup() (
-    [ "$verbose" = 1 ] && set -x
+    [ "$VERBOSE" = 1 ] && set -x
     _pkg_list="$1"
 
-    if [ "$do_cleanup" = 1 ]; then
+    if [ "$DO_CLEANUP" = 1 ]; then
         for _pkg in $_pkg_list; do
             log_debug "In cleanup: Running cleanup"
             _pkg_dir="$(get_package_dir "$_pkg")" || continue
@@ -232,8 +234,8 @@ cleanup() (
             # These direcorites contain build artifacts and such
             [ -d "${_pkg_dir:?In cleanup: pkg dir is unset}/build/" ] && \
                 rm -rf "${_pkg_dir:?In cleanup: pkg dir is unset}/build/"
-            [ -d "${_pkg_dir:?In cleanup: pkg dir is unset}/install/" ] && \
-                rm -rf "${_pkg_dir:?In cleanup: pkg dir is unset}/install/"
+            [ -d "${_pkg_dir:?In cleanup: pkg dir is unset}/INSTALL/" ] && \
+                rm -rf "${_pkg_dir:?In cleanup: pkg dir is unset}/INSTALL/"
         done
     else
         log_warn "In cleanup: Cleanup called, but was disabled"
@@ -281,7 +283,7 @@ list_of_dependencies() (
         log_error "In list_of_dependencies: Failed to get package build: $_pkg"
 
     # shellcheck source=/dev/null
-    . "$_pkg_build" || log_error "In list_of_dependencies: Failed to source: $_package_build"
+    . "$_pkg_build" || log_error "In list_of_dependencies: Failed to source: $_pkg_build"
 
     # package_dependencies is a variable defined in the package's build script
     trim_string_and_return "${package_dependencies:-}"
@@ -363,34 +365,39 @@ get_download_cmd() (
     done
 
     [ -z "$_download_cmd" ] && log_error "In get_download_cmd: no suitable download tools found"
-    [ "$certificate_check" = 0 ] && log_warn "In get_download_cmd: Certificate check disabled"
+    [ "$CERTIFICATE_CHECK" = 0 ] && log_warn "In get_download_cmd: Certificate check disabled"
 
     case "$_download_cmd" in
         wget|wget2)
             _download_cmd="$_download_cmd -P $_download_prefix"
-            [ "$verbose" = 0 ] && _download_cmd="$_download_cmd -q --show-progress"
-            [ "$certificate_check" = 0 ] && _download_cmd="$_download_cmd --no-check-certificate" ;;
+            [ "$VERBOSE" = 0 ] && _download_cmd="$_download_cmd -q --show-progress"
+            [ "$CERTIFICATE_CHECK" = 0 ] && _download_cmd="$_download_cmd --no-check-certificate" ;;
         curl)
             # Fix curl later, it's a pain in the ass to work with
-            [ "$certificate_check" = 0 ] && _download_cmd="$_download_cmd -k"
+            [ "$CERTIFICATE_CHECK" = 0 ] && _download_cmd="$_download_cmd -k"
             _download_cmd="$_download_cmd -L -O" ;;
     esac
 
     trim_string_and_return "$_download_cmd"
 )
 
-# First argument is the list of tarballs to download.
-# Second argument is the download command to use.
-download() (
+# First argument is list of tarballs to be downloaded.
+# Second argument is the list of checksums for those tarballs
+download_sources() (
     _sources_list="$1"
-    _download_cmd="$2"
+    _checksums_list="$2"
     _job_count=0
     _tarball_list=""
     _pids=""
 
+    [ -z "$_sources_list" ] && log_error "No sources provided"
+
     # Kill all child processes if we recieve an interrupt
     # shellcheck disable=SC2154
     trap 'for p in $_pids; do kill \$p 2>/dev/null; done; exit 1' INT TERM EXIT
+
+    _download_cmd="$(get_download_cmd "$CACHE_DIR")" || \
+        log_error "In download_sources: Failed to deduce available download tool"
 
     for source in $_sources_list; do
         case "$source" in
@@ -423,9 +430,9 @@ download() (
                 _pids="$_pids $!"
                 _job_count=$((_job_count + 1))
 
-                # Ensures that we have no more than $parallel_downloads number of
+                # Ensures that we have no more than $PARALLEL_DOWNLOADS number of
                 # subshells at a time
-                if [ "$_job_count" -ge "$parallel_downloads" ]; then
+                if [ "$_job_count" -ge "$PARALLEL_DOWNLOADS" ]; then
                     # wait -n is better if the shell supports it
                     wait -n 2>/dev/null || wait
                     _job_count=$((_job_count - 1))
@@ -435,25 +442,10 @@ download() (
 
     # Wait for the child processes to complete then remove the trap
     wait
-    trap - INT TERM EXIT
     trim_string_and_return "$_tarball_list"
-)
-
-# First argument is list of tarballs to be downloaded.
-# Second argument is the list of checksums for those tarballs
-download_sources() (
-    _sources_list="$1"
-    _checksums_list="$2"
-
-    [ -z "$_sources_list" ] && log_error "No sources provided"
-
-    _download_cmd="$(get_download_cmd "$CACHE_DIR")" || \
-        log_error "In download_sources: Failed to deduce available download tool"
-    _tarball_list="$(download "$_sources_list" "$_download_cmd")" || \
-        log_error "In download_sources: Failed to download one of: $_sources_list"
 
     # Verify checksums if enabled. Compares every checksum to every tarball
-    if [ "$checksum_check" = 1 ]; then
+    if [ "$CHECKSUM_CHECK" = 1 ]; then
         for tarball in $_tarball_list; do
             _md5sum="$(md5sum "$CACHE_DIR/$tarball" | awk '{print $1}')"
             _verified=0
@@ -464,6 +456,8 @@ download_sources() (
                 log_error "In download_sources: Checksum failed: $tarball"
         done
     fi
+
+    trap - INT TERM EXIT
     return 0
 )
 
@@ -514,15 +508,16 @@ main_build() (
 
     # These come from the packages build script
     _pkg_name="${package_name:?}"
+    _build_dir="/var/pkg/build/$_pkg_name"
     _needed_tarballs="$(echo "$package_source" | awk '{print $1}')"
     _needed_tarballs="${_needed_tarballs##*/}"
 
     log_debug "In main_build: Sourcing $_pkg_build"
 
     # Create build directory and cd to it
-    mkdir -p "$_pkg_dir/build"
-    cd "$_pkg_dir/build" \
-        || log_error "In main_build: Failed to change directory: $_package_dir/build"
+    mkdir -p "$_build_dir"
+    cd "$_build_dir" \
+        || log_error "In main_build: Failed to change directory: $_build_dir/build"
 
     # Unpack tarballs
     for tarball in $_needed_tarballs; do
@@ -531,28 +526,26 @@ main_build() (
     done
 
     # Move patches to the expected directory so the build script can apply them
-    log_debug "In main_build: Package directory is: $_pkg_dir"
+    log_debug "In main_build: Package directory is: $_build_dir"
     for patch in "$_pkg_dir"/*.patch; do
-        log_debug "In build: Moving $patch to $_pkg_dir/build/"
-        cp -a "$patch" "$_pkg_dir/build"
+        log_debug "In build: Moving $patch to $_build_dir"
+        cp -a "$patch" "$_build_dir"
     done
 
-    log_debug "In main_build: Starting build. Current dir is $PWD"
-
     # These commands are provided by the build script which was sourced in main_build
-    configure || log_error "In main_build: In $arguments: In configure: "
-    build || log_error "In main_build: In $arguments: In build: "
-
     log_debug "In main_build: Building package"
-    mkdir -p "$_pkg_dir/build/package"
+    mkdir -p "$_build_dir/package"
+    configure || log_error "In main_build: In $ARGUMENTS: In configure: "
+    build || log_error "In main_build: In $ARGUMENTS: In build: "
 
-    # So make and ninja and the like install the files to where we can easily make a tarball
-    export DESTDIR="$(realpath "$_pkg_dir/build/package")"
+    # So make and ninja and the like INSTALL the files to where we can easily make a tarball
+    export DESTDIR="$(realpath "$_build_dir/package")"
 
     log_debug "In main_build: DESTDIR is: $DESTDIR"
     install_files || log_error "In main_build: In $_pkg: In install_files"
 
     # Metadata about the package
+    # Note that these are actual tab characters, not spaces
     log_debug "In main_build: Creating metadata"
     cat > "$DESTDIR/PKGINFO" <<- EOF
 		package_name=${package_name:?}
@@ -566,7 +559,7 @@ main_build() (
     find . ! -name '.' ! -name 'PKGFILES' ! -name 'PKGINFO' \
         \( -type f -o -type l -o -type d \) -printf '%P\n' > PKGFILES
 
-    tar -Jcpf "$_pkg_dir/$_pkg_name.tar.xz" . \
+    tar -Jcpf "${INSTALL_ROOT:-}/${PACKAGE_CACHE:?}/$_pkg_name.tar.zst" . \
         || log_error "In main_build: Failed to create compressed tar archive: $_pkg_name.tar.xz"
 
     printf "%b[SUCCESS]%b: %b" "$green" "$default" "Successfully built $_pkg_name!"
@@ -580,18 +573,25 @@ main_install() (
     _max_jobs="$(nproc)"
 
     # Guarantee that no matter the input, 
-    # _package_to_install always points to a compressed tar archive
+    # _package_archive always points to a compressed tar archive
     _pkg_dir="$(get_package_dir "$_pkg")" || \
         log_error "In main_install: Failed to get package directory for: $_pkg"
     _pkg_name="$(get_package_name "$_pkg")" || \
         log_error "In main_install: Failed to get package name for: $_pkg"
-    _package_to_install="$_pkg_dir/$_pkg_name.tar.xz"
+    _package_archive="$_pkg_dir/$_pkg_name.tar.xz"
+
+    _data_dir="${INSTALL_ROOT:-}/${METADATA_DIR:?}/$_pkg_name"
+    log_debug "In install_package: data dir is: $_data_dir"
+
+    # Create it if it doesn't exist already
+    mkdir -p "$_data_dir" || \
+        log_error "In install_package: Failed to create dir: $_data_dir"
 
     # shellcheck disable=SC2154
     trap '
     for f in $_installed_files; do rm "$f" 2>/dev/null ; done
     for p in $_pids; do kill "$p" 2>/dev/null ; done
-    rm -rf "${install_root}/${METADATA_DIR:?}/${_pkg_name:?}" 2>/dev/null
+    rm -rf "${INSTALL_ROOT:-}/${METADATA_DIR:?}/${_pkg_name:?}" 2>/dev/null
     log_error "In main_install: Something went wrong. Cleaning up files..."' INT TERM EXIT
 
     log_debug "In install_package: Installing package"
@@ -600,32 +600,17 @@ main_install() (
         log_error "In install_package: Failed to change directory: $_pkg_dir/install"
 
     log_debug "In install_package: Current directory: $PWD"
-    log_debug "In install_package: Extracting: $_package_to_install"
-    
-    tar -xpf "$_package_to_install" \
-        || log_error "In install_package: Failed to extract tar archive: $_package_to_install"
+    log_debug "In install_package: Extracting: $_package_archive"
 
-    _data_dir="$install_root/$METADATA_DIR/$_pkg_name"
-    log_debug "In install_package: data dir is: $_data_dir"
-
-    # Create it if it doesn't exist already
-    mkdir -p "$_data_dir" || log_error "In install_package: Failed to create directory: $_data_dir"
-
-    [ -f ./PKGFILES ] && mv ./PKGFILES "$_data_dir"
-    [ -f ./PKGINFO ]  && mv ./PKGINFO  "$_data_dir"
-
-    # Add package name to world file if it's not in there already
-    grep -x "$_pkg_name" "$install_root/$INSTALLED" >/dev/null 2>&1 || \
-        echo "$_pkg_name" >> "$install_root/$INSTALLED"
+    tar -xpvf "$_package_archive" | sed 's/\.\///' > "$_data_dir/PKGFILES" \
+        || log_error "In install_package: Failed to extract archive: $_package_archive"
 
     IFS='
     '
     set -f
 
-    _files_to_install="$(find . \( -type f -o -type l \))"
-
-    for file in $_files_to_install; do
-        target="$install_root/${file#./}.pkg-new"
+    while read -r file; do
+        target="${INSTALL_ROOT:-}/${file#./}.pkg-new"
         _installed_files="$_installed_files $target"
         (
             _temp_target="$target"
@@ -635,40 +620,50 @@ main_install() (
             # TODO: If the file is not owned by the package manager, keep it as $target.pkg-new
             mkdir -p "$_targetdir" || \
                 log_error "In main_install: Failed to make dir: $_targetdir"
-            mv "${file:?}" "${_temp_target:?}" || \
-                log_error "In main_install: Failed to install temporary file: $_temp_target"
+            if [ ! -d "$file" ]; then
+                mv "${file:?}" "${_temp_target:?}" || \
+                log_error "In main_install: Failed to INSTALL temporary file: $_temp_target"
+            fi
         ) &
 
         _pids="$_pids $!"
         _job_count=$((_job_count + 1))
 
         if [ "$_job_count" -ge "$_max_jobs" ]; then
+            # shellcheck disable=SC3045
             wait -n 2>/dev/null || wait
             _job_count=$((_job_count - 1))
         fi
-    done
+    done < "$_data_dir/PKGFILES"
+    wait || log_error "In main_install: Failed to INSTALL temporary files"
 
-    wait || log_error "In main_install: Failed to install temporary files"
     _pids=""
     _job_count=0
 
-    for file in $_installed_files; do
+    while read -r file; do
         ( mv "${file:?}" "${file%.pkg-new}" ) &
         _pids="$_pids $!"
         _job_count=$((_job_count + 1))
 
         if [ "$_job_count" -ge "$_max_jobs" ]; then
+            # shellcheck disable=SC3045
             wait -n 2>/dev/null || wait
             _job_count=$((_job_count - 1))
         fi
-    done
-    wait || log_error "In main_install: Failed to install files"
+    done < "$_data_dir/PKGFILES"
+    wait || log_error "In main_install: Failed to INSTALL files"
+
+    [ -f ./PKGINFO ] && mv ./PKGINFO "$_data_dir"
+
+    # Add package name to world file if it's not in there already
+    grep -x "$_pkg_name" "${INSTALL_ROOT:-}/${INSTALLED:?}" >/dev/null 2>&1 || \
+        echo "$_pkg_name" >> "${INSTALL_ROOT:-}/${INSTALLED:?}"
 
     trap - INT TERM EXIT
     printf "%b[SUCCESS]%b: %b" "$green" "$default" "Successfully installed $_pkg_name!"
 )
 
-# First argument is the name of the package we want to uninstall
+# First argument is the name of the package we want to UNINSTALL
 # TODO: Add locked packages i.e. stuff like glibc which will 
 # permanently obliterate your system if you remove it
 #
@@ -677,7 +672,7 @@ main_uninstall() (
     _package_to_uninstall="$1"
 
     log_debug "In main_uninstall: Uninstalling package"
-    _package_metadata_dir="$install_root/$METADATA_DIR/$_package_to_uninstall"
+    _package_metadata_dir="${INSTALL_ROOT:-}/$METADATA_DIR/$_package_to_uninstall"
     
     [ -z "$_package_metadata_dir" ] && log_error "In main_uninstall: Package not found: $_package_to_uninstall"
     log_debug "In main_uninstall: Found metadata at: $_package_metadata_dir"
@@ -687,7 +682,7 @@ main_uninstall() (
     # Remove files in reverse order (deepest first)
     log_debug "In main_uninstall: Removing files"
     sort -r "$_package_metadata_dir/PKGFILES" | while IFS= read -r file; do
-        _full_path="$install_root/$file"
+        _full_path="${INSTALL_ROOT:-}/$file"
         if [ -f "$_full_path" ]; then
             log_debug "In main_uninstall: Removing file: $_full_path"
             rm "${_full_path:?In main_uninstall: _full_path is unset}" || \
@@ -713,9 +708,9 @@ main_uninstall() (
 
 # Simple
 main_query() (
-    [ "$show_info" = 1 ]   && cat "$install_root/$METADATA_DIR/$1/PKGINFO"
-    [ "$list_files" = 1 ]  && cat "$install_root/$METADATA_DIR/$1/PKGFILES"
-    [ "$print_world" = 1 ] && cat "$install_root/$INSTALLED"
+    [ "$SHOW_INFO" = 1 ]   && cat "${INSTALL_ROOT:-}/${METADATA_DIR:?}/$1/PKGINFO"
+    [ "$LIST_FILES" = 1 ]  && cat "${INSTALL_ROOT:-}/${METADATA_DIR:?}/$1/PKGFILES"
+    [ "$PRINT_WORLD" = 1 ] && cat "${INSTALL_ROOT:-}/${INSTALLED:?}"
 )
 
 # Takes in a full list of packages and uses get_dependency_graph to get the final build order
@@ -723,7 +718,7 @@ get_build_order() (
     _pkg_list="$1"
     _BUILD_ORDER=""
 
-    if [ "$resolve_dependencies" = 0 ]; then
+    if [ "$RESOLVE_DEPENDENCIES" = 0 ]; then
         log_warn "In get_build_order: Resolution of dependencies is disabled"
         trim_string_and_return "$_pkg_list"
         return 0
@@ -741,10 +736,10 @@ get_build_order() (
 
 # Basic stuff to check before doing anything gnarly
 sanity_checks() {
-    [ -z "$arguments" ] && log_error "In sanity_checks: No arguments were provided"
-    case "$parallel_downloads" in
+    [ -z "$ARGUMENTS" ] && log_error "In sanity_checks: No arguments were provided"
+    case "$PARALLEL_DOWNLOADS" in
         ''|*[!0-9]*)
-            log_error "In sanity_checks: Invalid parallel downloads value: $parallel_downloads"
+            log_error "In sanity_checks: Invalid parallel downloads value: $PARALLEL_DOWNLOADS"
             ;;
     esac
     mkdir -p "$CACHE_DIR" || \
@@ -761,75 +756,69 @@ main() {
     parse_arguments "$@"
     sanity_checks
 
-    log_debug "In main: arguments are: $arguments"
+    log_debug "In main: arguments are: $ARGUMENTS"
 
-    trap 'if [ -n "$CURRENT_PACKAGE" ]; then cleanup "$CURRENT_PACKAGE"; fi; exit 1' INT TERM EXIT
+    trap 'cleanup "$BUILD_ORDER"' INT TERM EXIT
 
-    if [ "$install" = 1 ]; then
-        BUILD_ORDER="$(get_build_order "$arguments")" || \
+    if [ "$INSTALL" = 1 ]; then
+        BUILD_ORDER="$(get_build_order "$ARGUMENTS")" || \
             log_error "In main: Failed to get build order"
         log_debug "Build order: $BUILD_ORDER"
 
         # Install already-built packages and remove from build list
         for pkg in $BUILD_ORDER; do
-            CURRENT_PACKAGE="$pkg"
             _package_dir="$(get_package_dir "$pkg")" || \
                 log_error "In main: Failed to get package dir for: $pkg"
-            if is_installed "$pkg" && [ "$install_force" = 0 ]; then
+
+            if is_installed "$pkg" && [ "$INSTALL_FORCE" = 0 ]; then
                 log_warn "$pkg already installed. Use -If to force"
                 BUILD_ORDER="$(remove_string_from_list "$pkg" "$BUILD_ORDER")"
                 continue
             elif [ -e "$_package_dir/$pkg.tar.xz" ]; then
                 main_install "$pkg" || \
-                    log_error "In main: Failed to install: $pkg"
+                    log_error "In main: Failed to INSTALL: $pkg"
                 BUILD_ORDER="$(remove_string_from_list "$pkg" "$BUILD_ORDER")"
             fi
-            CURRENT_PACKAGE=""
         done
 
-        [ -z "$BUILD_ORDER" ] && exit 0
-        [ "$build_to_install" = 0 ] && \
+        [ -z "$BUILD_ORDER" ] && echo "Nothing to do." && exit 0
+        [ "$CREATE_PACKAGE" = 0 ] && \
             log_error "Packages not built and -Ib not specified: $BUILD_ORDER"
+
         collect_all_sources "$BUILD_ORDER" || \
             log_error "In main: Failed to collect sources for one of: $BUILD_ORDER"
 
-        # We need to set CURRENT_PACKAGE for the trap
         for pkg in $BUILD_ORDER; do
-            CURRENT_PACKAGE="$pkg"
             main_build "$pkg"   || log_error "In main: Failed to build: $pkg"
-            main_install "$pkg" || log_error "In main: Failed to install: $pkg"
-            CURRENT_PACKAGE=""
+            main_install "$pkg" || log_error "In main: Failed to INSTALL: $pkg"
         done
         exit 0
     fi
 
     # Same logic as install, but simpler
-    if [ "$create_package" = 1 ]; then
-        BUILD_ORDER="$(get_build_order "$arguments")" || \
+    if [ "$CREATE_PACKAGE" = 1 ]; then
+        BUILD_ORDER="$(get_build_order "$ARGUMENTS")" || \
             log_error "In main: Failed to get build order"
+
         log_debug "In main: Build order is: $BUILD_ORDER"
         [ -z "$BUILD_ORDER" ] && exit 0
         collect_all_sources "$BUILD_ORDER" || \
             log_error "In main: Failed to collect sources for one of: $BUILD_ORDER"
 
         for pkg in $BUILD_ORDER; do
-            CURRENT_PACKAGE="$pkg"
             main_build "$pkg" || log_error "In main: Failed to build: $pkg"
-            CURRENT_PACKAGE=""
         done
         exit 0
     fi
 
-    if [ "$uninstall" = 1 ]; then
-        for arg in $arguments; do
-            main_uninstall "$arg" || \
-                log_error "In main: Failed to uninstall: $arg"
+    if [ "$UNINSTALL" = 1 ]; then
+        for arg in $ARGUMENTS; do
+            main_uninstall "$arg" || log_error "In main: Failed to uninstall: $arg"
         done && exit 0
     fi
 
-    [ "$query" = 1 ] && for arg in $arguments; do
-        main_query "$arg" || \
-            log_error "In main: Failed to query: $arg"
+    [ "$QUERY" = 1 ] && for arg in $ARGUMENTS; do
+        main_query "$arg" || log_error "In main: Failed to QUERY: $arg"
     done && exit 0
 }
 
