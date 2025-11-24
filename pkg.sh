@@ -614,6 +614,7 @@ main_install() (
         target="${INSTALL_ROOT:-}/${file#./}.pkg-new"
         _installed_files="$_installed_files $target"
         (
+            _file="$file"
             _temp_target="$target"
             _targetdir="$(dirname "$target")"
 
@@ -622,8 +623,8 @@ main_install() (
             mkdir -p "$_targetdir" || \
                 log_error "In main_install: Failed to make dir: $_targetdir"
 
-            if [ -e "$file" ]; then
-                mv "${file:?}" "${_temp_target:?}" || \
+            if [ -e "$_file" ]; then
+                mv "${_file:?}" "${_temp_target:?}" || \
                 log_error "In main_install: Failed to INSTALL temporary file: $_temp_target"
             fi
         ) &
