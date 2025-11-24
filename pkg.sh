@@ -621,7 +621,8 @@ main_install() (
             # TODO: If the file is not owned by the package manager, keep it as $target.pkg-new
             mkdir -p "$_targetdir" || \
                 log_error "In main_install: Failed to make dir: $_targetdir"
-            if [ ! -d "$file" ]; then
+
+            if [ -e "$file" ]; then
                 mv "${file:?}" "${_temp_target:?}" || \
                 log_error "In main_install: Failed to INSTALL temporary file: $_temp_target"
             fi
