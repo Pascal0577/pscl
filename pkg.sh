@@ -627,7 +627,7 @@ main_install() (
     for file in $_files_to_install; do
         target="$install_root/${file#./}.pkg-new"
         _installed_files="$_installed_files $target"
-        if ! (
+        (
             _temp_target="$target"
             _targetdir="$(dirname "$target")"
 
@@ -637,9 +637,7 @@ main_install() (
                 log_error "In main_install: Failed to make dir: $_targetdir"
             mv "${file:?}" "${_temp_target:?}" || \
                 log_error "In main_install: Failed to install temporary file: $_temp_target"
-        ) & then
-            log_error "In main_install: Failed to install temporary files"
-        fi
+        ) &
 
         _pids="$_pids $!"
         _job_count=$((_job_count + 1))
@@ -650,14 +648,12 @@ main_install() (
         fi
     done
 
-    wait
+    wait || log_error "In main_install: Failed to install temporary files"
     _pids=""
     _job_count=0
 
     for file in $_installed_files; do
-        if ! ( mv "${file:?}" "${file%.pkg-new}" ) & then
-            log_error "In main_install: Failed to install files"
-        fi
+        ( mv "${file:?}" "${file%.pkg-new}" ) &
         _pids="$_pids $!"
         _job_count=$((_job_count + 1))
 
@@ -666,7 +662,7 @@ main_install() (
             _job_count=$((_job_count - 1))
         fi
     done
-    wait
+    wait || log_error "In main_install: Failed to install files"
 
     trap - INT TERM EXIT
     printf "%b[SUCCESS]%b: %b" "$green" "$default" "Successfully installed $_pkg_name!"
