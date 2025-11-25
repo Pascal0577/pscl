@@ -603,7 +603,7 @@ main_install() (
     log_debug "In install_package: Current directory: $PWD"
     log_debug "In install_package: Extracting: $_package_archive"
 
-    tar -xpvf "$_package_archive" | sed 's/\.\///' > "$_data_dir/PKGFILES.pkg-new" \
+    tar -xpvf "$_package_archive" | grep -v '/$' | sed 's/\.\///' > "$_data_dir/PKGFILES.pkg-new" \
         || log_error "In install_package: Failed to extract archive: $_package_archive"
 
     IFS='
@@ -623,7 +623,7 @@ main_install() (
             mkdir -p "$_targetdir" || \
                 log_error "In main_install: Failed to make dir: $_targetdir"
 
-            if [ -e "$_file" ]; then
+            if [ -f "$_file" ] || [ -L "$_file" ]; then
                 mv "${_file:?}" "${_temp_target:?}" || \
                 log_error "In main_install: Failed to INSTALL temporary file: $_temp_target"
             fi
@@ -665,7 +665,7 @@ main_install() (
         echo "$_pkg_name" >> "${INSTALL_ROOT:-}/${INSTALLED:?}"
 
     trap - INT TERM EXIT
-    printf "%b[SUCCESS]%b: %b" "$green" "$default" "Successfully installed $_pkg_name!"
+    printf "%b[SUCCESS]%b: %b\n" "$green" "$default" "Successfully installed $_pkg_name!"
 )
 
 # First argument is the name of the package we want to UNINSTALL
