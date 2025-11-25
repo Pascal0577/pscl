@@ -152,7 +152,7 @@ trim_string_and_return() (
     set -f
     set -- $*
     var="$(printf '%s\n' "$*")"
-    echo "$var" | sed 's/\/\//\//g'
+    echo "$var"
 )
 
 # Check if a package is already installed
