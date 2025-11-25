@@ -548,7 +548,7 @@ main_build() (
     # Metadata about the package
     # Note that these are actual tab characters, not spaces
     log_debug "In main_build: Creating metadata"
-    cat > "$DESTDIR/PKGINFO" <<- EOF
+    cat >| "$DESTDIR/PKGINFO" <<- EOF
 		package_name=${package_name:?}
 		package_version=${package_version:-unknown}
 		builddate=$(date +%s)
@@ -557,8 +557,6 @@ main_build() (
 
     log_debug "In main_build: Creating package"
     cd "$DESTDIR" || log_error "In main_build: Failed to change directory: $DESTDIR"
-    find . ! -name '.' ! -name 'PKGFILES' ! -name 'PKGINFO' \
-        \( -type f -o -type l -o -type d \) -printf '%P\n' > PKGFILES
 
     tar -Jcpf "${INSTALL_ROOT:-}/${PACKAGE_CACHE:?}/$_pkg_name.tar.zst" . \
         || log_error "In main_build: Failed to create compressed tar archive: $_pkg_name.tar.zst"
