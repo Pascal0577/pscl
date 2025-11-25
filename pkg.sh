@@ -407,6 +407,7 @@ download_sources() (
                 _sources_list="$(remove_string_from_list "$source" "$_sources_list")" ;;
 
             *)
+                log_debug "In download_sources: Trying to download: $source"
                 _tarball_name="${source##*/}"
                 _tarball_list="$_tarball_list $_tarball_name"
 
@@ -424,7 +425,7 @@ download_sources() (
                     echo ""
                     trap - INT TERM EXIT
                 ) & then
-                    exit 1
+                    log_error "In download_sources: A subshell to failed to download: $source"
                 fi
 
                 # Keep track of PIDs so we can kill the subshells if we recieve an interrupt.
@@ -446,6 +447,7 @@ download_sources() (
     trim_string_and_return "$_tarball_list"
 
     # Verify checksums if enabled. Compares every checksum to every tarball
+    log_debug "In download_sources: Verifying checksums"
     if [ "$CHECKSUM_CHECK" = 1 ]; then
         for tarball in $_tarball_list; do
             _md5sum="$(md5sum "$CACHE_DIR/$tarball" | awk '{print $1}')"
