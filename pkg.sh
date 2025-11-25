@@ -601,7 +601,7 @@ main_install() (
     log_debug "In install_package: Current directory: $PWD"
     log_debug "In install_package: Extracting: $_package_archive"
 
-    tar -xpvf "$_package_archive" | grep -v '/$' | sed 's/\.\///' > "$_data_dir/PKGFILES.pkg-new" \
+    tar -xpvf "$_package_archive" | sed 's/\.\///' > "$_data_dir/PKGFILES.pkg-new" \
         || log_error "In install_package: Failed to extract archive: $_package_archive"
 
     IFS='
@@ -609,11 +609,11 @@ main_install() (
     set -f
 
     while read -r file; do
-        target="${INSTALL_ROOT:-}/${file#./}.pkg-new"
+        target="${INSTALL_ROOT:-}/${file:?}"
         _installed_files="$_installed_files $target"
         (
             _file="$file"
-            _temp_target="$target"
+            _target="$target"
             _targetdir="$(dirname "$target")"
 
             # Install to temp location first, then replace
@@ -622,8 +622,8 @@ main_install() (
                 log_error "In main_install: Failed to make dir: $_targetdir"
 
             if [ -f "$_file" ] || [ -L "$_file" ]; then
-                mv "${_file:?}" "${_temp_target:?}" || \
-                log_error "In main_install: Failed to INSTALL temporary file: $_temp_target"
+                mv "${_file:?}" "${_target:?}" || \
+                log_error "In main_install: Failed to install file: $_target"
             fi
         ) &
 
@@ -637,22 +637,6 @@ main_install() (
         fi
     done < "$_data_dir/PKGFILES.pkg-new"
     wait || log_error "In main_install: Failed to INSTALL temporary files"
-
-    _pids=""
-    _job_count=0
-
-    while read -r file; do
-        ( [ -e "$file" ] && mv "${file:?}" "${file%.pkg-new}" ) &
-        _pids="$_pids $!"
-        _job_count=$((_job_count + 1))
-
-        if [ "$_job_count" -ge "$_max_jobs" ]; then
-            # shellcheck disable=SC3045
-            wait -n 2>/dev/null || wait
-            _job_count=$((_job_count - 1))
-        fi
-    done < "$_data_dir/PKGFILES.pkg-new"
-    wait || log_error "In main_install: Failed to INSTALL files"
 
     [ -f ./PKGINFO ] && mv ./PKGINFO "$_data_dir"
     [ -f "$_data_dir/PKGFILES.pkg-new" ] && \
