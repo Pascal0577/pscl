@@ -601,7 +601,7 @@ main_install() (
     log_debug "In install_package: Current directory: $PWD"
     log_debug "In install_package: Extracting: $_package_archive"
 
-    tar -xpvf "$_package_archive" | sed 's/\.\///' > "$_data_dir/PKGFILES.pkg-new" \
+    tar -xpvf "$_package_archive" > "$_data_dir/PKGFILES.pkg-new" \
         || log_error "In install_package: Failed to extract archive: $_package_archive"
 
     IFS='
@@ -609,7 +609,7 @@ main_install() (
     set -f
 
     while read -r file; do
-        target="${INSTALL_ROOT:-}/${file:?}"
+        target="${INSTALL_ROOT:-}/${file##./}"
         _installed_files="$_installed_files $target"
         (
             _file="$file"
