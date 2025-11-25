@@ -230,13 +230,9 @@ cleanup() (
     if [ "$DO_CLEANUP" = 1 ]; then
         for _pkg in $_pkg_list; do
             log_debug "In cleanup: Running cleanup"
-            _pkg_dir="$(get_package_dir "$_pkg")" || continue
-
+            _build_dir="/var/pkg/$_pkg/"
             # These direcorites contain build artifacts and such
-            [ -d "${_pkg_dir:?In cleanup: pkg dir is unset}/build/" ] && \
-                rm -rf "${_pkg_dir:?In cleanup: pkg dir is unset}/build/"
-            [ -d "${_pkg_dir:?In cleanup: pkg dir is unset}/INSTALL/" ] && \
-                rm -rf "${_pkg_dir:?In cleanup: pkg dir is unset}/INSTALL/"
+            [ -d "${_build_dir:?}" ] && rm -rf "${_build_dir:?}/INSTALL/"
         done
     else
         log_warn "In cleanup: Cleanup called, but was disabled"
@@ -580,6 +576,7 @@ main_install() (
     _package_archive="$PACKAGE_CACHE/$_pkg_name.tar.zst"
 
     _data_dir="${INSTALL_ROOT:-}/${METADATA_DIR:?}/$_pkg_name"
+    _install_dir="${INSTALL_ROOT:-}/var/pkg/build/$_pkg_name/install"
     log_debug "In install_package: data dir is: $_data_dir"
 
     # Create it if it doesn't exist already
@@ -594,9 +591,9 @@ main_install() (
     log_error "In main_install: Something went wrong. Cleaning up files..."' INT TERM EXIT
 
     log_debug "In install_package: Installing package"
-    mkdir -p "${_pkg_dir:?}/install"
-    cd "$_pkg_dir/install" || \
-        log_error "In install_package: Failed to change directory: $_pkg_dir/install"
+    mkdir -p "$_install_dir"
+    cd "$_install_dir" || \
+        log_error "In install_package: Failed to change directory: $_install_dir"
 
     log_debug "In install_package: Current directory: $PWD"
     log_debug "In install_package: Extracting: $_package_archive"
