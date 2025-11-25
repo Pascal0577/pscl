@@ -395,7 +395,7 @@ download_sources() (
 
     # Kill all child processes if we recieve an interrupt
     # shellcheck disable=SC2154
-    trap 'for p in $_pids; do kill \$p 2>/dev/null; done; exit 1' INT TERM EXIT
+    trap 'for p in $_pids; do kill -- -\$p 2>/dev/null; done; exit 1' INT TERM EXIT
 
     _download_cmd="$(get_download_cmd "$CACHE_DIR")" || \
         log_error "In download_sources: Failed to deduce available download tool"
@@ -414,7 +414,8 @@ download_sources() (
                 [ -e "$CACHE_DIR/$_tarball_name" ] && continue
 
                 # This downloads the tarballs to the cache directory
-                if ! (
+                (
+                    set -m
                     # Make a variable in this subshell to prevent _tarball_name's modification from
                     # affecting what is removed by the trap. The trap ensures that no tarballs are
                     # partially downloaded to the cache
@@ -424,9 +425,7 @@ download_sources() (
                         log_error "In download: Failed to download: $source"
                     echo ""
                     trap - INT TERM EXIT
-                ) & then
-                    log_error "In download_sources: A subshell to failed to download: $source"
-                fi
+                ) &
 
                 # Keep track of PIDs so we can kill the subshells if we recieve an interrupt.
                 _pids="$_pids $!"
@@ -443,8 +442,7 @@ download_sources() (
     done
 
     # Wait for the child processes to complete then remove the trap
-    wait
-    trim_string_and_return "$_tarball_list"
+    wait || log_error "In download_sources: A download failed"
 
     # Verify checksums if enabled. Compares every checksum to every tarball
     log_debug "In download_sources: Verifying checksums"
