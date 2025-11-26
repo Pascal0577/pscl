@@ -198,11 +198,14 @@ main_install() (
     backend_prepare_sources "$_install_order" || \
         log_error "Failed to prepare sources"
 
-    for pkg in $_install_order; do
+    _install_order_temp="$_install_order"
+    for pkg in $_install_order_temp; do
         log_debug "Checking if we should build $pkg"
         if backend_want_to_build_package "$pkg"; then
             log_debug "We should! Trying to build package: $pkg"
             build_package "$pkg" || log_error "Failed to build: $pkg"
+            install_package "$pkg" || log_error "Failed to install: $pkg"
+            remove_string_from_list "$pkg" "$_install_order"
         fi
     done
 
