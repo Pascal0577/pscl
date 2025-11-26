@@ -217,26 +217,19 @@ backend_build_source() (
     # These commands are provided by the build script which was sourced in main_build
     log_debug "Building package"
     mkdir -p "$_build_dir/package"
+    export DESTDIR="$(realpath "$_build_dir/package")"
+    log_debug "DESTDIR is: $DESTDIR"
     configure || log_error "In $ARGUMENTS: In configure: "
     build || log_error "In $ARGUMENTS: In build: "
+    install_files || log_error "In install_files"
 )
 
 backend_create_package() (
     _pkg="$1"
     _pkg_name="$(backend_get_package_name "$_pkg")"
-    _build_dir="/var/pkg/build/$_pkg_name"
-    _pkg_build="$(backend_get_package_build "$_pkg")" || \
-        log_error "Failed to get build script for: $_pkg"
+    _build_dir="/var/pkg/build/$_pkg_name/package"
 
-    # shellcheck source=/dev/null
-    . "$(realpath "$_pkg_build")" || \
-        log_error "Failed to source: $_pkg_build"
-
-    export DESTDIR="$(realpath "$_build_dir/package")"
-
-    log_debug "DESTDIR is: $DESTDIR"
-    install_files || log_error "In install_files"
-    cat >| "$DESTDIR/PKGINFO" <<- EOF
+    cat >| "$_build_dir/PKGINFO" <<- EOF
 		package_name=${package_name:?}
 		package_version=${package_version:-unknown}
 		package_dependencies=${package_dependencies:-}
@@ -245,7 +238,7 @@ backend_create_package() (
 	EOF
 
     log_debug "Creating package"
-    cd "$DESTDIR" || log_error "Failed to change directory: $DESTDIR"
+    cd "$_build_dir" || log_error "Failed to change directory: $_build_dir"
 
     tar -cpf - . | zstd > "${INSTALL_ROOT:-}/${PACKAGE_CACHE:?}/$_pkg_name.tar.zst" \
         || log_error "Failed to create compressed tar archive: $_pkg_name.tar.zst"
