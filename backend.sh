@@ -228,6 +228,12 @@ backend_create_package() (
     _pkg="$1"
     _pkg_name="$(backend_get_package_name "$_pkg")"
     _build_dir="/var/pkg/build/$_pkg_name/package"
+    _pkg_build="$(backend_get_package_build "$_pkg")" || \
+        log_error "Failed to get build script for: $_pkg"
+
+    # shellcheck source=/dev/null
+    . "$(realpath "$_pkg_build")" || \
+        log_error "Failed to source: $_pkg_build"
 
     cat >| "$_build_dir/PKGINFO" <<- EOF
 		package_name=${package_name:?}
