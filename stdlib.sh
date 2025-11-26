@@ -33,6 +33,33 @@ remove_string_from_list() (
     trim_string_and_return "$_result"
 )
 
+get_reverse_dependencies() (
+    _target_pkg="$1"
+    _reverse_deps_list=""
+
+    while read -r installed_pkg; do
+        _pkginfo="${INSTALL_ROOT:-}/${METADATA_DIR:?}/$installed_pkg/PKGINFO"
+
+        [ -f "$_pkginfo" ] || continue
+
+        # Extract dependencies line from PKGINFO
+        _deps="$(grep "^package_dependencies=" "$_pkginfo" | cut -d'=' -f2-)"
+
+        if [ -z "$_deps" ]; then
+            _pkg_build="$(backend_get_package_build "$installed_pkg")"
+            # shellcheck disable=SC1090
+            . "$_pkg_build"
+            _deps="${package_dependencies:?}"
+        fi
+
+        if string_is_in_list "$_target_pkg" "$_deps"; then
+            _reverse_deps_list="$_reverse_deps_list $installed_pkg"
+        fi
+    done < "${INSTALL_ROOT:-}/${WORLD:?}"
+
+    trim_string_and_return "$_reverse_deps_list"
+)
+
 list_of_dependencies() (
     _pkg="$(backend_get_package_name "$1")" || \
         log_error "Failed to get package name: $_pkg"
@@ -130,7 +157,7 @@ HOOKS_POST_UNINSTALL=""
 register_hook() {
     _hook_point="$1"
     _hook_func="$2"
-    
+
     case "$_hook_point" in
         pre_install)    HOOKS_PRE_INSTALL="$HOOKS_PRE_INSTALL $_hook_func" ;;
         post_install)   HOOKS_POST_INSTALL="$HOOKS_POST_INSTALL $_hook_func" ;;
@@ -145,7 +172,7 @@ register_hook() {
 run_hooks() {
     _hook_point="$1"
     shift
-    
+
     case "$_hook_point" in
         pre_install)    _hooks="$HOOKS_PRE_INSTALL" ;;
         post_install)   _hooks="$HOOKS_POST_INSTALL" ;;
@@ -155,11 +182,11 @@ run_hooks() {
         post_uninstall) _hooks="$HOOKS_POST_UNINSTALL" ;;
         *) return 0 ;;
     esac
-    
+
     for hook in $_hooks; do
         log_debug "Running hook: $hook"
         "$hook" "$@" || return 1
     done
-    
+
     return 0
 }

@@ -48,7 +48,8 @@ backend_get_package_dir() (
 
     for pkg in $_pkg_list; do
         _to_test_against="$_pkg_dir_list"
-        # Searches all repositories. Stops searching on the first one
+        # Searches all repositories. Stops searching on the first valid package
+        # that is found
         for repo in $REPOSITORY_LIST; do
             if [ -d "$repo/$pkg/" ]; then
                 _pkg_dir_list="$_pkg_dir_list $repo/$pkg"
@@ -232,6 +233,7 @@ backend_create_package() (
     cat >| "$DESTDIR/PKGINFO" <<- EOF
 		package_name=${package_name:?}
 		package_version=${package_version:-unknown}
+		package_dependencies=${package_dependencies:-}
 		builddate=$(date +%s)
 		source="$package_source"
 	EOF
@@ -265,15 +267,27 @@ backend_resolve_install_order() (
 )
 
 backend_resolve_uninstall_order() (
-    # For now, just reverse the order
-    # TODO: Check reverse dependencies properly
-    _requested="$*"
-    _order=""
-    for pkg in $_requested; do
-        backend_is_installed "$pkg" || log_error "Package not installed: $pkg"
-        _order="$pkg $_order"  # Prepend for reverse
+    _requested_packages="$*"
+    _final_order=""
+
+    for _pkg_name in $_requested_packages; do
+        _reverse_deps_for_pkg="$(get_reverse_dependencies "$_pkg_name")"
+        [ -n "$_reverse_deps_for_pkg" ] && \
+            log_error "Can't remove $_pkg_name: Needed by: $_reverse_deps_for_pkg"
+
+        _uninstall_order="$_pkg_name"
+        _tree="$(get_dependency_tree "$_pkg_name" "" "" "" | cut -d '|' -f3)"
+
+        for dep in $_tree; do
+            _reverse_deps="$(get_reverse_dependencies "$dep")"
+            [ "$_reverse_deps" = "$_pkg_name" ] && \
+                _uninstall_order="$_uninstall_order $dep"
+        done
+
+        _final_order="$_final_order $_uninstall_order"
     done
-    echo "$_order"
+
+    trim_string_and_return "$_final_order"
 )
 
 backend_download_sources() (
@@ -333,7 +347,10 @@ backend_download_sources() (
                     # The trap ensures that no tarballs are partially downloaded 
                     # to the cache
                     _file="$_tarball_name"
-                    trap 'rm -f "${CACHE_DIR:?}/${_file:?}" 2>/dev/null; exit 1' INT TERM EXIT
+                    trap '
+                    rm -f "${CACHE_DIR:?}/${_file:?}" 2>/dev/null
+                    exit 1' INT TERM EXIT
+
                     $_download_cmd "$source" || \
                         log_error "Failed to download: $source"
                     echo ""
@@ -381,7 +398,7 @@ backend_prepare_sources() (
     _package_list="$1"
     _sources=""
     _checksums=""
-    
+
     for pkg in $_package_list; do
         _pkg_dir="$(backend_get_package_dir "$pkg")" ||
             log_error "Failed to get package dir for: $_pkg_dir"
@@ -403,14 +420,13 @@ backend_prepare_sources() (
         log_error "Failed to download needed source code"
 )
 
-backend_remove_files() (
+backend_unactivate_package() (
     _pkg="$1"
 
     backend_is_installed "$_pkg" || log_error "Package not installed: $_pkg"
 
-    log_debug "Uninstalling package"
     _package_metadata_dir="${INSTALL_ROOT:-}/$METADATA_DIR/$_pkg"
-    
+
     # Remove files in reverse order (deepest first)
     sort -r "$_package_metadata_dir/PKGFILES" | while IFS= read -r file; do
         _full_path="${INSTALL_ROOT:-}/$file"
@@ -427,13 +443,19 @@ backend_remove_files() (
     done
 )
 
+backend_remove_files() (
+    _pkg="$1"
+    _pkg_install_dir="${INSTALL_ROOT:-}/var/pkg/installed_packages/${_pkg:?}"
+    [ -d "$_pkg_install_dir" ] && rm -rf "${_pkg_install_dir:?}"
+)
+
 backend_unregister_package() (
     _pkg="$1"
     _package_metadata_dir="${INSTALL_ROOT:-}/$METADATA_DIR/$_pkg"
     _world="${INSTALL_ROOT:-}/${WORLD:?}"
 
     grep -vx "$_pkg" "$_world" > "$_world.tmp" && mv "$_world.tmp" "$_world"
- 
+
     rm -rf "${_package_metadata_dir:?}"
 )
 

@@ -34,7 +34,7 @@ parse_arguments() {
     SHOW_INFO=0
     LIST_FILES=0
     PRINT_WORLD=0
-    INSTALL_ROOT="/"
+    INSTALL_ROOT=""
     
     case "$_flag" in
         -B*)
@@ -133,18 +133,6 @@ parse_arguments() {
     esac
 }
 
-load_extensions() {
-    _ext_dir="${EXTENSION_DIR:-${SCRIPT_DIR:-.}/extensions}"
-    
-    [ -d "$_ext_dir" ] || return 0
-    
-    for ext in "$_ext_dir"/*.sh; do
-        [ -f "$ext" ] || continue
-        log_debug "Loading extension: $ext"
-        . "$ext" || log_warn "Failed to load extension: $ext"
-    done
-}
-
 log_error() {
     if [ -n "${BASH_VERSION+x}" ]; then
         _msg_prefix=" In ${FUNCNAME[1]}: (line ${BASH_LINENO[0]})"
@@ -152,7 +140,7 @@ log_error() {
         _msg_prefix=" In ${funcstack[2]}:"
     fi
 
-    printf "%b[ERROR]%b:%s %s\n" "$red" "$def" "${_msg_prefix:-}" "$1" >&2
+    printf "%b[ERROR]%b%s: %s\n" "$red" "$def" "${_msg_prefix:-}" "$1" >&2
     exit 1
 }
 
@@ -168,24 +156,29 @@ log_debug() {
     fi
 
     [ "${VERBOSE:-0}" = 1 ] && \
-        printf "%b[ERROR]%b:%s %s\n" "$blue" "$def" "${_msg_prefix:-}" "$1" >&2
+        printf "%b[DEBUG]%b%s: %s\n" "$blue" "$def" "${_msg_prefix:-}" "$1" >&2
 }
 
 install_package() (
     _pkg_name="$1"
 
+    log_debug "Running pre-install hooks for: $_pkg_name"
     run_hooks pre_install "$_pkg_name" || \
         log_error "Pre-install hook failed for: $_pkg_name"
 
+    log_debug "Installing package files for: $_pkg_name"
     backend_install_files "$_pkg_name" || \
         log_error "Failed to install files for: $_pkg_name"
 
+    log_debug "Registering package in database: $_pkg_name"
     backend_register_package "$_pkg_name" || \
         log_error "Failed to register package: $_pkg_name"
 
+    log_debug "Activating package: $_pkg_name"
     backend_activate_package "$_pkg_name" || \
         log_error "Failed to activate package: $_pkg_name"
 
+    log_debug "Running post install hooks for: $_pkg_name"
     run_hooks post_install "$_pkg_name" || \
         log_error "Post-install hook failed for: $_pkg_name"
 
@@ -196,21 +189,26 @@ main_install() (
     _requested_packages="$(backend_get_package_name "$*")" || \
         log_error "Failed to get package names from list"
 
+    log_debug "Getting install order for packages: $_requested_packages"
     _install_order="$(backend_resolve_install_order "$_requested_packages")" || \
         log_error "Failed to resolve install order"
 
     # Prepare any sources that need building
+    log_debug "Preparing source for: $_install_order"
     backend_prepare_sources "$_install_order" || \
         log_error "Failed to prepare sources"
 
     for pkg in $_install_order; do
+        log_debug "Checking if we should build $pkg"
         if backend_want_to_build_package "$pkg"; then
+            log_debug "We should! Trying to build package: $pkg"
             build_package "$pkg" || log_error "Failed to build: $pkg"
         fi
     done
 
     # Install all packages
     for pkg in $_install_order; do
+        log_debug "Installing package: $pkg"
         install_package "$pkg" || log_error "Failed to install: $pkg"
     done
 )
@@ -218,15 +216,19 @@ main_install() (
 build_package() (
     _pkg_name="$1"
 
+    log_debug "Running pre-build hooks for package: $_pkg_name"
     run_hooks pre_build "$_pkg_name" || \
         log_error "Pre-build hook failed for: $_pkg_name"
 
+    log_debug "Compiling package: $_pkg_name"
     backend_build_source "$_pkg_name" || \
         log_error "Failed to build source for: $_pkg_name"
 
+    log_debug "Creating installable package for: $_pkg_name"
     backend_create_package "$_pkg_name" || \
         log_error "Failed to create package for: $_pkg_name"
 
+    log_debug "Running post-build hooks for: $_pkg_name"
     run_hooks post_build "$_pkg_name" || \
         log_error "Post-build hook failed for: $_pkg_name"
 
@@ -236,15 +238,16 @@ build_package() (
 main_build() (
     _requested_packages="$*"
 
-    # Resolve reverse dependencies later
-    # _build_order="$(backend_resolve_build_order "$_requested_packages")" || \
-    #     log_error "Failed to resolve build order"
+    log_debug "Getting build order for: $_requested_packages"
+    _build_order="$(backend_resolve_build_order "$_requested_packages")" || \
+        log_error "Failed to resolve build order"
 
-    _build_order="$_requested_packages"
+    log_debug "Preparing sources"
     backend_prepare_sources "$_build_order" || \
         log_error "Failed to prepare sources"
 
     for pkg in $_build_order; do
+        log_debug "Building package: $pkg"
         build_package "$pkg" || log_error "Failed to build: $pkg"
     done
 )
@@ -252,18 +255,27 @@ main_build() (
 uninstall_package() (
     _pkg_name="$1"
 
+    log_debug "Checking if package is installed: $_pkg_name"
     backend_is_installed "$_pkg_name" || \
-        log_error "Package not installed: $_pkg_name"
+        log_warn "Package not installed: $_pkg_name"
 
+    log_debug "Running pre-uninstall hooks: $_pkg_name"
     run_hooks pre_uninstall "$_pkg_name" || \
         log_error "Pre-uninstall hook failed for: $_pkg_name"
 
+    log_debug "Unactivating package: $_pkg_name"
+    backend_unactivate_package "$_pkg_name" || \
+        log_error "Failed to unactivate package"
+
+    log_debug "Removing files for package: $_pkg_name"
     backend_remove_files "$_pkg_name" || \
         log_error "Failed to remove files for $_pkg_name"
 
+    log_debug "Unregistering package in database: $_pkg_name"
     backend_unregister_package "$_pkg_name" || \
         log_error "Failed to unregister package: $_pkg_name"
 
+    log_debug "Running post-uninstall hooks for: $_pkg_name"
     run_hooks post_uninstall "$_pkg_name" || \
         log_error "Post-uninstall hook failed for: $_pkg_name"
 
@@ -273,11 +285,12 @@ uninstall_package() (
 main_uninstall() (
     _requested_packages="$*"
     
-    # Backend determines uninstall order (reverse dependencies)
+    log_debug "Getting uninstall order for packages: $_requested_packages"
     _uninstall_order="$(backend_resolve_uninstall_order "$_requested_packages")" || \
         log_error "Failed to resolve uninstall order"
     
     for pkg in $_uninstall_order; do
+        log_debug "Uninstalling package: $pkg"
         uninstall_package "$pkg" || log_error "Failed to uninstall: $pkg"
     done
 )
@@ -285,9 +298,23 @@ main_uninstall() (
 main_query() (
     _pkg_name="$1"
 
+    log_debug "Querying package: $_pkg_name"
     backend_query "$_pkg_name" || \
         log_error "Failed to query package: $_pkg_name"
 )
+
+
+load_extensions() {
+    _ext_dir="${EXTENSION_DIR:-${SCRIPT_DIR:-.}/extensions}"
+    
+    [ -d "$_ext_dir" ] || return 0
+    
+    for ext in "$_ext_dir"/*.sh; do
+        [ -f "$ext" ] || continue
+        log_debug "Loading extension: $ext"
+        . "$ext" || log_error "Failed to load extension: $ext"
+    done
+}
 
 # Default stub - extensions can override this
 extension_parse_flag() {
