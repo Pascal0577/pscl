@@ -754,11 +754,12 @@ main() {
         for pkg in $BUILD_ORDER; do
             _package_dir="$(get_package_dir "$pkg")" || \
                 log_error "In main: Failed to get package dir for: $pkg"
-
+            # If it's already installed and we don't force install it, skip
             if is_installed "$pkg" && [ "$INSTALL_FORCE" = 0 ]; then
                 log_warn "$pkg already installed. Use -If to force"
                 BUILD_ORDER="$(remove_string_from_list "$pkg" "$BUILD_ORDER")"
                 continue
+            # If the package is in the cache, install it
             elif [ -e "$PACKAGE_CACHE/$pkg.tar.zst" ]; then
                 main_install "$pkg" || \
                     log_error "In main: Failed to install: $pkg"
@@ -766,6 +767,7 @@ main() {
             fi
         done
 
+        # If -b isn't set, end here. Otherwise build the package and install it
         [ -z "$BUILD_ORDER" ] && echo "Nothing to do." && exit 0
         [ "$CREATE_PACKAGE" = 0 ] && \
             log_error "No pre-built package available. Use -Ib to build package before installing"

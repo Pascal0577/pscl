@@ -1,0 +1,326 @@
+#!/bin/sh
+
+readonly red="\x1b[31m"
+readonly blue="\x1b[34m"
+readonly yellow="\x1b[33m"
+readonly green="\x1b[32m"
+readonly def="\x1b[39m"
+
+. "${SCRIPT_DIR:-.}/stdlib.sh" || { echo "Failed to load stdlib" >&2; exit 1; }
+. "${SCRIPT_DIR:-.}/backend.sh" || { echo "Failed to load backend" >&2; exit 1; }
+
+readonly METADATA_DIR="/var/pkg/metadata"
+readonly WORLD="$METADATA_DIR/world"
+readonly LOCKFILE="/var/pkg/pkg.lock"
+readonly CACHE_DIR="${CACHE_DIR:-/var/pkg/source_cache}"
+readonly PACKAGE_CACHE="${PACKAGE_CACHE:-/var/pkg/package_cache}"
+readonly REPOSITORY_LIST="${REPOSITORY_LIST:-/var/pkg/repositories/*}"
+
+parse_arguments() {
+    _flag="$1"
+    shift
+    
+    # Default values
+    ACTION=""
+    ARGUMENTS=""
+    VERBOSE=0
+    RESOLVE_DEPENDENCIES=1
+    PARALLEL_DOWNLOADS=5
+    DO_CLEANUP=1
+    CERTIFICATE_CHECK=1
+    CHECKSUM_CHECK=1
+    INSTALL_FORCE=0
+    CREATE_PACKAGE=0
+    SHOW_INFO=0
+    LIST_FILES=0
+    PRINT_WORLD=0
+    INSTALL_ROOT="/"
+    
+    case "$_flag" in
+        -B*)
+            readonly ACTION="build"
+            _flag="${_flag#-B}"
+            while [ -n "$_flag" ]; do
+                _char="${_flag%"${_flag#?}"}"
+                _flag="${_flag#?}"
+                case "$_char" in
+                    k) readonly CERTIFICATE_CHECK=0 ;;
+                    s) readonly CHECKSUM_CHECK=0 ;;
+                    d) readonly RESOLVE_DEPENDENCIES=0 ;;
+                    j) readonly PARALLEL_DOWNLOADS="$1"; shift ;;
+                    c) readonly DO_CLEANUP=0 ;;
+                    v) readonly VERBOSE=1 ;;
+                    *) 
+                        if ! extension_parse_flag "B" "$_char" "$@"; then
+                            log_error "Invalid option for -B: -$_char"
+                        fi
+                        ;;
+                esac
+            done
+            readonly ARGUMENTS="$*"
+            ;;
+
+        -I*)
+            readonly ACTION="install"
+            _flag="${_flag#-I}"
+            while [ -n "$_flag" ]; do
+                _char="${_flag%"${_flag#?}"}"
+                _flag="${_flag#?}"
+                case "$_char" in
+                    r) readonly INSTALL_ROOT="$1"; shift ;;
+                    b) readonly CREATE_PACKAGE=1 ;;
+                    d) readonly RESOLVE_DEPENDENCIES=0 ;;
+                    f) readonly INSTALL_FORCE=1 ;;
+                    j) readonly PARALLEL_DOWNLOADS="$1"; shift ;;
+                    c) readonly DO_CLEANUP=0 ;;
+                    v) readonly VERBOSE=1 ;;
+                    *)
+                        if ! extension_parse_flag "I" "$_char" "$@"; then
+                            log_error "Invalid option for -I: -$_char"
+                        fi
+                        ;;
+                esac
+            done
+            readonly ARGUMENTS="$*"
+            ;;
+            
+        -U*)
+            readonly ACTION="uninstall"
+            _flag="${_flag#-U}"
+            while [ -n "$_flag" ]; do
+                _char="${_flag%"${_flag#?}"}"
+                _flag="${_flag#?}"
+                case "$_char" in
+                    r) readonly INSTALL_ROOT="$1"; shift ;;
+                    v) readonly VERBOSE=1 ;;
+                    *)
+                        if ! extension_parse_flag "U" "$_char" "$@"; then
+                            log_error "Invalid option for -U: -$_char"
+                        fi
+                        ;;
+                esac
+            done
+            readonly ARGUMENTS="$*"
+            ;;
+            
+        -Q*)
+            readonly ACTION="query"
+            _flag="${_flag#-Q}"
+            while [ -n "$_flag" ]; do
+                _char="${_flag%"${_flag#?}"}"
+                _flag="${_flag#?}"
+                case "$_char" in
+                    i) readonly SHOW_INFO=1 ;;
+                    l) readonly LIST_FILES=1 ;;
+                    w) readonly PRINT_WORLD=1 ;;
+                    v) readonly VERBOSE=1 ;;
+                    *)
+                        if ! extension_parse_flag "Q" "$_char" "$@"; then
+                            log_error "Invalid option for -Q: -$_char"
+                        fi
+                        ;;
+                esac
+            done
+            readonly ARGUMENTS="$*"
+            ;;
+            
+        *)
+            # Allow extensions to handle completely custom actions
+            if ! extension_parse_action "$_flag" "$@"; then
+                log_error "Unknown action: $_flag"
+            fi
+            ;;
+    esac
+}
+
+load_extensions() {
+    _ext_dir="${EXTENSION_DIR:-${SCRIPT_DIR:-.}/extensions}"
+    
+    [ -d "$_ext_dir" ] || return 0
+    
+    for ext in "$_ext_dir"/*.sh; do
+        [ -f "$ext" ] || continue
+        log_debug "Loading extension: $ext"
+        . "$ext" || log_warn "Failed to load extension: $ext"
+    done
+}
+
+log_error() {
+    if [ -n "${BASH_VERSION+x}" ]; then
+        _msg_prefix=" In ${FUNCNAME[1]}: (line ${BASH_LINENO[0]})"
+    elif [ -n "${ZSH_VERSION+x}" ]; then
+        _msg_prefix=" In ${funcstack[2]}:"
+    fi
+
+    printf "%b[ERROR]%b:%s %s\n" "$red" "$def" "${_msg_prefix:-}" "$1" >&2
+    exit 1
+}
+
+log_warn() {
+    printf "%b[WARNING]%b: %s\n" "$yellow" "$def" "$1" >&2
+}
+
+log_debug() {
+    if [ -n "${BASH_VERSION+x}" ]; then
+        _msg_prefix=" In ${FUNCNAME[1]}: (line ${BASH_LINENO[0]})"
+    elif [ -n "${ZSH_VERSION+x}" ]; then
+        _msg_prefix=" In ${funcstack[2]}:"
+    fi
+
+    [ "${VERBOSE:-0}" = 1 ] && \
+        printf "%b[ERROR]%b:%s %s\n" "$blue" "$def" "${_msg_prefix:-}" "$1" >&2
+}
+
+install_package() (
+    _pkg_name="$1"
+
+    run_hooks pre_install "$_pkg_name" || \
+        log_error "Pre-install hook failed for: $_pkg_name"
+
+    backend_install_files "$_pkg_name" || \
+        log_error "Failed to install files for: $_pkg_name"
+
+    backend_register_package "$_pkg_name" || \
+        log_error "Failed to register package: $_pkg_name"
+
+    backend_activate_package "$_pkg_name" || \
+        log_error "Failed to activate package: $_pkg_name"
+
+    run_hooks post_install "$_pkg_name" || \
+        log_error "Post-install hook failed for: $_pkg_name"
+
+    printf "%b[SUCCESS]%b: Successfully installed %s\n" "$green" "$def" "$_pkg_name"
+)
+
+main_install() (
+    _requested_packages="$(backend_get_package_name "$*")" || \
+        log_error "Failed to get package names from list"
+
+    _install_order="$(backend_resolve_install_order "$_requested_packages")" || \
+        log_error "Failed to resolve install order"
+
+    # Prepare any sources that need building
+    backend_prepare_sources "$_install_order" || \
+        log_error "Failed to prepare sources"
+
+    for pkg in $_install_order; do
+        if backend_want_to_build_package "$pkg"; then
+            build_package "$pkg" || log_error "Failed to build: $pkg"
+        fi
+    done
+
+    # Install all packages
+    for pkg in $_install_order; do
+        install_package "$pkg" || log_error "Failed to install: $pkg"
+    done
+)
+
+build_package() (
+    _pkg_name="$1"
+
+    run_hooks pre_build "$_pkg_name" || \
+        log_error "Pre-build hook failed for: $_pkg_name"
+
+    backend_build_source "$_pkg_name" || \
+        log_error "Failed to build source for: $_pkg_name"
+
+    backend_create_package "$_pkg_name" || \
+        log_error "Failed to create package for: $_pkg_name"
+
+    run_hooks post_build "$_pkg_name" || \
+        log_error "Post-build hook failed for: $_pkg_name"
+
+    printf "%b[SUCCESS]%b: %b\n" "$green" "$def" "Successfully built $_pkg_name!"
+)
+
+main_build() (
+    _requested_packages="$*"
+
+    # Resolve reverse dependencies later
+    # _build_order="$(backend_resolve_build_order "$_requested_packages")" || \
+    #     log_error "Failed to resolve build order"
+
+    _build_order="$_requested_packages"
+    backend_prepare_sources "$_build_order" || \
+        log_error "Failed to prepare sources"
+
+    for pkg in $_build_order; do
+        build_package "$pkg" || log_error "Failed to build: $pkg"
+    done
+)
+
+uninstall_package() (
+    _pkg_name="$1"
+
+    backend_is_installed "$_pkg_name" || \
+        log_error "Package not installed: $_pkg_name"
+
+    run_hooks pre_uninstall "$_pkg_name" || \
+        log_error "Pre-uninstall hook failed for: $_pkg_name"
+
+    backend_remove_files "$_pkg_name" || \
+        log_error "Failed to remove files for $_pkg_name"
+
+    backend_unregister_package "$_pkg_name" || \
+        log_error "Failed to unregister package: $_pkg_name"
+
+    run_hooks post_uninstall "$_pkg_name" || \
+        log_error "Post-uninstall hook failed for: $_pkg_name"
+
+    printf "%b[SUCCESS]%b: %b\n" "$green" "$def" "Successfully uninstalled $_pkg_name!"
+)
+
+main_uninstall() (
+    _requested_packages="$*"
+    
+    # Backend determines uninstall order (reverse dependencies)
+    _uninstall_order="$(backend_resolve_uninstall_order "$_requested_packages")" || \
+        log_error "Failed to resolve uninstall order"
+    
+    for pkg in $_uninstall_order; do
+        uninstall_package "$pkg" || log_error "Failed to uninstall: $pkg"
+    done
+)
+
+main_query() (
+    _pkg_name="$1"
+
+    backend_query "$_pkg_name" || \
+        log_error "Failed to query package: $_pkg_name"
+)
+
+# Default stub - extensions can override this
+extension_parse_flag() {
+    # Args: action, flag_char, remaining_args...
+    return 1  # Return 1 = flag not handled
+}
+
+# Default stub - extensions can override this
+extension_parse_action() {
+    # Args: flag, remaining_args...
+    return 1  # Return 1 = action not handled
+}
+
+# Default stub - extensions can override this
+extension_handle_action() {
+    return 1  # Return 1 = action not handled
+}
+
+main() {
+    exec 9>|"$LOCKFILE"
+    flock -n 9 || log_error "In main: Another instance is running!"
+
+    load_extensions || log_error "Failed to load extensions"
+    parse_arguments "$@" || log_error "Failed to parse arguments"
+    backend_run_checks || log_error "One or more checks failed"
+
+    case "${ACTION:-}" in
+        install)   main_install "$ARGUMENTS" ;;
+        uninstall) main_uninstall "$ARGUMENTS" ;;
+        build)     main_build "$ARGUMENTS" ;;
+        query)     main_query "$ARGUMENTS" ;;
+        *)         log_error "Unknown action: ${ACTION:-none}" ;;
+    esac
+}
+
+main "$@"
