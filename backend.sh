@@ -284,6 +284,7 @@ backend_resolve_uninstall_order() (
         log_debug "Reverse dependencies for $_pkg_name are: $_reverse_deps_for_pkg"
 
         _uninstall_order="$_pkg_name"
+        export INSTALL_FORCE=1
         _tree="$(get_dependency_tree "$_pkg_name" "" "" "" | cut -d '|' -f3)"
         log_debug "Dependencies for $_pkg_name are: $_tree"
 
