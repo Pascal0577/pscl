@@ -281,12 +281,15 @@ backend_resolve_uninstall_order() (
         _reverse_deps_for_pkg="$(get_reverse_dependencies "$_pkg_name")"
         [ -n "$_reverse_deps_for_pkg" ] && \
             log_error "Can't remove $_pkg_name: Needed by: $_reverse_deps_for_pkg"
+        log_debug "Reverse dependencies for $_pkg_name are: $_reverse_deps_for_pkg"
 
         _uninstall_order="$_pkg_name"
         _tree="$(get_dependency_tree "$_pkg_name" "" "" "" | cut -d '|' -f3)"
+        log_debug "Dependencies for $_pkg_name are: $_tree"
 
         for dep in $_tree; do
             _reverse_deps="$(get_reverse_dependencies "$dep")"
+            log_debug "Reverse dependencies of dependency $dep are: $_reverse_deps"
             [ "$_reverse_deps" = "$_pkg_name" ] && \
                 _uninstall_order="$_uninstall_order $dep"
         done
