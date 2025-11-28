@@ -9,7 +9,7 @@ source_dir="Python-3.13.7"
 
 configure() {
     cd "$source_dir" || log_error "In $package_name.build: Failed to cd to $source_dir"
-    ./configure --prefix=/usr          \
+    ./configure --prefix=/usr  \
         --enable-shared        \
         --with-system-expat    \
         --enable-optimizations \

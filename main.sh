@@ -198,6 +198,7 @@ main_install() (
     backend_prepare_sources "$_install_order" || \
         log_error "Failed to prepare sources"
 
+    log_debug "Install order is: $_install_order"
     _install_order_temp="$_install_order"
     for pkg in $_install_order_temp; do
         log_debug "Checking if we should build $pkg"
