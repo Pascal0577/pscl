@@ -1,0 +1,25 @@
+#!/bin/sh
+
+package_name="lzo"
+package_version="2.10"
+package_description=""
+package_source="https://www.oberhumer.com/opensource/lzo/download/lzo-2.10.tar.gz 39d3f3f9c55c87b1e5d6888e1420f4b5"
+package_dependencies="Data compression library which is suitable for data decompression and compression in real-time"
+
+source_dir="$package_name-$package_version"
+
+configure() {
+    cd "$source_dir" || log_error "In $package_name.build: Failed to cd to $source_dir"
+    ./configure --prefix=/usr    \
+            --enable-shared  \
+            --disable-static \
+            --docdir=/usr/share/doc/lzo-2.10
+}
+
+build() {
+    make
+}
+
+install_files() {
+    make install
+}
