@@ -12,6 +12,8 @@ backend_run_checks() (
         log_error "Cannot create cache directory: $CACHE_DIR"
     [ -w "$CACHE_DIR" ] || \
         log_error "Cache directory: $CACHE_DIR is not writable"
+
+    mkdir -p "${INSTALL_ROOT:-}/${PACKAGE_CACHE:?}"
 )
 
 backend_is_installed() (

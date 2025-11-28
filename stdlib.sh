@@ -49,7 +49,7 @@ get_reverse_dependencies() (
             _pkg_build="$(backend_get_package_build "$installed_pkg")"
             # shellcheck disable=SC1090
             . "$_pkg_build"
-            _deps="${package_dependencies:?}"
+            _deps="${package_dependencies:-}"
         fi
 
         if string_is_in_list "$_target_pkg" "$_deps"; then
