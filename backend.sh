@@ -290,6 +290,7 @@ backend_resolve_uninstall_order() (
 
         for dep in $_tree; do
             _reverse_deps="$(get_reverse_dependencies "$dep")"
+            _reverse_deps="$(trim_string_and_return "$_reverse_deps")"
             log_debug "Reverse dependencies of dependency $dep are: $_reverse_deps"
             [ "$_reverse_deps" = "$_pkg_name" ] && \
                 _uninstall_order="$_uninstall_order $dep"
