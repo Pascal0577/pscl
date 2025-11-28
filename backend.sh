@@ -145,7 +145,7 @@ backend_register_package() (
     _pkg_name="$(backend_get_package_name "$_pkg")" || \
         log_error "Failed to get package name for: $_pkg"
     _data_dir="${INSTALL_ROOT:-}/${METADATA_DIR:?}/$_pkg_name"
-    _install_dir="${INSTALL_ROOT:-}/var/pkg/build/$_pkg_name/package"
+    _install_dir="${INSTALL_ROOT:-}/var/pkg/installed_packages/$_pkg_name"
 
     [ -f "$_install_dir/PKGINFO" ] && mv "$_install_dir/PKGINFO" "$_data_dir"
     [ -f "$_data_dir/PKGFILES.pkg-new" ] && \
