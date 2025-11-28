@@ -6,7 +6,7 @@ package_description="Contains administration and debugging tools for the B-tree 
 package_source="https://www.kernel.org/pub/linux/kernel/people/kdave/btrfs-progs/btrfs-progs-v6.16.tar.xz 2954d539b75beb912a0c0c98783ba5f3"
 package_dependencies="lzo"
 
-source_dir="$package_name-$package_version"
+source_dir="$package_name-v$package_version"
 
 configure() {
     cd "$source_dir" || log_error "In $package_name.build: Failed to cd to $source_dir"
