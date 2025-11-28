@@ -57,6 +57,7 @@ get_reverse_dependencies() (
         fi
     done < "${INSTALL_ROOT:-}/${WORLD:?}"
 
+    log_debug "Reverse dependencies for $_target_pkg are: $_reverse_deps_list"
     trim_string_and_return "$_reverse_deps_list"
 )
 

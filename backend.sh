@@ -291,9 +291,11 @@ backend_resolve_uninstall_order() (
                 _uninstall_order="$_uninstall_order $dep"
         done
 
+        log_debug "Adding $_uninstall_order to uninstall order"
         _final_order="$_final_order $_uninstall_order"
     done
 
+    log_debug "Uninstall order is: $_final_order"
     trim_string_and_return "$_final_order"
 )
 
