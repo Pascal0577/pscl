@@ -19,7 +19,7 @@ cleanup() {
 build_file="${package:?}/${package:?}.build"
 
 mkdir "${package:?}"
-cp ../blank.build "$build_file"
+cp ../../blank.build "$build_file"
 sed s/package_name=\"/package_name=\""$package"/ "$build_file" > "$build_file".tmp
 mv "$build_file".tmp "$build_file"
 
