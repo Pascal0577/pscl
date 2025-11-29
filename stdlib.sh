@@ -59,7 +59,7 @@ get_dependency_tree() (
         
         if backend_is_installed "$_current"; then
             _resolved="$_resolved$_current "
-            log_debug "_current is already installed. Skipping adding it to the tree"
+            log_debug "$_current is already installed. Skipping adding it to the tree"
         fi
 
         # Skip if already resolved
