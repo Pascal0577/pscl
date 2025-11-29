@@ -519,7 +519,7 @@ backend_unactivate_package() (
             if rmdir "${_full_path:?}" 2>/dev/null; then
                 log_debug "Removed empty directory: $_full_path"
             else
-                log_warn "Failed to remove directory: $_full_path"
+                log_debug "Failed to remove directory: $_full_path"
             fi
         fi
     done
