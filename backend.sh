@@ -424,7 +424,7 @@ backend_download_sources() (
                     _file="$_tarball_name"
                     trap '
                     rm -f "${CACHE_DIR:?}/${_file:?}" 2>/dev/null
-                    exit 1' INT TERM EXIT
+                    log_warn "Deleting cached download"' INT TERM EXIT
 
                     $_download_cmd "$source" || \
                         log_error "Failed to download: $source"
