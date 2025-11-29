@@ -412,11 +412,11 @@ backend_download_sources() (
                 ;;
 
             *)
-                log_debug "Trying to download: $source"
                 _tarball_name="${source##*/}"
                 _tarball_list="$_tarball_list $_tarball_name"
 
                 [ -e "$CACHE_DIR/$_tarball_name" ] && continue
+                log_debug "Trying to download: $source"
 
                 # This downloads the tarballs to the cache directory
                 (
@@ -485,8 +485,17 @@ backend_prepare_sources() (
 
         # shellcheck source=/dev/null
         . "$_pkg_build" || log_error "Failed to source: $_pkg_build"
-        _sources="$_sources $(echo "$package_source" | awk '{print $1}')"
-        _checksums="$_checksums $(echo "$package_source" | awk '{print $2}')"
+
+        _sources_temp="$_sources $(echo "$package_source" | awk '{print $1}')"
+        _checksums_temp="$_checksums $(echo "$package_source" | awk '{print $2}')"
+
+        # If it's already installed, skip
+        for source in $_sources_temp; do
+            [ -e "${CACHE_DIR:?}/${source##*/}" ] && continue 2
+        done
+
+        _sources="$_sources $_sources_temp"
+        _checksums="$_checksums $_checksums_temp"
     done
 
     _sources="$(trim_string_and_return "$_sources")"
