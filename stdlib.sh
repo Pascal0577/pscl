@@ -57,13 +57,16 @@ get_dependency_tree() (
         _current=$(echo "$_queue" | awk '{print $1}')
         _queue=$(echo "$_queue" | sed 's/^[^ ]* *//')
         
+        if backend_is_installed "$_current"; then
+            _resolved="$_resolved$_current "
+            log_debug "_current is already installed. Skipping adding it to the tree"
+        fi
+
         # Skip if already resolved
         case $_resolved in
             *" $_current "*) continue ;;
         esac
-
-        backend_is_installed "$_current" && continue
-        
+ 
         _deps=$(list_of_dependencies "$_current") || {
             log_error "Failed to get dependencies for: $_current"
         }
