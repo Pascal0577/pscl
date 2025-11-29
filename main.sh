@@ -193,7 +193,7 @@ main_install() (
     _install_order="$(backend_resolve_install_order "$_requested_packages")" || \
         log_error "Failed to resolve install order"
 
-    if [ -z "$_build_order" ]; then
+    if [ -z "$_install_order" ]; then
         echo "Nothing to do."
         return 0
     fi
