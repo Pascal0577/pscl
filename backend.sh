@@ -288,6 +288,7 @@ backend_resolve_uninstall_order() (
     trap 'for p in $_pids; do kill "$p" 2>/dev/null; done
     rm -rf ${_map_file:?} ${_map_dir:?} || true' INT TERM EXIT
 
+    log_debug "Creating dependency map"
     # First build a map of all installed packages and their dependencies
     while read -r installed_pkg; do
         (
@@ -317,6 +318,7 @@ backend_resolve_uninstall_order() (
 
     _reverse_deps=""
 
+    log_debug "Checking if package is still needed"
     for _pkg_name in $_requested_packages; do
         _reverse_deps_temp=""
         while IFS=":" read -r installed_pkg dep; do
@@ -339,12 +341,14 @@ backend_resolve_uninstall_order() (
     # at the top of the tree which is why we use the reversed tree 
     INSTALL_FORCE=1
     _tree="$(get_dependency_tree "$_requested_packages")"
-    
+
+    log_debug "Reversing tree"
     # Reset and build reversed tree for this package
     for dep in $_tree; do
         _reversed_tree="${_reversed_tree:-} $dep"
     done
 
+    log_debug "Creating uninstall order"
     for dep in $_reversed_tree; do
         # Skip if it's one of the requested packages (already in uninstall order)
         string_is_in_list "$dep" "$_uninstall_order" && continue
@@ -360,6 +364,7 @@ backend_resolve_uninstall_order() (
         done
         
         [ "$_should_uninstall" = 1 ] && [ -n "$_rdeps_list" ] && \
+            log_debug "Adding $dep to uninstall order"
             _uninstall_order="$_uninstall_order $dep"
     done
 
