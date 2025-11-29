@@ -277,7 +277,6 @@ backend_resolve_uninstall_order() (
     _map_file="$(mktemp)"
     _map_dir="$(mktemp -d)"
 
-    _pids=""
     _job_count=0
     _max_job_nums="$(nproc)"
 
@@ -298,7 +297,6 @@ backend_resolve_uninstall_order() (
             printf "%s:%s\n" "$installed_pkg" "$_deps" > "${_map_dir:?}/$$"
         ) &
 
-        _pids="$_pids $!"
         _job_count=$((_job_count + 1))
 
         if [ "$_job_count" -ge "$_max_job_nums" ]; then
@@ -370,11 +368,11 @@ backend_resolve_uninstall_order() (
 )
 
 backend_download_sources() (
+    set -m
     _source_list="$1"
     _checksums_list="$2"
     _job_count=0
     _tarball_list=""
-    _pids=""
 
     [ -z "$_source_list" ] && log_error "No sources provided"
 
@@ -402,7 +400,7 @@ backend_download_sources() (
 
     # Kill all child processes if we recieve an interrupt
     # shellcheck disable=SC2154
-    trap 'for p in $_pids; do kill $p 2>/dev/null; done; exit 1' INT TERM EXIT
+    trap 'kill 0; exit 130' INT TERM EXIT
 
     for source in $_source_list; do
         case "$source" in
@@ -420,7 +418,6 @@ backend_download_sources() (
 
                 # This downloads the tarballs to the cache directory
                 (
-                    set -m
                     # Make a variable in this subshell to prevent _tarball_name's 
                     # modification from affecting what is removed by the trap.
                     # The trap ensures that no tarballs are partially downloaded 
