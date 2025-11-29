@@ -444,7 +444,7 @@ backend_download_sources() (
                     wait -n 2>/dev/null || wait
                     _job_count=$((_job_count - 1))
                 fi
-                sleep 0.05
+                sleep 0.1
                 ;;
         esac
     done
