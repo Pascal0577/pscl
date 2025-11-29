@@ -369,6 +369,7 @@ backend_resolve_uninstall_order() (
 
 backend_download_sources() (
     set -m
+    pgid=$$
     _source_list="$1"
     _checksums_list="$2"
     _job_count=0
@@ -400,7 +401,7 @@ backend_download_sources() (
 
     # Kill all child processes if we recieve an interrupt
     # shellcheck disable=SC2154
-    trap 'kill 0; exit 130' INT TERM EXIT
+    trap 'kill -TERM -$pgid; exit 130' INT TERM EXIT
 
     for source in $_source_list; do
         case "$source" in
