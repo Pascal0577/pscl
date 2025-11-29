@@ -108,6 +108,7 @@ get_dependency_tree() (
         fi
     done
     
+    log_debug "Dependency tree is: $_order"
     trim_string_and_return "$_order"
 )
 
