@@ -418,7 +418,7 @@ backend_download_sources() (
                 log_debug "Trying to download: $source"
 
                 # This downloads the tarballs to the cache directory
-                (
+                {
                     # Make a variable in this subshell to prevent _tarball_name's 
                     # modification from affecting what is removed by the trap.
                     # The trap ensures that no tarballs are partially downloaded 
@@ -432,7 +432,7 @@ backend_download_sources() (
                         log_error "Failed to download: $source"
                     echo ""
                     trap - INT TERM EXIT
-                ) &
+                } &
 
                 # Keep track of PIDs so we can kill the subshells
                 # if we recieve an interrupt.
