@@ -46,15 +46,14 @@ list_of_dependencies() (
 
 get_dependency_tree() (
     _initial_packages="$*"
+    # Spaces for easier pattern matching
     _order=""
-    _resolved=" "  # Add spaces for easier pattern matching
+    _resolved=" "
     _processing=" "
     
-    # Use a queue for iterative traversal
     _queue="$_initial_packages"
     
     while [ -n "$_queue" ]; do
-        # Pop first item from queue
         _current=$(echo "$_queue" | awk '{print $1}')
         _queue=$(echo "$_queue" | sed 's/^[^ ]* *//')
         
@@ -62,8 +61,9 @@ get_dependency_tree() (
         case $_resolved in
             *" $_current "*) continue ;;
         esac
+
+        backend_is_installed "$_current" && continue
         
-        # Get dependencies (cached)
         _deps=$(list_of_dependencies "$_current") || {
             log_error "Failed to get dependencies for: $_current"
         }
@@ -79,8 +79,7 @@ get_dependency_tree() (
                 *" $dep "*) ;;
                 *)
                     _all_resolved=0
-                    _unresolved_deps="$_unresolved_deps $dep"
-                    ;;
+                    _unresolved_deps="$_unresolved_deps $dep" ;;
             esac
         done
         
@@ -88,8 +87,7 @@ get_dependency_tree() (
             # Check for circular dependency only when we need to re-queue
             case $_processing in
                 *" $_current "*)
-                    log_error "Circular dependency detected involving: $_current"
-                    ;;
+                    log_error "Circular dependency detected involving: $_current" ;;
             esac
             
             # Mark as processing and re-queue after dependencies
