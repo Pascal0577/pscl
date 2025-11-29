@@ -3,7 +3,7 @@
 package_name="expat"
 package_version="2.7.1"
 package_description="A stream oriented C library for parsing XML"
-package_source="https://github.com/libexpat/libexpat/releases/download/R_2_7_1/expat-2.7.1.tar.xz d41d8cd98f00b204e9800998ecf8427e"
+package_source="https://github.com/libexpat/libexpat/releases/download/R_2_7_1/expat-2.7.1.tar.xz 9f0c266ff4b9720beae0c6bd53ae4469"
 
 source_dir="$package_name-$package_version"
 
