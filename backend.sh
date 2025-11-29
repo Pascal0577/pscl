@@ -260,12 +260,9 @@ backend_resolve_build_order() (
         return 0
     fi
 
-    _final_order=""
-    for pkg in $_requested_packages; do
-        result=$(get_dependency_tree "$pkg" "" "" "")
-        _final_order="$_final_order $(echo "$result" | cut -d '|' -f3)"
-    done
+    _final_order="$(get_dependency_tree "$_requested_packages")"
 
+    [ -z "$_final_order" ] && log_warn "No packages to build"
     trim_string_and_return "$_final_order"
 )
 
