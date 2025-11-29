@@ -368,8 +368,6 @@ backend_resolve_uninstall_order() (
 )
 
 backend_download_sources() (
-    set -m
-    pgid=$$
     _source_list="$1"
     _checksums_list="$2"
     _job_count=0
@@ -401,7 +399,7 @@ backend_download_sources() (
 
     # Kill all child processes if we recieve an interrupt
     # shellcheck disable=SC2154
-    trap 'kill -TERM -$pgid; exit 130' INT TERM EXIT
+    trap 'kill 0; exit 130' INT TERM EXIT
 
     for source in $_source_list; do
         case "$source" in
@@ -418,7 +416,7 @@ backend_download_sources() (
                 log_debug "Trying to download: $source"
 
                 # This downloads the tarballs to the cache directory
-                {
+                (
                     # Make a variable in this subshell to prevent _tarball_name's 
                     # modification from affecting what is removed by the trap.
                     # The trap ensures that no tarballs are partially downloaded 
@@ -432,7 +430,7 @@ backend_download_sources() (
                         log_error "Failed to download: $source"
                     echo ""
                     trap - INT TERM EXIT
-                } &
+                ) &
 
                 # Keep track of PIDs so we can kill the subshells
                 # if we recieve an interrupt.
@@ -446,6 +444,7 @@ backend_download_sources() (
                     wait -n 2>/dev/null || wait
                     _job_count=$((_job_count - 1))
                 fi
+                sleep 0.05
                 ;;
         esac
     done
