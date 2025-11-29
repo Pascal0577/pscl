@@ -483,33 +483,41 @@ backend_prepare_sources() (
         # shellcheck source=/dev/null
         . "$_pkg_build" || log_error "Failed to source: $_pkg_build"
 
-        _sources_temp="$_sources $(echo "$package_source" | awk '{print $1}')"
-        _checksums_temp="$_checksums $(echo "$package_source" | awk '{print $2}')"
+        _pkg_sources="$(echo "$package_source" | awk '{print $1}')"
+        _pkg_checksums="$(echo "$package_source" | awk '{print $2}')"
 
-        # If it's already installed, skip
-        for source in $_sources_temp; do
-            if [ -e "${CACHE_DIR:?}/${source##*/}" ]; then
-                log_debug "$source already downloaded. Skipping"
-                continue 2
+        # Skip package if ALL its sources already exist
+        skip_pkg=true
+        for src in $_pkg_sources; do
+            file="${src##*/}"
+            if [ ! -e "${CACHE_DIR:?}/$file" ]; then
+                skip_pkg=false
+                break
             fi
         done
 
-        _sources="$_sources $_sources_temp"
-        _checksums="$_checksums $_checksums_temp"
+        $skip_pkg && {
+            log_debug "$pkg: all sources already cached, skipping"
+            continue
+        }
+
+        _sources="$_sources $_pkg_sources"
+        _checksums="$_checksums $_pkg_checksums"
     done
 
+    # Trim spaces
     _sources="$(trim_string_and_return "$_sources")"
     _checksums="$(trim_string_and_return "$_checksums")"
-
-    if [ -z "$_sources" ]; then
-        log_debug "All sources already in cache. Skipping downloads"
-        return 0
-    fi
 
     log_debug "Sources are $_sources"
     log_debug "Sums are $_checksums"
 
-    backend_download_sources "$_sources" "$_checksums" || \
+    [ -z "$_sources" ] && {
+        log_debug "All sources already in cache. Skipping downloads."
+        return 0
+    }
+
+    backend_download_sources "$_sources" "$_checksums" ||
         log_error "Failed to download needed source code"
 )
 
