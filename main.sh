@@ -193,6 +193,8 @@ main_install() (
     _install_order="$(backend_resolve_install_order "$_requested_packages")" || \
         log_error "Failed to resolve install order"
 
+    [ -z "$_install_order" ] && echo "Nothing to do."
+
     # Prepare any sources that need building
     log_debug "Preparing source for: $_install_order"
     backend_prepare_sources "$_install_order" || \
@@ -245,6 +247,8 @@ main_build() (
     log_debug "Getting build order for: $_requested_packages"
     _build_order="$(backend_resolve_build_order "$_requested_packages")" || \
         log_error "Failed to resolve build order"
+
+    [ -z "$_build_order" ] && echo "Nothing to do."
 
     log_debug "Preparing sources"
     backend_prepare_sources "$_build_order" || \
