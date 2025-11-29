@@ -399,7 +399,7 @@ backend_download_sources() (
 
     # Kill all child processes if we recieve an interrupt
     # shellcheck disable=SC2154
-    trap 'kill 0; exit 130' INT TERM EXIT
+    trap 'kill 0 >/dev/null 2>/dev/null; exit 130' INT TERM EXIT
 
     for source in $_source_list; do
         case "$source" in
