@@ -57,7 +57,7 @@ get_dependency_tree() (
         _current=$(echo "$_queue" | awk '{print $1}')
         _queue=$(echo "$_queue" | sed 's/^[^ ]* *//')
         
-        if backend_is_installed "$_current"; then
+        if backend_is_installed "$_current" && [ "$INSTALL_FORCE" = 0 ]; then
             _resolved="$_resolved$_current "
             log_debug "$_current is already installed. Skipping adding it to the tree"
         fi
