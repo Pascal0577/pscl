@@ -275,32 +275,96 @@ backend_resolve_install_order() (
 
 backend_resolve_uninstall_order() (
     _requested_packages="$*"
-    _final_order=""
+    _uninstall_order=""
+
+    _map_file="$(mktemp)"
+    _map_dir="$(mktemp -d)"
+
+    _pids=""
+    _job_count=0
+    _max_job_nums="$(nproc)"
+
+    # shellcheck disable=SC2154
+    trap 'for p in $_pids; do kill "$p" 2>/dev/null; done
+    rm -rf ${_map_file:?} ${_map_dir:?} || true' INT TERM EXIT
+
+    # First build a map of all installed packages and their dependencies
+    while read -r installed_pkg; do
+        (
+            _pkginfo="${INSTALL_ROOT:-}/${METADATA_DIR:?}/$installed_pkg/PKGINFO"
+            [ -f "$_pkginfo" ] || exit 0
+
+            _deps="$(grep "^package_dependencies=" "$_pkginfo" | cut -d'=' -f2-)"
+
+            # Print result to its own file to avoid race conditions
+            printf "%s:%s\n" "$installed_pkg" "$_deps" > "${_map_dir:?}/$$"
+        ) &
+
+        _pids="$_pids $!"
+        _job_count=$((_job_count + 1))
+
+        if [ "$_job_count" -ge "$_max_job_nums" ]; then
+            # wait -n is better if the shell supports it
+            wait -n 2>/dev/null || wait
+            _job_count=$((_job_count - 1))
+        fi
+    done < "${INSTALL_ROOT:-}/${WORLD:?}"
+    wait
+
+    # Combine all outputs of the child processes
+    cat "$_map_dir"/* > "$_map_file" 2>/dev/null
+    _map="$(cat "$_map_file")"
+
+    _reverse_deps=""
 
     for _pkg_name in $_requested_packages; do
-        _reverse_deps_for_pkg="$(get_reverse_dependencies "$_pkg_name")"
-        [ -n "$_reverse_deps_for_pkg" ] && \
-            log_error "Can't remove $_pkg_name: Needed by: $_reverse_deps_for_pkg"
-        log_debug "Reverse dependencies for $_pkg_name are: $_reverse_deps_for_pkg"
-
-        _uninstall_order="$_pkg_name"
-        export INSTALL_FORCE=1
-        _tree="$(get_dependency_tree "$_pkg_name" "" "" "" | cut -d '|' -f3)"
-        log_debug "Dependencies for $_pkg_name are: $_tree"
-
-        for dep in $_tree; do
-            _reverse_deps="$(get_reverse_dependencies "$dep")"
-            _reverse_deps="$(trim_string_and_return "$_reverse_deps")"
-            [ "$_reverse_deps" = "$_pkg_name" ] && \
-                _uninstall_order="$_uninstall_order $dep"
-        done
-
-        log_debug "Adding $_uninstall_order to uninstall order"
-        _final_order="$_final_order $_uninstall_order"
+        _reverse_deps_temp=""
+        while IFS=":" read -r installed_pkg dep; do
+            if string_is_in_list "$_pkg_name" "$dep"; then
+                _reverse_deps_temp="${_reverse_deps_temp:-} $installed_pkg"
+            fi
+        done <<- EOF
+		$_map
+		EOF
+        [ -n "$_reverse_deps_temp" ] && \
+            log_error "Cannot remove $_pkg_name: Needed by: $_reverse_deps_temp"
+        _reverse_deps="$_reverse_deps $_reverse_deps_temp"
     done
 
-    log_debug "Uninstall order is: $_final_order"
-    trim_string_and_return "$_final_order"
+    _reverse_deps="$(trim_string_and_return "$_reverse_deps")"
+    _uninstall_order="$_uninstall_order $_requested_packages"
+
+    # If all of a dependency's reverse dependencies are in the uninstall
+    # order, add the dependency to the uninstall order. We need to start
+    # at the top of the tree which is why we use the reversed tree 
+    INSTALL_FORCE=1
+    _tree="$(get_dependency_tree "$_requested_packages")"
+    
+    # Reset and build reversed tree for this package
+    for dep in $_tree; do
+        _reversed_tree="${_reversed_tree:-} $dep"
+    done
+
+    for dep in $_reversed_tree; do
+        # Skip if it's one of the requested packages (already in uninstall order)
+        string_is_in_list "$dep" "$_uninstall_order" && continue
+        
+        _rdeps_list="$(echo "$_map" | awk -F: -v dep="$dep" '$1 == dep {print $2}')"
+        
+        _should_uninstall=1
+        for rdep in $_rdeps_list; do
+            if ! string_is_in_list "$rdep" "$_uninstall_order"; then
+                _should_uninstall=0
+                break
+            fi
+        done
+        
+        [ "$_should_uninstall" = 1 ] && [ -n "$_rdeps_list" ] && \
+            _uninstall_order="$_uninstall_order $dep"
+    done
+
+    log_debug "Uninstall order is: $_uninstall_order"
+    trim_string_and_return "$_uninstall_order"
 )
 
 backend_download_sources() (

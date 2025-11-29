@@ -10,11 +10,11 @@ trim_string_and_return() (
 string_is_in_list() (
     _string="$1"
     shift
-    _list="${*:-}"
+    _list=" ${*:-} "
 
-    for word in $_list; do
-        [ "$_string" = "$word" ] && return 0
-    done
+    case $_list in
+        *" $_string "*) return 0 ;;
+    esac
     return 1
 )
 
@@ -33,91 +33,81 @@ remove_string_from_list() (
     trim_string_and_return "$_result"
 )
 
-get_reverse_dependencies() (
-    _target_pkg="$1"
-    _reverse_deps_list=""
-
-    while read -r installed_pkg; do
-        _pkginfo="${INSTALL_ROOT:-}/${METADATA_DIR:?}/$installed_pkg/PKGINFO"
-
-        [ -f "$_pkginfo" ] || continue
-
-        # Extract dependencies line from PKGINFO
-        _deps="$(grep "^package_dependencies=" "$_pkginfo" | cut -d'=' -f2-)"
-
-        if [ -z "$_deps" ]; then
-            _pkg_build="$(backend_get_package_build "$installed_pkg")"
-            # shellcheck disable=SC1090
-            . "$_pkg_build"
-            _deps="${package_dependencies:-}"
-        fi
-
-        if string_is_in_list "$_target_pkg" "$_deps"; then
-            _reverse_deps_list="$_reverse_deps_list $installed_pkg"
-        fi
-    done < "${INSTALL_ROOT:-}/${WORLD:?}"
-
-    log_debug "Reverse dependencies for $_target_pkg are: $_reverse_deps_list"
-    trim_string_and_return "$_reverse_deps_list"
-)
-
 list_of_dependencies() (
-    _pkg="$(backend_get_package_name "$1")" || \
-        log_error "Failed to get package name: $_pkg"
-    _pkg_build="$(backend_get_package_build "$_pkg")" || \
-        log_error "Failed to get package build: $_pkg"
+    for build in $1; do
+        _pkg_build="./repositories/main/$build/${build}.build"
 
-    # shellcheck source=/dev/null
-    . "$_pkg_build" || log_error "Failed to source: $_pkg_build"
-
-    # package_dependencies is a variable defined in the package's build script
-    trim_string_and_return "${package_dependencies:-}"
+        # shellcheck source=/dev/null
+        . "$_pkg_build" || log_error "Failed to source: $_pkg_build"
+        string="${string:-} ${package_dependencies:-}"
+    done
+    trim_string_and_return "$string"
 )
 
 get_dependency_tree() (
-    _node=$1
-    _visiting=$2
-    _resolved=$3
-    _order=$4
-
-    # Errors if there's a circular dependency
-    if string_is_in_list "$_node" "$_visiting"; then
-        log_error "In get_dependency_graph: Circular dependency involving: $_node"
-    fi
-
-    # If a node has been resolved, don't search its subtree
-    if string_is_in_list "$_node" "$_resolved"; then
-        echo "$_visiting|$_resolved|$_order"
-        return 0
-    fi
-
-    _visiting="$_visiting $_node"
-
-    # The dependencies of a package are the children
-    _deps=$(list_of_dependencies "$_node") || \
-        log_error "In get_dependency_graph: Failed to get dependencies for: $_node"
-    log_debug "In get_dependency_graph: Dependencies for $_node are: $_deps"
-
-    for child in $_deps; do
-        # If a package is installed we don't need to resolve it
-        [ "$INSTALL_FORCE" = 0 ] && ( backend_is_installed "$child" ) && continue
-
-        # Get the dependency graph of all the children recursively until there
-        # are no more childen. At that point we are in the deepest part of the
-        # tree and can append the child to the build order.
-        result=$(get_dependency_tree "$child" "$_visiting" "$_resolved" "$_order") || \
-            log_error "Failed to get dependency graph for: $child"
-        _visiting=$(echo "$result" | cut -d '|' -f1)
-        _resolved=$(echo "$result" | cut -d '|' -f2)
-        _order=$(echo "$result" | cut -d '|' -f3)
+    _initial_packages="$*"
+    _order=""
+    _resolved=" "  # Add spaces for easier pattern matching
+    _processing=" "
+    
+    # Use a queue for iterative traversal
+    _queue="$_initial_packages"
+    
+    while [ -n "$_queue" ]; do
+        # Pop first item from queue
+        _current=$(echo "$_queue" | awk '{print $1}')
+        _queue=$(echo "$_queue" | sed 's/^[^ ]* *//')
+        
+        # Skip if already resolved
+        case $_resolved in
+            *" $_current "*) continue ;;
+        esac
+        
+        # Get dependencies (cached)
+        _deps=$(list_of_dependencies "$_current") || {
+            log_error "Failed to get dependencies for: $_current"
+        }
+        
+        log_debug "Dependencies for $_current are: $_deps"
+        
+        # Check if all dependencies are resolved
+        _all_resolved=1
+        _unresolved_deps=""
+        
+        for dep in $_deps; do
+            case $_resolved in
+                *" $dep "*) ;;
+                *)
+                    _all_resolved=0
+                    _unresolved_deps="$_unresolved_deps $dep"
+                    ;;
+            esac
+        done
+        
+        if [ "$_all_resolved" -eq 0 ]; then
+            # Check for circular dependency only when we need to re-queue
+            case $_processing in
+                *" $_current "*)
+                    log_error "Circular dependency detected involving: $_current"
+                    ;;
+            esac
+            
+            # Mark as processing and re-queue after dependencies
+            _processing="$_processing$_current "
+            _queue="$_unresolved_deps $_current $_queue"
+        else
+            # All dependencies resolved, add to order
+            _resolved="$_resolved$_current "
+            _order="$_order $_current"
+            
+            # Remove from processing since it's now resolved
+            _processing=$(echo "$_processing" | sed "s| $_current | |")
+            
+            log_debug "Adding $_current to dependency graph"
+        fi
     done
-
-    _visiting=$(remove_string_from_list "$_node" "$_visiting")
-    _resolved="$_resolved $_node"
-    _order="$_order $_node"
-    log_debug "Adding $_node to dependency graph"
-
-    trim_string_and_return "$_visiting|$_resolved|$_order"
+    
+    trim_string_and_return "$_order"
 )
 
 run_in_parallel() (
