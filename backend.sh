@@ -491,7 +491,10 @@ backend_prepare_sources() (
 
         # If it's already installed, skip
         for source in $_sources_temp; do
-            [ -e "${CACHE_DIR:?}/${source##*/}" ] && continue 2
+            if [ -e "${CACHE_DIR:?}/${source##*/}" ]; then
+                log_debug "$source already downloaded. Skipping"
+                continue 2
+            fi
         done
 
         _sources="$_sources $_sources_temp"
@@ -500,6 +503,11 @@ backend_prepare_sources() (
 
     _sources="$(trim_string_and_return "$_sources")"
     _checksums="$(trim_string_and_return "$_checksums")"
+
+    if [ -z "$_sources" ]; then
+        log_debug "All sources already in cache. Skipping downloads"
+        return 0
+    fi
 
     log_debug "Sources are $_sources"
     log_debug "Sums are $_checksums"
