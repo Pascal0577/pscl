@@ -9,12 +9,13 @@ readonly def="\x1b[39m"
 . "${SCRIPT_DIR:-.}/stdlib.sh" || { echo "Failed to load stdlib" >&2; exit 1; }
 . "${SCRIPT_DIR:-.}/backend.sh" || { echo "Failed to load backend" >&2; exit 1; }
 
-readonly METADATA_DIR="/var/pkg/metadata"
+readonly PKGDIR="${PKGDIR:-/home/pascal-work/src/package-management/}"
+readonly METADATA_DIR="$PKGDIR/metadata"
 readonly WORLD="$METADATA_DIR/world"
-readonly LOCKFILE="/var/pkg/pkg.lock"
-readonly CACHE_DIR="${CACHE_DIR:-/var/pkg/source_cache}"
-readonly PACKAGE_CACHE="${PACKAGE_CACHE:-/var/pkg/package_cache}"
-readonly REPOSITORY_LIST="${REPOSITORY_LIST:-/var/pkg/repositories/*}"
+readonly LOCKFILE="$PKGDIR/pkg.lock"
+readonly CACHE_DIR="${CACHE_DIR:-$PKGDIR/source_cache}"
+readonly PACKAGE_CACHE="${PACKAGE_CACHE:-$PKGDIR/package_cache}"
+readonly REPOSITORY_LIST="${REPOSITORY_LIST:-$PKGDIR/repositories/*}"
 
 parse_arguments() {
     _flag="$1"
@@ -67,7 +68,7 @@ parse_arguments() {
                 _char="${_flag%"${_flag#?}"}"
                 _flag="${_flag#?}"
                 case "$_char" in
-                    r) readonly INSTALL_ROOT="$1"; shift ;;
+                    r) readonly INSTALL_ROOT="$(realpath "$1")"; shift ;;
                     b) readonly CREATE_PACKAGE=1 ;;
                     d) readonly RESOLVE_DEPENDENCIES=0 ;;
                     f) readonly INSTALL_FORCE=1 ;;
@@ -91,7 +92,7 @@ parse_arguments() {
                 _char="${_flag%"${_flag#?}"}"
                 _flag="${_flag#?}"
                 case "$_char" in
-                    r) readonly INSTALL_ROOT="$1"; shift ;;
+                    r) readonly INSTALL_ROOT="$(realpath "$1")"; shift ;;
                     v) readonly VERBOSE=1 ;;
                     *)
                         if ! extension_parse_flag "U" "$_char" "$@"; then

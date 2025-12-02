@@ -121,9 +121,9 @@ backend_install_files() (
         log_error "Failed to get package directory for: $_pkg"
     _pkg_name="$(backend_get_package_name "$_pkg")" || \
         log_error "Failed to get package name for: $_pkg"
-    _package_archive="$PACKAGE_CACHE/$_pkg_name.tar.zst"
+    _package_archive="${INSTALL_ROOT:-}/$PACKAGE_CACHE/$_pkg_name.tar.zst"
     _data_dir="${INSTALL_ROOT:-}/${METADATA_DIR:?}/$_pkg_name"
-    _install_dir="${INSTALL_ROOT:-}/var/pkg/installed_packages/$_pkg_name"
+    _install_dir="${INSTALL_ROOT:-}/${PKGDIR:?}/installed_packages/$_pkg_name"
 
     trap '
         [ -d "$_data_dir" ] && rm -rf "${_data_dir:?}"
@@ -145,7 +145,7 @@ backend_register_package() (
     _pkg_name="$(backend_get_package_name "$_pkg")" || \
         log_error "Failed to get package name for: $_pkg"
     _data_dir="${INSTALL_ROOT:-}/${METADATA_DIR:?}/$_pkg_name"
-    _install_dir="${INSTALL_ROOT:-}/var/pkg/installed_packages/$_pkg_name"
+    _install_dir="${INSTALL_ROOT:-}/${PKGDIR:?}/installed_packages/$_pkg_name"
 
     [ -f "$_install_dir/PKGINFO" ] && mv "$_install_dir/PKGINFO" "$_data_dir"
     [ -f "$_data_dir/PKGFILES.pkg-new" ] && \
@@ -160,10 +160,11 @@ backend_register_package() (
 backend_activate_package() (
     _pkg="$1"
     _pkg_name="$(backend_get_package_name "$_pkg")"
-    _pkg_install_dir="${INSTALL_ROOT:-}/var/pkg/installed_packages/$_pkg_name"
+    _pkg_install_dir="${INSTALL_ROOT:-}/${PKGDIR:?}/installed_packages/$_pkg_name"
 
     find "$_pkg_install_dir" -mindepth 1 | sed "s|^${_pkg_install_dir}/||" | \
     while read -r line; do
+    (
         _source="$_pkg_install_dir/$line"
         _target="${INSTALL_ROOT:-}/$line"
         
@@ -173,7 +174,9 @@ backend_activate_package() (
             mkdir -p "$(dirname "$_target")"
             ln -sf "$_source" "$_target"
         fi
+    ) &
     done
+    wait
 )
 
 backend_build_source() (
@@ -189,7 +192,7 @@ backend_build_source() (
 
     # These come from the packages build script
     _pkg_name="${package_name:?}"
-    _build_dir="/var/pkg/build/$_pkg_name"
+    _build_dir="/${PKGDIR:?}/build/$_pkg_name"
     _url_list="$(echo "$package_source" | awk '{print $1}')"
     _needed_tarballs=""
 
@@ -229,7 +232,7 @@ backend_build_source() (
 backend_create_package() (
     _pkg="$1"
     _pkg_name="$(backend_get_package_name "$_pkg")"
-    _build_dir="/var/pkg/build/$_pkg_name/package"
+    _build_dir="/${PKGDIR:?}/build/$_pkg_name/package"
     _pkg_build="$(backend_get_package_build "$_pkg")" || \
         log_error "Failed to get build script for: $_pkg"
 
@@ -384,7 +387,6 @@ backend_download_sources() (
 
     case "$_download_cmd" in
         wget|wget2)
-            _download_cmd="$_download_cmd -P $CACHE_DIR"
             [ "$VERBOSE" = 0 ] && _download_cmd="$_download_cmd -q --show-progress"
             [ "$CERTIFICATE_CHECK" = 0 ] && \
                 _download_cmd="$_download_cmd --no-check-certificate" ;;
@@ -425,6 +427,8 @@ backend_download_sources() (
                     trap '
                     rm -f "${CACHE_DIR:?}/${_file:?}" 2>/dev/null
                     log_warn "Deleting cached download"' INT TERM EXIT
+
+                    cd "${PKGDIR:?}/source_cache" || true
 
                     $_download_cmd "$source" || \
                         log_error "Failed to download: $source"
@@ -527,14 +531,26 @@ backend_unactivate_package() (
     backend_is_installed "$_pkg" || log_error "Package not installed: $_pkg"
 
     _package_metadata_dir="${INSTALL_ROOT:-}/$METADATA_DIR/$_pkg"
+    _pkgfiles="$(sort -r "$_package_metadata_dir/PKGFILES")"
+    _pkgfiles2="$_pkgfiles"
 
     # Remove files in reverse order (deepest first)
-    sort -r "$_package_metadata_dir/PKGFILES" | while IFS= read -r file; do
+    echo "$_pkgfiles" | while IFS= read -r file; do
+    (
         _full_path="${INSTALL_ROOT:-}/$file"
         if [ -f "$_full_path" ] || [ -L "$_full_path" ]; then
             log_debug "Removing file: $_full_path"
             rm "${_full_path:?}" || log_warn "Failed to remove: $_full_path"
-        elif [ -d "$_full_path" ]; then
+
+        fi
+    ) &
+    wait
+    done
+    
+    echo "$_pkgfiles" | while IFS= read -r file; do
+    (
+        _full_path="${INSTALL_ROOT:-}/$file"
+        if [ -d "$_full_path" ]; then
             if rmdir "${_full_path:?}" 2>/dev/null; then
                 log_debug "Removed empty directory: $_full_path"
             else
@@ -542,12 +558,14 @@ backend_unactivate_package() (
                 true
             fi
         fi
+    ) &
+    wait
     done
 )
 
 backend_remove_files() (
     _pkg="$1"
-    _pkg_install_dir="${INSTALL_ROOT:-}/var/pkg/installed_packages/${_pkg:?}"
+    _pkg_install_dir="${INSTALL_ROOT:-}/${PKGDIR:?}/installed_packages/${_pkg:?}"
     [ -d "$_pkg_install_dir" ] && rm -rf "${_pkg_install_dir:?}"
 )
 
@@ -566,7 +584,8 @@ backend_want_to_build_package() (
     _pkg_name="$(backend_get_package_name "$_pkg")" || \
         log_error "Failed to get package name"
 
-    if [ ! -f "${PACKAGE_CACHE:?}/$_pkg_name.tar.zst" ] || [ "$INSTALL_FORCE" = 1 ]
+    if [ ! -f "${INSTALL_ROOT:-}/${PACKAGE_CACHE:?}/$_pkg_name.tar.zst" ] \
+        || [ "$INSTALL_FORCE" = 1 ]
     then
         return 0
     else
