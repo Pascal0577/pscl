@@ -6,9 +6,6 @@ readonly yellow="\x1b[33m"
 readonly green="\x1b[32m"
 readonly def="\x1b[39m"
 
-. "${SCRIPT_DIR:-.}/stdlib.sh" || { echo "Failed to load stdlib" >&2; exit 1; }
-. "${SCRIPT_DIR:-.}/backend.sh" || { echo "Failed to load backend" >&2; exit 1; }
-
 readonly PKGDIR="${PKGDIR:-/home/pascal-work/src/package-management/}"
 readonly METADATA_DIR="$PKGDIR/metadata"
 readonly WORLD="$METADATA_DIR/world"
@@ -20,7 +17,7 @@ readonly REPOSITORY_LIST="${REPOSITORY_LIST:-$PKGDIR/repositories/*}"
 parse_arguments() {
     _flag="$1"
     shift
-    
+
     # Default values
     ACTION=""
     ARGUMENTS=""
@@ -36,7 +33,7 @@ parse_arguments() {
     LIST_FILES=0
     PRINT_WORLD=0
     INSTALL_ROOT=""
-    
+
     case "$_flag" in
         -B*)
             readonly ACTION="build"
@@ -84,7 +81,7 @@ parse_arguments() {
             done
             readonly ARGUMENTS="$*"
             ;;
-            
+
         -U*)
             readonly ACTION="uninstall"
             _flag="${_flag#-U}"
@@ -103,7 +100,7 @@ parse_arguments() {
             done
             readonly ARGUMENTS="$*"
             ;;
-            
+
         -Q*)
             readonly ACTION="query"
             _flag="${_flag#-Q}"
@@ -124,7 +121,7 @@ parse_arguments() {
             done
             readonly ARGUMENTS="$*"
             ;;
-            
+
         *)
             # Allow extensions to handle completely custom actions
             if ! extension_parse_action "$_flag" "$@"; then
@@ -271,8 +268,10 @@ uninstall_package() (
     _pkg_name="$1"
 
     log_debug "Checking if package is installed: $_pkg_name"
-    backend_is_installed "$_pkg_name" || \
+    if backend_is_installed "$_pkg_name"; then
         log_warn "Package not installed: $_pkg_name"
+        exit 0
+    fi
 
     log_debug "Running pre-uninstall hooks: $_pkg_name"
     run_hooks pre_uninstall "$_pkg_name" || \
@@ -351,6 +350,9 @@ extension_handle_action() {
 main() {
     exec 9>|"$LOCKFILE"
     flock -n 9 || log_error "In main: Another instance is running!"
+
+    . "${SCRIPT_DIR:-.}/stdlib.sh" || log_error "Failed to load stdlib"
+    . "${SCRIPT_DIR:-.}/backend.sh" || log_error "Failed to load backend"
 
     load_extensions || log_error "Failed to load extensions"
     parse_arguments "$@" || log_error "Failed to parse arguments"

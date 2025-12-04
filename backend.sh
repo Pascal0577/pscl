@@ -1,20 +1,8 @@
 #!/bin/sh
 
-backend_run_checks() (
-    [ -z "$ARGUMENTS" ] && [ "$PRINT_WORLD" = 0 ] && \
-        log_error "Arguments were expected but none were provided"
-    case "$PARALLEL_DOWNLOADS" in
-        ''|*[!0-9]*)
-            log_error "Invalid parallel downloads value: $PARALLEL_DOWNLOADS"
-            ;;
-    esac
-    mkdir -p "$CACHE_DIR" || \
-        log_error "Cannot create cache directory: $CACHE_DIR"
-    [ -w "$CACHE_DIR" ] || \
-        log_error "Cache directory: $CACHE_DIR is not writable"
-
-    mkdir -p "${INSTALL_ROOT:-}/${PACKAGE_CACHE:?}"
-)
+###########
+# Helpers #
+###########
 
 backend_is_installed() (
     _pkg_name="$1"
@@ -67,11 +55,9 @@ backend_get_package_dir() (
 
 # Returns the path to the build file for a package
 backend_get_package_build() (
-    _pkg_list="$(backend_get_package_name "$1")" || \
-        log_error "Failed to get package name: $1"
     _pkg_build_list=""
 
-    for pkg in $_pkg_list; do
+    for pkg in $1; do
         _pkg_dir="$(backend_get_package_dir "$pkg")" || \
             log_error "Failed to get package dir: $pkg"
         _pkg_build_list="$_pkg_build_list $_pkg_dir/$pkg.build"
@@ -80,38 +66,294 @@ backend_get_package_build() (
     trim_string_and_return "$_pkg_build_list"
 )
 
-backend_list_files_owned_by_package() (
+backend_download_sources() (
+    _source_list="$1"
+    _checksums_list="$2"
+    _job_count=0
+    _tarball_list=""
+
+    [ -z "$_source_list" ] && log_error "No sources provided"
+
+    for _cmd in wget wget2 curl; do
+        command -v "$_cmd" > /dev/null || continue
+        _download_cmd="$_cmd"
+        log_debug "Using $_download_cmd"
+        break
+    done
+
+    case "$_download_cmd" in
+        wget|wget2)
+            [ "$VERBOSE" = 0 ] && _download_cmd="$_download_cmd -q --show-progress"
+            [ "$CERTIFICATE_CHECK" = 0 ] && \
+                _download_cmd="$_download_cmd --no-check-certificate" ;;
+        curl)
+            # Fix curl later, it's a pain in the ass to work with
+            [ "$CERTIFICATE_CHECK" = 0 ] && _download_cmd="$_download_cmd -k"
+            _download_cmd="$_download_cmd -L -O" ;;
+    esac
+
+    [ -z "$_download_cmd" ] && log_error "No suitable download tools found"
+    [ "$CERTIFICATE_CHECK" = 0 ] && log_warn "Certificate check disabled"
+
+    # Kill all child processes if we recieve an interrupt
+    # shellcheck disable=SC2154
+    trap 'kill 0 >/dev/null 2>/dev/null; exit 130' INT TERM EXIT
+
+    for source in $_source_list; do
+        case "$source" in
+            *.git)
+                git clone "$source" || return 1
+                _sources_list="$(remove_string_from_list "$source" "$_source_list")"
+                ;;
+
+            *)
+                _tarball_name="${source##*/}"
+                _tarball_list="$_tarball_list $_tarball_name"
+
+                [ -e "$CACHE_DIR/$_tarball_name" ] && continue
+                log_debug "Trying to download: $source"
+
+                # This downloads the tarballs to the cache directory
+                (
+                    # Make a variable in this subshell to prevent _tarball_name's 
+                    # modification from affecting what is removed by the trap.
+                    # The trap ensures that no tarballs are partially downloaded 
+                    # to the cache
+                    _file="$_tarball_name"
+                    trap '
+                    rm -f "${CACHE_DIR:?}/${_file:?}" 2>/dev/null
+                    log_warn "Deleting cached download"' INT TERM EXIT
+
+                    cd "${PKGDIR:?}/source_cache" || true
+
+                    $_download_cmd "$source" || \
+                        log_error "Failed to download: $source"
+                    echo ""
+                    trap - INT TERM EXIT
+                ) &
+
+                # Keep track of PIDs so we can kill the subshells
+                # if we recieve an interrupt.
+                _pids="$_pids $!"
+                _job_count=$((_job_count + 1))
+
+                # Ensures that we have no more than $PARALLEL_DOWNLOADS number of
+                # subshells at a time
+                if [ "$_job_count" -ge "$PARALLEL_DOWNLOADS" ]; then
+                    # wait -n is better if the shell supports it
+                    wait -n 2>/dev/null || wait
+                    _job_count=$((_job_count - 1))
+                fi
+                sleep 0.05
+                ;;
+        esac
+    done
+
+    # Wait for the child processes to complete then remove the trap
+    wait || log_error "A download failed"
+
+    # Verify checksums if enabled. Compares every checksum to every tarball
+    if [ "$CHECKSUM_CHECK" = 1 ]; then
+        log_debug "Verifying checksums"
+        for tarball in $_tarball_list; do
+            _md5sum="$(md5sum "$CACHE_DIR/$tarball" | awk '{print $1}')"
+            _verified=0
+            for checksum in $_checksums_list; do
+                [ "$_md5sum" = "$checksum" ] && _verified=1 && break
+            done
+            [ "${_verified:?}" = 0 ] && \
+                log_error "Checksum failed: $tarball"
+        done
+    fi
+
+    trap - INT TERM EXIT
+    return 0
+)
+
+backend_prepare_sources() (
+    _package_list="$1"
+    _sources=""
+    _checksums=""
+
+    for pkg in $_package_list; do
+        _pkg_dir="$(backend_get_package_dir "$pkg")" ||
+            log_error "Failed to get package dir for: $_pkg_dir"
+        _pkg_build="$(trim_string_and_return "${_pkg_dir}/${pkg}.build")"
+
+        # shellcheck source=/dev/null
+        . "$_pkg_build" || log_error "Failed to source: $_pkg_build"
+
+        _pkg_sources="$(echo "$package_source" | awk '{print $1}')"
+        _pkg_checksums="$(echo "$package_source" | awk '{print $2}')"
+
+        # Skip package if ALL its sources already exist
+        skip_pkg=true
+        for src in $_pkg_sources; do
+            file="${src##*/}"
+            if [ ! -e "${CACHE_DIR:?}/$file" ]; then
+                skip_pkg=false
+                break
+            fi
+        done
+
+        $skip_pkg && {
+            log_debug "$pkg: all sources already cached, skipping"
+            continue
+        }
+
+        _sources="$_sources $_pkg_sources"
+        _checksums="$_checksums $_pkg_checksums"
+    done
+
+    # Trim spaces
+    _sources="$(trim_string_and_return "$_sources")"
+    _checksums="$(trim_string_and_return "$_checksums")"
+
+    log_debug "Sources are $_sources"
+    log_debug "Sums are $_checksums"
+
+    [ -z "$_sources" ] && {
+        log_debug "All sources already in cache. Skipping downloads."
+        return 0
+    }
+
+    backend_download_sources "$_sources" "$_checksums" ||
+        log_error "Failed to download needed source code"
+)
+
+backend_want_to_build_package() (
     _pkg="$1"
-    if backend_is_installed "$_pkg"; then
-        cat "${INSTALL_ROOT:-}/${METADATA_DIR:?}/$1/PKGFILES"
+    _pkg_name="$(backend_get_package_name "$_pkg")" || \
+        log_error "Failed to get package name"
+
+    if [ ! -f "${INSTALL_ROOT:-}/${PACKAGE_CACHE:?}/$_pkg_name.tar.zst" ] \
+        || [ "$INSTALL_FORCE" = 1 ]
+    then
+        return 0
     else
-        log_error "Package not installed: $_pkg"
+        return 1
     fi
 )
 
-backend_show_package_info() (
+backend_run_checks() (
+    [ -z "$ARGUMENTS" ] && [ "$PRINT_WORLD" = 0 ] && \
+        log_error "Arguments were expected but none were provided"
+    case "$PARALLEL_DOWNLOADS" in
+        ''|*[!0-9]*)
+            log_error "Invalid parallel downloads value: $PARALLEL_DOWNLOADS"
+            ;;
+    esac
+    mkdir -p "$CACHE_DIR" || \
+        log_error "Cannot create cache directory: $CACHE_DIR"
+    [ -w "$CACHE_DIR" ] || \
+        log_error "Cache directory: $CACHE_DIR is not writable"
+
+    mkdir -p "${INSTALL_ROOT:-}/${PACKAGE_CACHE:?}"
+)
+
+###############
+# Build Steps #
+###############
+
+backend_resolve_build_order() (
+    _requested_packages="$*"
+
+    if [ "${RESOLVE_DEPENDENCIES:-1}" = 0 ]; then
+        echo "$_requested_packages"
+        return 0
+    fi
+
+    _final_order="$(get_dependency_tree "$_requested_packages")"
+
+    [ -z "$_final_order" ] && log_warn "No packages to build"
+    trim_string_and_return "$_final_order"
+)
+
+backend_build_source() (
     _pkg="$1"
-    if backend_is_installed "$_pkg"; then
-        cat "${INSTALL_ROOT:-}/${METADATA_DIR:?}/$1/PKGINFO"
-    else
-        log_error "Package not installed: $_pkg"
-    fi
+    _pkg_dir="$(backend_get_package_dir "$_pkg")" || \
+        log_error "Failed to get package directory for: $_pkg"
+    _pkg_build="$(backend_get_package_build "$_pkg")" || \
+        log_error "Failed to get build script for: $_pkg"
+
+    # shellcheck source=/dev/null
+    . "$(realpath "$_pkg_build")" || \
+        log_error "Failed to source: $_pkg_build"
+
+    # These come from the packages build script
+    _pkg_name="${package_name:?}"
+    _build_dir="/${PKGDIR:?}/build/$_pkg_name"
+    _url_list="$(echo "$package_source" | awk '{print $1}')"
+    _needed_tarballs=""
+
+    trap 'rm -rf ${_build_dir:?} || exit 1' INT TERM EXIT
+
+    for url in $_url_list; do
+        _needed_tarballs="$_needed_tarballs ${url##*/}"
+    done
+    _needed_tarballs="$(echo "$_needed_tarballs" | xargs)"
+
+    # Create build directory and cd to it
+    mkdir -p "$_build_dir"
+    cd "$_build_dir" \
+        || log_error "Failed to change directory: $_build_dir/build"
+
+    # Unpack tarballs
+    for tarball in $_needed_tarballs; do
+        log_debug "Unpacking $tarball"
+        tar -xf "$CACHE_DIR/$tarball" || log_error "Failed to unpack: $tarball"
+    done
+
+    # Move patches to the expected directory so the build script can apply them
+    log_debug "Package directory is: $_build_dir"
+    find "$_pkg_dir" -name "*.patch" | while read -r patch; do
+        log_debug "Moving $patch to $_build_dir"
+        cp -a "$patch" "$_build_dir"
+    done
+
+    # These commands are provided by the build script which was sourced in main_build
+    log_debug "Building package"
+    mkdir -p "$_build_dir/package"
+    export DESTDIR="$(realpath "$_build_dir/package")"
+    log_debug "DESTDIR is: $DESTDIR"
+    configure || log_error "In $ARGUMENTS: In configure: "
+    build || log_error "In $ARGUMENTS: In build: "
+    install_files || log_error "In install_files"
 )
 
-backend_print_world() (
-    cat "${INSTALL_ROOT:-}/${WORLD:?}"
-)
-
-backend_query() (
+backend_create_package() (
     _pkg="$1"
-    if [ "$PRINT_WORLD" = 1 ]; then
-        backend_print_world || log_error "World file doesn't exist"
-    elif [ "$LIST_FILES" = 1 ]; then
-        backend_list_files_owned_by_package "$_pkg" || \
-            log_error "Failed to list files owned by package"
-    elif [ "$SHOW_INFO" = 1 ]; then
-        backend_show_package_info "$_pkg" || log_error "Failed to get package info"
-    fi
+    _pkg_name="$(backend_get_package_name "$_pkg")"
+    _build_dir="/${PKGDIR:?}/build/$_pkg_name/package"
+    _pkg_build="$(backend_get_package_build "$_pkg")" || \
+        log_error "Failed to get build script for: $_pkg"
+
+    # shellcheck source=/dev/null
+    . "$(realpath "$_pkg_build")" || \
+        log_error "Failed to source: $_pkg_build"
+
+    cat >| "$_build_dir/PKGINFO" <<- EOF
+		package_name=${package_name:?}
+		package_version=${package_version:-unknown}
+		package_dependencies=${package_dependencies:-}
+		builddate=$(date +%s)
+		source="$package_source"
+	EOF
+
+    log_debug "Creating package"
+    cd "$_build_dir" || log_error "Failed to change directory: $_build_dir"
+
+    tar -cpf - . | zstd > "${INSTALL_ROOT:-}/${PACKAGE_CACHE:?}/$_pkg_name.tar.zst" \
+        || log_error "Failed to create compressed tar archive: $_pkg_name.tar.zst"
+)
+
+
+######################
+# Installation Steps #
+######################
+
+backend_resolve_install_order() (
+    backend_resolve_build_order "$@"
 )
 
 backend_install_files() (
@@ -179,99 +421,9 @@ backend_activate_package() (
     wait
 )
 
-backend_build_source() (
-    _pkg="$1"
-    _pkg_dir="$(backend_get_package_dir "$_pkg")" || \
-        log_error "Failed to get package directory for: $_pkg"
-    _pkg_build="$(backend_get_package_build "$_pkg")" || \
-        log_error "Failed to get build script for: $_pkg"
-
-    # shellcheck source=/dev/null
-    . "$(realpath "$_pkg_build")" || \
-        log_error "Failed to source: $_pkg_build"
-
-    # These come from the packages build script
-    _pkg_name="${package_name:?}"
-    _build_dir="/${PKGDIR:?}/build/$_pkg_name"
-    _url_list="$(echo "$package_source" | awk '{print $1}')"
-    _needed_tarballs=""
-
-    for url in $_url_list; do
-        _needed_tarballs="$_needed_tarballs ${url##*/}"
-    done
-    _needed_tarballs="$(echo "$_needed_tarballs" | xargs)"
-
-    # Create build directory and cd to it
-    mkdir -p "$_build_dir"
-    cd "$_build_dir" \
-        || log_error "Failed to change directory: $_build_dir/build"
-
-    # Unpack tarballs
-    for tarball in $_needed_tarballs; do
-        log_debug "Unpacking $tarball"
-        tar -xf "$CACHE_DIR/$tarball" || log_error "Failed to unpack: $tarball"
-    done
-
-    # Move patches to the expected directory so the build script can apply them
-    log_debug "Package directory is: $_build_dir"
-    find "$_pkg_dir" -name "*.patch" | while read -r patch; do
-        log_debug "Moving $patch to $_build_dir"
-        cp -a "$patch" "$_build_dir"
-    done
-
-    # These commands are provided by the build script which was sourced in main_build
-    log_debug "Building package"
-    mkdir -p "$_build_dir/package"
-    export DESTDIR="$(realpath "$_build_dir/package")"
-    log_debug "DESTDIR is: $DESTDIR"
-    configure || log_error "In $ARGUMENTS: In configure: "
-    build || log_error "In $ARGUMENTS: In build: "
-    install_files || log_error "In install_files"
-)
-
-backend_create_package() (
-    _pkg="$1"
-    _pkg_name="$(backend_get_package_name "$_pkg")"
-    _build_dir="/${PKGDIR:?}/build/$_pkg_name/package"
-    _pkg_build="$(backend_get_package_build "$_pkg")" || \
-        log_error "Failed to get build script for: $_pkg"
-
-    # shellcheck source=/dev/null
-    . "$(realpath "$_pkg_build")" || \
-        log_error "Failed to source: $_pkg_build"
-
-    cat >| "$_build_dir/PKGINFO" <<- EOF
-		package_name=${package_name:?}
-		package_version=${package_version:-unknown}
-		package_dependencies=${package_dependencies:-}
-		builddate=$(date +%s)
-		source="$package_source"
-	EOF
-
-    log_debug "Creating package"
-    cd "$_build_dir" || log_error "Failed to change directory: $_build_dir"
-
-    tar -cpf - . | zstd > "${INSTALL_ROOT:-}/${PACKAGE_CACHE:?}/$_pkg_name.tar.zst" \
-        || log_error "Failed to create compressed tar archive: $_pkg_name.tar.zst"
-)
-
-backend_resolve_build_order() (
-    _requested_packages="$*"
-
-    if [ "${RESOLVE_DEPENDENCIES:-1}" = 0 ]; then
-        echo "$_requested_packages"
-        return 0
-    fi
-
-    _final_order="$(get_dependency_tree "$_requested_packages")"
-
-    [ -z "$_final_order" ] && log_warn "No packages to build"
-    trim_string_and_return "$_final_order"
-)
-
-backend_resolve_install_order() (
-    backend_resolve_build_order "$@"
-)
+###################
+# Uninstall Steps #
+###################
 
 backend_resolve_uninstall_order() (
     _requested_packages="$*"
@@ -370,161 +522,6 @@ backend_resolve_uninstall_order() (
     trim_string_and_return "$_uninstall_order"
 )
 
-backend_download_sources() (
-    _source_list="$1"
-    _checksums_list="$2"
-    _job_count=0
-    _tarball_list=""
-
-    [ -z "$_source_list" ] && log_error "No sources provided"
-
-    for _cmd in wget wget2 curl; do
-        command -v "$_cmd" > /dev/null || continue
-        _download_cmd="$_cmd"
-        log_debug "Using $_download_cmd"
-        break
-    done
-
-    case "$_download_cmd" in
-        wget|wget2)
-            [ "$VERBOSE" = 0 ] && _download_cmd="$_download_cmd -q --show-progress"
-            [ "$CERTIFICATE_CHECK" = 0 ] && \
-                _download_cmd="$_download_cmd --no-check-certificate" ;;
-        curl)
-            # Fix curl later, it's a pain in the ass to work with
-            [ "$CERTIFICATE_CHECK" = 0 ] && _download_cmd="$_download_cmd -k"
-            _download_cmd="$_download_cmd -L -O" ;;
-    esac
-
-    [ -z "$_download_cmd" ] && log_error "No suitable download tools found"
-    [ "$CERTIFICATE_CHECK" = 0 ] && log_warn "Certificate check disabled"
-
-    # Kill all child processes if we recieve an interrupt
-    # shellcheck disable=SC2154
-    trap 'kill 0 >/dev/null 2>/dev/null; exit 130' INT TERM EXIT
-
-    for source in $_source_list; do
-        case "$source" in
-            *.git)
-                git clone "$source" || return 1
-                _sources_list="$(remove_string_from_list "$source" "$_source_list")"
-                ;;
-
-            *)
-                _tarball_name="${source##*/}"
-                _tarball_list="$_tarball_list $_tarball_name"
-
-                [ -e "$CACHE_DIR/$_tarball_name" ] && continue
-                log_debug "Trying to download: $source"
-
-                # This downloads the tarballs to the cache directory
-                (
-                    # Make a variable in this subshell to prevent _tarball_name's 
-                    # modification from affecting what is removed by the trap.
-                    # The trap ensures that no tarballs are partially downloaded 
-                    # to the cache
-                    _file="$_tarball_name"
-                    trap '
-                    rm -f "${CACHE_DIR:?}/${_file:?}" 2>/dev/null
-                    log_warn "Deleting cached download"' INT TERM EXIT
-
-                    cd "${PKGDIR:?}/source_cache" || true
-
-                    $_download_cmd "$source" || \
-                        log_error "Failed to download: $source"
-                    echo ""
-                    trap - INT TERM EXIT
-                ) &
-
-                # Keep track of PIDs so we can kill the subshells
-                # if we recieve an interrupt.
-                _pids="$_pids $!"
-                _job_count=$((_job_count + 1))
-
-                # Ensures that we have no more than $PARALLEL_DOWNLOADS number of
-                # subshells at a time
-                if [ "$_job_count" -ge "$PARALLEL_DOWNLOADS" ]; then
-                    # wait -n is better if the shell supports it
-                    wait -n 2>/dev/null || wait
-                    _job_count=$((_job_count - 1))
-                fi
-                sleep 0.05
-                ;;
-        esac
-    done
-
-    # Wait for the child processes to complete then remove the trap
-    wait || log_error "A download failed"
-
-    # Verify checksums if enabled. Compares every checksum to every tarball
-    log_debug "Verifying checksums"
-    if [ "$CHECKSUM_CHECK" = 1 ]; then
-        for tarball in $_tarball_list; do
-            _md5sum="$(md5sum "$CACHE_DIR/$tarball" | awk '{print $1}')"
-            _verified=0
-            for checksum in $_checksums_list; do
-                [ "$_md5sum" = "$checksum" ] && _verified=1 && break
-            done
-            [ "${_verified:?}" = 0 ] && \
-                log_error "Checksum failed: $tarball"
-        done
-    fi
-
-    trap - INT TERM EXIT
-    return 0
-)
-
-backend_prepare_sources() (
-    _package_list="$1"
-    _sources=""
-    _checksums=""
-
-    for pkg in $_package_list; do
-        _pkg_dir="$(backend_get_package_dir "$pkg")" ||
-            log_error "Failed to get package dir for: $_pkg_dir"
-        _pkg_build="$(trim_string_and_return "$_pkg_dir"/"$pkg".build)"
-
-        # shellcheck source=/dev/null
-        . "$_pkg_build" || log_error "Failed to source: $_pkg_build"
-
-        _pkg_sources="$(echo "$package_source" | awk '{print $1}')"
-        _pkg_checksums="$(echo "$package_source" | awk '{print $2}')"
-
-        # Skip package if ALL its sources already exist
-        skip_pkg=true
-        for src in $_pkg_sources; do
-            file="${src##*/}"
-            if [ ! -e "${CACHE_DIR:?}/$file" ]; then
-                skip_pkg=false
-                break
-            fi
-        done
-
-        $skip_pkg && {
-            log_debug "$pkg: all sources already cached, skipping"
-            continue
-        }
-
-        _sources="$_sources $_pkg_sources"
-        _checksums="$_checksums $_pkg_checksums"
-    done
-
-    # Trim spaces
-    _sources="$(trim_string_and_return "$_sources")"
-    _checksums="$(trim_string_and_return "$_checksums")"
-
-    log_debug "Sources are $_sources"
-    log_debug "Sums are $_checksums"
-
-    [ -z "$_sources" ] && {
-        log_debug "All sources already in cache. Skipping downloads."
-        return 0
-    }
-
-    backend_download_sources "$_sources" "$_checksums" ||
-        log_error "Failed to download needed source code"
-)
-
 backend_unactivate_package() (
     _pkg="$1"
 
@@ -579,16 +576,41 @@ backend_unregister_package() (
     rm -rf "${_package_metadata_dir:?}"
 )
 
-backend_want_to_build_package() (
-    _pkg="$1"
-    _pkg_name="$(backend_get_package_name "$_pkg")" || \
-        log_error "Failed to get package name"
+###############
+# Query Steps #
+###############
 
-    if [ ! -f "${INSTALL_ROOT:-}/${PACKAGE_CACHE:?}/$_pkg_name.tar.zst" ] \
-        || [ "$INSTALL_FORCE" = 1 ]
-    then
-        return 0
+backend_list_files_owned_by_package() (
+    _pkg="$1"
+    if backend_is_installed "$_pkg"; then
+        cat "${INSTALL_ROOT:-}/${METADATA_DIR:?}/$1/PKGFILES"
     else
-        return 1
+        log_error "Package not installed: $_pkg"
     fi
 )
+
+backend_show_package_info() (
+    _pkg="$1"
+    if backend_is_installed "$_pkg"; then
+        cat "${INSTALL_ROOT:-}/${METADATA_DIR:?}/$1/PKGINFO"
+    else
+        log_error "Package not installed: $_pkg"
+    fi
+)
+
+backend_print_world() (
+    cat "${INSTALL_ROOT:-}/${WORLD:?}"
+)
+
+backend_query() (
+    _pkg="$1"
+    if [ "$PRINT_WORLD" = 1 ]; then
+        backend_print_world || log_error "World file doesn't exist"
+    elif [ "$LIST_FILES" = 1 ]; then
+        backend_list_files_owned_by_package "$_pkg" || \
+            log_error "Failed to list files owned by package"
+    elif [ "$SHOW_INFO" = 1 ]; then
+        backend_show_package_info "$_pkg" || log_error "Failed to get package info"
+    fi
+)
+
