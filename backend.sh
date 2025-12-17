@@ -131,10 +131,6 @@ backend_download_sources() (
                     echo ""
                     trap - INT TERM EXIT
                 ) &
-
-                # Keep track of PIDs so we can kill the subshells
-                # if we recieve an interrupt.
-                _pids="$_pids $!"
                 _job_count=$((_job_count + 1))
 
                 # Ensures that we have no more than $PARALLEL_DOWNLOADS number of
@@ -223,7 +219,7 @@ backend_prepare_sources() (
 
 backend_want_to_build_package() (
     _pkg="$1"
-    _pkg_name="$(backend_get_package_name "$_pkg")" || \
+    _pkg_name="$(backend_getackage_name "$_pkg")" || \
         log_error "Failed to get package name"
 
     if [ ! -f "${INSTALL_ROOT:-}/${PACKAGE_CACHE:?}/$_pkg_name.tar.zst" ] \
@@ -435,7 +431,6 @@ backend_resolve_uninstall_order() (
     _job_count=0
     _max_job_nums="$(nproc)"
 
-    # shellcheck disable=SC2154
     trap 'for p in $_pids; do kill "$p" 2>/dev/null; done
     rm -rf ${_map_file:?} ${_map_dir:?} || true' INT TERM EXIT
 
@@ -468,6 +463,7 @@ backend_resolve_uninstall_order() (
 
     _reverse_deps=""
 
+    # Checks if there is a package that has a dependency of the selected package
     log_debug "Checking if package is still needed"
     for _pkg_name in $_requested_packages; do
         _reverse_deps_temp=""
@@ -488,7 +484,7 @@ backend_resolve_uninstall_order() (
 
     # If all of a dependency's reverse dependencies are in the uninstall
     # order, add the dependency to the uninstall order. We need to start
-    # at the top of the tree which is why we use the reversed tree 
+    # at the top of the tree which is why we use the reversed dependency tree 
     INSTALL_FORCE=1
     _tree="$(get_dependency_tree "$_requested_packages")"
 
