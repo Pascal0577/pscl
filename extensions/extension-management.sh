@@ -117,6 +117,11 @@ extension_uninstall_extension() (
         _ext_name="${_ext##*/}"
         _install_path="${EXTENSION_DIR:?}/$_ext_name"
 
+        case "$_ext_name" in
+            stdlib.sh|backend.sh)
+                log_error "Refusing to remove $_ext_name"
+        esac
+
         if [ ! -f "$_ext" ]; then
             log_warn "$_ext_name is not an extension. Skipping."
             continue
