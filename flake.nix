@@ -18,6 +18,8 @@
             PYTHON = "${pkgs.python312}/bin/python3";
             shellHook = ''
                 echo "Welcome to the devShell!"
+                export SHELL="${pkgs.zsh}/bin/zsh"
+                exec ${pkgs.zsh}/bin/zsh
             '';
         };
     };
