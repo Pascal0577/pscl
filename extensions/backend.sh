@@ -181,8 +181,8 @@ backend_prepare_sources() (
         # shellcheck source=/dev/null
         . "$_pkg_build" || log_error "Failed to source: $_pkg_build"
 
-        _pkg_sources="$(echo "$package_source" | awk '{print $1}')"
-        _pkg_checksums="$(echo "$package_source" | awk '{print $2}')"
+        _pkg_sources="$(echo "${package_source:?}" | awk '{print $1}')"
+        _pkg_checksums="$(echo "${package_source:?}" | awk '{print $2}')"
 
         # Skip package if ALL its sources already exist
         skip_pkg=true
@@ -445,8 +445,7 @@ backend_resolve_uninstall_order() (
     _job_count=0
     _max_job_nums="$(nproc)"
 
-    trap 'for p in $_pids; do kill "$p" 2>/dev/null; done
-    rm -rf ${_map_file:?} ${_map_dir:?} || true' INT TERM EXIT
+    trap 'rm -rf ${_map_file:?} ${_map_dir:?} || true' INT TERM EXIT
 
     log_debug "Creating dependency map"
     # First build a map of all installed packages and their dependencies

@@ -1,5 +1,12 @@
 #!/bin/sh
 
+# This file serves as both an extension management extension
+# and also as a reference implementation for your own extensions
+
+# shellcheck source=./backend.sh
+# shellcheck source=./stdlib.sh
+# shellcheck source=../pkg
+
 extension_parse_action() {
     log_debug "Parsing arguments in extension: Extension Management"
     INSTALL_EXTENSION=0
