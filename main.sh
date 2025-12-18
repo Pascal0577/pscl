@@ -6,7 +6,7 @@ readonly yellow="\x1b[33m"
 readonly green="\x1b[32m"
 readonly def="\x1b[39m"
 
-readonly PKGDIR="${PKGDIR:-/home/pascal-work/src/package-management/}"
+readonly PKGDIR="${PKGDIR:-/home/pascal/src/lfs/package-management/}"
 readonly METADATA_DIR="$PKGDIR/metadata"
 readonly WORLD="$METADATA_DIR/world"
 readonly LOCKFILE="$PKGDIR/pkg.lock"
