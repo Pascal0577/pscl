@@ -550,8 +550,8 @@ backend_unactivate_package() (
 
         fi
     ) &
-    wait
     done
+    wait
     
     echo "$_pkgfiles" | while IFS= read -r file; do
     (
@@ -565,8 +565,8 @@ backend_unactivate_package() (
             fi
         fi
     ) &
-    wait
     done
+    wait
 )
 
 backend_remove_files() (
