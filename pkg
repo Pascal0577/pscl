@@ -439,11 +439,19 @@ main_query() (
 
 load_extensions() {
     log_debug "Extension dir is: $EXTENSION_DIR"
-    
+
+    . "${EXTENSION_DIR:?}/stdlib.sh" || log_error "Failed to load stdlib"
+    . "${EXTENSION_DIR:?}/backend.sh" || log_error "Failed to load backend"
+
     [ ! -d "$EXTENSION_DIR" ] || \
         log_warn "Extenstion directory does not exist: $EXTENSION_DIR"
 
     for ext in "$EXTENSION_DIR"/*.sh; do
+        _ext_name="$(basename "$ext")"
+        if [ "$_ext_name" = "stdlib.sh" ] || [ "$_ext_name" = "backend.sh" ]; then
+            continue 
+        fi
+
         log_debug "Loading extension: $ext"
         [ -f "$ext" ] || continue
         . "$ext" || log_error "Failed to load extension: $ext"
@@ -470,9 +478,6 @@ extension_handle_action() {
 main() {
     exec 9>|"$LOCKFILE"
     flock -n 9 || log_error "In main: Another instance is running!"
-
-    . ./stdlib.sh || log_error "Failed to load stdlib"
-    . ./backend.sh || log_error "Failed to load backend"
 
     load_extensions || log_error "Failed to load extensions"
     parse_arguments "$@" || log_error "Failed to parse arguments"
