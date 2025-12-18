@@ -411,6 +411,9 @@ backend_activate_package() (
     _pkg_name="$(backend_get_package_name "$_pkg")"
     _pkg_install_dir="${INSTALL_ROOT:-}/${PKGDIR:?}/installed_packages/$_pkg_name"
 
+    [ ! -d "$_pkg_install_dir" ] && \
+        log_error "Package not installed: $_pkg"
+
     find "$_pkg_install_dir" -mindepth 1 | sed "s|^${_pkg_install_dir}/||" | \
     while read -r line; do
     (
