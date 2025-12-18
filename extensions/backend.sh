@@ -255,11 +255,6 @@ backend_run_checks() (
         log_error "Cache directory: $CACHE_DIR is not writable"
 
     mkdir -p "${INSTALL_ROOT:-}/${PACKAGE_CACHE:?}"
-
-    [ ! -f "${INSTALL_ROOT:-}/${WORLD:?}" ] && \
-        mkdir -p "$(dirname "${INSTALL_ROOT:-}/${WORLD:?}")" && \
-        touch "${INSTALL_ROOT:-}/${WORLD:?}" || \
-        log_error "Could not create world file"
 )
 
 ###############
