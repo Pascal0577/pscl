@@ -145,6 +145,8 @@ parse_arguments() {
             readonly ARGUMENTS="$*"
             ;;
 
+        -h|--help) print_usage ;;
+
         *)
             # Allow extensions to handle completely custom actions
             if ! extension_parse_action "$_flag" "$@"; then
@@ -152,6 +154,85 @@ parse_arguments() {
             fi
             ;;
     esac
+}
+
+print_usage() {
+    cat <<- EOF
+	Usage: pkg [ACTION] [OPTIONS] [PACKAGES...]
+
+	ACTIONS:
+	    -B [OPTIONS] <packages>    Build packages from source
+	    -I [OPTIONS] <packages>    Install packages
+	    -U [OPTIONS] <packages>    Uninstall packages
+	    -A [OPTIONS] <packages>    Activate/deactivate packages
+	    -Q [OPTIONS] [package]     Query package information
+	    -E [OPTIONS] <extensions>  Manage extensions
+
+	BUILD OPTIONS (-B):
+	    -k    Disable certificate checking
+	    -s    Disable checksum verification
+	    -d    Disable dependency resolution
+	    -j N  Set number of parallel downloads (default: 5)
+	    -c    Keep build directory after completion
+	    -v    Verbose output
+
+	INSTALL OPTIONS (-I):
+	    -r PATH  Set installation root directory
+	    -b       Build packages before installing
+	    -d       Disable dependency resolution
+	    -f       Force reinstall even if already installed
+	    -j N     Set number of parallel downloads (default: 5)
+	    -c       Keep build directory after completion
+	    -v       Verbose output
+
+	UNINSTALL OPTIONS (-U):
+	    -r PATH  Set installation root directory
+	    -v       Verbose output
+
+	ACTIVATION OPTIONS (-A):
+	    -u       Activate (link) package files
+	    -d       Deactivate (unlink) package files
+	    -r PATH  Set installation root directory
+	    -v       Verbose output
+
+	QUERY OPTIONS (-Q):
+	    -i       Show package information
+	    -l       List files owned by package
+	    -w       Print world file (all installed packages)
+	    -r PATH  Set installation root directory
+	    -v       Verbose output
+
+	EXAMPLES:
+	    # Build a package
+	    pkg -B gcc
+
+	    # Install with dependencies
+	    pkg -I bash coreutils
+
+	    # Install to alternate root
+	    pkg -Ir /mnt/sysroot gcc coreutils
+
+	    # Force rebuild and install
+	    pkg -Ibf vim
+
+	    # Uninstall package and unused dependencies
+	    pkg -U vim
+
+	    # Query package info
+	    pkg -Qi bash
+
+	    # List all installed packages
+	    pkg -Qw
+
+	    # Activate/deactivate packages
+	    pkg -Au gcc
+	    pkg -Ad bash
+
+	    # Install extension
+	    pkg -Ei my-extension.sh
+	EOF
+
+    exit 1
 }
 
 log_error() {
