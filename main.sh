@@ -268,7 +268,8 @@ uninstall_package() (
     _pkg_name="$1"
 
     log_debug "Checking if package is installed: $_pkg_name"
-    if backend_is_installed "$_pkg_name"; then
+    log_debug "root is: $INSTALL_ROOT"
+    if ! backend_is_installed "$_pkg_name"; then
         log_warn "Package not installed: $_pkg_name"
         exit 0
     fi
