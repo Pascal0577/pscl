@@ -286,7 +286,7 @@ backend_build_source() (
     _url_list="$(echo "$package_source" | awk '{print $1}')"
     _needed_tarballs=""
 
-    trap 'rm -rf ${_build_dir:?} || exit 1' INT TERM EXIT
+    trap '[ "$DO_CLEANUP" = 1 ] && rm -rf ${_build_dir:?} || exit 1' INT TERM EXIT
 
     for url in $_url_list; do
         _needed_tarballs="$_needed_tarballs ${url##*/}"
@@ -313,12 +313,13 @@ backend_build_source() (
 
     # These commands are provided by the build script which was sourced in main_build
     log_debug "Building package"
-    mkdir -p "$_build_dir/package"
-    export DESTDIR="$(realpath "$_build_dir/package")"
+    _pkg_creation_dir="$(realpath "$_build_dir/package")"
+    mkdir -p "$_pkg_creation_dir"
+    export DESTDIR="$_pkg_creation_dir"
     log_debug "DESTDIR is: $DESTDIR"
-    configure || log_error "In $ARGUMENTS: In configure: "
-    build || log_error "In $ARGUMENTS: In build: "
-    install_files || log_error "In install_files"
+    configure || log_error "Configure failed!"
+    build || log_error "Build failed!"
+    install_files || log_error "Installing files to package creation dir failed!"
     
     trap - INT TERM EXIT
 )

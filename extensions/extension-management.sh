@@ -5,7 +5,7 @@
 
 # shellcheck source=./backend.sh
 # shellcheck source=./stdlib.sh
-# shellcheck source=../pkg
+# shellcheck source=../pscl
 
 extension_parse_action() {
     log_debug "Parsing arguments in extension: Extension Management"
