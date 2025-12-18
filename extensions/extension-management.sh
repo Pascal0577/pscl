@@ -36,7 +36,7 @@ extension_parse_flag() {
         Q)
             case "$_char" in
                 e) readonly LIST_EXTENSION=1 ;;
-                *) log_error "Invalid option for -Q: ;$_char"
+                *) log_error "Invalid option for -Q: -$_char"
             esac
             ;;
         *) log_error "Invalid action: $_action"
