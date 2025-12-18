@@ -220,6 +220,8 @@ backend_prepare_sources() (
 )
 
 backend_want_to_build_package() (
+    [ "$CREATE_PACKAGE" = 0 ] && return 1
+
     _pkg="$1"
     _pkg_name="$(backend_get_package_name "$_pkg")" || \
         log_error "Failed to get package name"
@@ -368,6 +370,9 @@ backend_install_files() (
     _package_archive="${INSTALL_ROOT:-}/$PACKAGE_CACHE/$_pkg_name.tar.zst"
     _data_dir="${INSTALL_ROOT:-}/${METADATA_DIR:?}/$_pkg_name"
     _install_dir="${INSTALL_ROOT:-}/${PKGDIR:?}/installed_packages/$_pkg_name"
+
+    [ ! -e "$_package_archive" ] && \
+        log_error "Package archive doesn't exit: $_package_archive"
 
     trap '
         [ -d "$_data_dir" ] && rm -rf "${_data_dir:?}"
