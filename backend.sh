@@ -219,7 +219,7 @@ backend_prepare_sources() (
 
 backend_want_to_build_package() (
     _pkg="$1"
-    _pkg_name="$(backend_getackage_name "$_pkg")" || \
+    _pkg_name="$(backend_get_package_name "$_pkg")" || \
         log_error "Failed to get package name"
 
     if [ ! -f "${INSTALL_ROOT:-}/${PACKAGE_CACHE:?}/$_pkg_name.tar.zst" ] \
@@ -315,6 +315,8 @@ backend_build_source() (
     configure || log_error "In $ARGUMENTS: In configure: "
     build || log_error "In $ARGUMENTS: In build: "
     install_files || log_error "In install_files"
+    
+    trap - INT TERM EXIT
 )
 
 backend_create_package() (
@@ -338,6 +340,8 @@ backend_create_package() (
 
     log_debug "Creating package"
     cd "$_build_dir" || log_error "Failed to change directory: $_build_dir"
+
+    find . -type f -exec strip --strip-debug {} + 2>/dev/null || true
 
     tar -cpf - . | zstd > "${INSTALL_ROOT:-}/${PACKAGE_CACHE:?}/$_pkg_name.tar.zst" \
         || log_error "Failed to create compressed tar archive: $_pkg_name.tar.zst"
