@@ -6,7 +6,9 @@
 
 backend_is_installed() (
     _pkg_name="$1"
-    [ -d "${INSTALL_ROOT:-}/${METADATA_DIR:?}/$_pkg_name" ] && return 0
+    _pkg_data_dir="${INSTALL_ROOT:-}/${METADATA_DIR:?}/$_pkg_name"
+    log_debug "Checking $_pkg_data_dir"
+    [ -d "$_pkg_data_dir" ] && return 0
     return 1
 )
 
@@ -529,7 +531,6 @@ backend_unactivate_package() (
 
     _package_metadata_dir="${INSTALL_ROOT:-}/$METADATA_DIR/$_pkg"
     _pkgfiles="$(sort -r "$_package_metadata_dir/PKGFILES")"
-    _pkgfiles2="$_pkgfiles"
 
     # Remove files in reverse order (deepest first)
     echo "$_pkgfiles" | while IFS= read -r file; do
