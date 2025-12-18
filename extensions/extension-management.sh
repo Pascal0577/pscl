@@ -1,7 +1,5 @@
 #!/bin/sh
 
-readonly EXTENSION_DIR="${PKGDIR:?}/extensions/"
-
 extension_parse_action() {
     log_debug "Parsing arguments in extension: Extension Management"
     INSTALL_EXTENSION=0
