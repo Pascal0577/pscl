@@ -345,7 +345,7 @@ backend_create_package() (
     log_debug "Creating package"
     cd "$_build_dir" || log_error "Failed to change directory: $_build_dir"
 
-    find . -type f -exec strip --strip-debug {} + 2>/dev/null || true
+    find . -type f -exec strip --strip-unneeded {} + 2>/dev/null || true
 
     tar -cpf - . | zstd > "${INSTALL_ROOT:-}/${PACKAGE_CACHE:?}/$_pkg_name.tar.zst" \
         || log_error "Failed to create compressed tar archive: $_pkg_name.tar.zst"
