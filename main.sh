@@ -356,7 +356,7 @@ main_query() (
 )
 
 load_extensions() {
-    _ext_dir="${EXTENSION_DIR:-${SCRIPT_DIR:-.}/extensions}"
+    _ext_dir="${EXTENSION_DIR:-${PKGDIR:-.}/extensions}"
     
     [ -d "$_ext_dir" ] || return 0
     
@@ -401,7 +401,8 @@ main() {
         uninstall)  main_uninstall "$ARGUMENTS" ;;
         activation) main_activation "$ARGUMENTS" ;;
         query)      main_query "$ARGUMENTS" ;;
-        *)          log_error "Unknown action: ${ACTION:-none}" ;;
+        *)          extension_augment_main "$ACTION" "$ARGUMENTS" || \
+                        log_error "Invalid action: $ACTION";;
     esac
 }
 
