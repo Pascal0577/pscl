@@ -21,6 +21,7 @@ parse_arguments() {
     # Default values
     ACTION=""
     ARGUMENTS=""
+    ACTIVATION=""
     VERBOSE=0
     RESOLVE_DEPENDENCIES=1
     PARALLEL_DOWNLOADS=5
@@ -89,6 +90,27 @@ parse_arguments() {
                 _char="${_flag%"${_flag#?}"}"
                 _flag="${_flag#?}"
                 case "$_char" in
+                    r) readonly INSTALL_ROOT="$(realpath "$1")"; shift ;;
+                    v) readonly VERBOSE=1 ;;
+                    *)
+                        if ! extension_parse_flag "U" "$_char" "$@"; then
+                            log_error "Invalid option for -U: -$_char"
+                        fi
+                        ;;
+                esac
+            done
+            readonly ARGUMENTS="$*"
+            ;;
+
+        -A*)
+            readonly ACTION="activation"
+            _flag="${_flag#-A}"
+            while [ -n "$_flag" ]; do
+                _char="${_flag%"${_flag#?}"}"
+                _flag="${_flag#?}"
+                case "$_char" in
+                    u) readonly ACTIVATION="up" ;;
+                    d) readonly ACTIVATION="down" ;;
                     r) readonly INSTALL_ROOT="$(realpath "$1")"; shift ;;
                     v) readonly VERBOSE=1 ;;
                     *)
@@ -208,6 +230,8 @@ main_install() (
         if backend_want_to_build_package "$pkg"; then
             log_debug "We should! Trying to build package: $pkg"
             build_package "$pkg" || log_error "Failed to build: $pkg"
+            # Some packages may be build dependencies of others,
+            # so we need to install everything in ordoer right now
             install_package "$pkg" || log_error "Failed to install: $pkg"
             remove_string_from_list "$pkg" "$_install_order"
         fi
@@ -221,7 +245,7 @@ main_install() (
 )
 
 build_package() (
-    trap 'rm -rf ${PKGDIR:?}/build' INT TERM EXIT
+    trap '[ "$DO_CLEANUP" = 1 ] && rm -rf ${PKGDIR:?}/build' INT TERM EXIT
     _pkg_name="$1"
 
     log_debug "Running pre-build hooks for package: $_pkg_name"
@@ -311,6 +335,15 @@ main_uninstall() (
     done
 )
 
+main_activation() (
+    _requested_packages="$*"
+    if [ "$ACTIVATION" = "up" ]; then
+        backend_activate_package "$_requested_packages"
+    elif [ "$ACTIVATION" = "down" ]; then
+        backend_unactivate_package "$_requested_packages"
+    fi
+)
+
 main_query() (
     _pkg_name="$1"
 
@@ -318,7 +351,6 @@ main_query() (
     backend_query "$_pkg_name" || \
         log_error "Failed to query package: $_pkg_name"
 )
-
 
 load_extensions() {
     _ext_dir="${EXTENSION_DIR:-${SCRIPT_DIR:-.}/extensions}"
@@ -361,11 +393,12 @@ main() {
     backend_run_checks || log_error "One or more checks failed"
 
     case "${ACTION:-}" in
-        install)   main_install "$ARGUMENTS" ;;
-        uninstall) main_uninstall "$ARGUMENTS" ;;
-        build)     main_build "$ARGUMENTS" ;;
-        query)     main_query "$ARGUMENTS" ;;
-        *)         log_error "Unknown action: ${ACTION:-none}" ;;
+        install)    main_install "$ARGUMENTS" ;;
+        build)      main_build "$ARGUMENTS" ;;
+        uninstall)  main_uninstall "$ARGUMENTS" ;;
+        activation) main_activation "$ARGUMENTS" ;;
+        query)      main_query "$ARGUMENTS" ;;
+        *)          log_error "Unknown action: ${ACTION:-none}" ;;
     esac
 }
 
