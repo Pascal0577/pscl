@@ -232,7 +232,7 @@ main_install() (
             log_debug "We should! Trying to build package: $pkg"
             build_package "$pkg" || log_error "Failed to build: $pkg"
             # Some packages may be build dependencies of others,
-            # so we need to install everything in ordoer right now
+            # so we need to install everything in order right now
             install_package "$pkg" || log_error "Failed to install: $pkg"
             remove_string_from_list "$pkg" "$_install_order"
         fi
@@ -356,13 +356,15 @@ main_query() (
 )
 
 load_extensions() {
+    log_debug "Loading extensions"
     _ext_dir="${EXTENSION_DIR:-${PKGDIR:-.}/extensions}"
+    log_debug "Extension dir is: $_ext_dir"
     
     [ -d "$_ext_dir" ] || return 0
-    
+
     for ext in "$_ext_dir"/*.sh; do
-        [ -f "$ext" ] || continue
         log_debug "Loading extension: $ext"
+        [ -f "$ext" ] || continue
         . "$ext" || log_error "Failed to load extension: $ext"
     done
 }

@@ -3,10 +3,12 @@
 readonly EXTENSION_DIR="${PKGDIR:?}/extensions/"
 
 extension_parse_action() {
+    log_debug "Parsing arguments in extension: Extension Management"
     INSTALL_EXTENSION=0
     UNINSTALL_EXTENSION=0
 
     _flag="$1"
+    shift
     case "$_flag" in
         -E*)
             readonly ACTION="extension"
@@ -18,11 +20,7 @@ extension_parse_action() {
                     i) readonly INSTALL_EXTENSION=1 ;;
                     u) readonly UNINSTALL_EXTENSION=1 ;;
                     v) readonly VERBOSE=1 ;;
-                    *)
-                        if ! extension_parse_flag "E" "$_char" "$@"; then
-                            log_error "Invalid option for -Q: -$_char"
-                        fi
-                        ;;
+                    *) log_error "Invalid option for -E: -$_char" ;;
                 esac
             done
             readonly ARGUMENTS="$*"
@@ -41,6 +39,7 @@ extension_parse_flag() {
                 *) log_error "Invalid option for -Q: ;$_char"
             esac
             ;;
+        *) log_error "Invalid action: $_action"
     esac
 }
 
@@ -52,6 +51,9 @@ extension_augment_main() {
 
 extension_main_extension() (
     _requested_extensions="$*"
+
+    [ -z "$ARGUMENTS" ] && \
+        log_error "Arguments expected for -E but none were given"
 
     if [ "$INSTALL_EXTENSION" = 1 ] && [ "$UNINSTALL_EXTENSION" = 1 ]; then
         log_error "-Ei and -Eu cannot both be set"
@@ -73,7 +75,8 @@ extension_install_extension() (
         _ext_name="${_ext##*/}"
         _install_path="${EXTENSION_DIR:?}/$_ext_name"
 
-        if [ ! -f "$_ext" ]; then
+        # It needs to be a file with the .sh extension
+        if [ ! -f "$_ext" ] || [ "$_ext" = "${_ext##*.sh}" ]; then
             log_warn "$_ext_name is not an extension. Skipping."
             continue
         elif [ -f "$_install_path" ]; then
@@ -81,21 +84,28 @@ extension_install_extension() (
             continue 
         fi
 
-        (
+        if (
             cp -a "$_ext" "$_install_path" || \
                 log_error "Failed to copy extension to extensions directory"
 
             . "$_install_path" || \
                 log_error "Failed to source: $_install_path"
 
-            command -v extension_post_install 2>/dev/null && \
+            if command -v extension_post_install 2>/dev/null; then
                 extension_post_install || \
-                log_error "Failed to execute post-install commands for $_ext_name"
-        ) || log_warn "Failed to install extension: $_ext_name"
+                    log_error "Failed to execute post-install commands for $_ext_name"
+            fi
+        )
+        then
+            printf "%b[SUCCESS]%b: Successfully installed extension: %s\n" \
+                "$green" "$def" "$_ext_name"
+        else
+            log_warn "Failed to install extension: $_ext_name"
+        fi
     done
 )
 
-extension_unininstall_extension() (
+extension_uninstall_extension() (
     _extension="$*"
     for extension in $_extension; do
         _ext="$(realpath "$extension")"
@@ -110,16 +120,23 @@ extension_unininstall_extension() (
             continue 
         fi
 
-        (
+        if (
             . "$_install_path" || \
                 log_error "Failed to source: $_install_path"
 
-            command -v extension_post_uninstall 2>/dev/null && \
+            if command -v extension_post_uninstall 2>/dev/null; then
                 extension_post_uninstall || \
-                log_error "Failed to execute post-uninstall commands for $_ext_name"
+                    log_error "Failed to execute post-uninstall commands for $_ext_name"
+            fi
 
             rm "$_install_path" || \
                 log_error "Failed to copy extension to extensions directory"
-        ) || log_warn "Failed to install extension: $_ext_name"
+        ) 
+        then
+            printf "%b[SUCCESS]%b: Successfully uninstalled extension: %s\n" \
+                "$green" "$def" "$_ext_name"
+        else
+            log_warn "Failed to install extension: $_ext_name"
+        fi
     done
 )
