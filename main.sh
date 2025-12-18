@@ -221,6 +221,7 @@ main_install() (
 )
 
 build_package() (
+    trap 'rm -rf ${PKGDIR:?}/build' INT TERM EXIT
     _pkg_name="$1"
 
     log_debug "Running pre-build hooks for package: $_pkg_name"
