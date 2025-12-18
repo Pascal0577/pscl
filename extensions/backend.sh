@@ -181,6 +181,9 @@ backend_prepare_sources() (
         # shellcheck source=/dev/null
         . "$_pkg_build" || log_error "Failed to source: $_pkg_build"
 
+        [ -z "${package_source:-}" ] && \
+            log_error "package_source not defined in $_pkg_build"
+
         _pkg_sources="$(echo "${package_source:?}" | awk '{print $1}')"
         _pkg_checksums="$(echo "${package_source:?}" | awk '{print $2}')"
 
@@ -238,17 +241,25 @@ backend_want_to_build_package() (
 backend_run_checks() (
     [ -z "$ARGUMENTS" ] && [ "$PRINT_WORLD" = 0 ] && \
         log_error "Arguments were expected but none were provided"
+
     case "$PARALLEL_DOWNLOADS" in
         ''|*[!0-9]*)
             log_error "Invalid parallel downloads value: $PARALLEL_DOWNLOADS"
             ;;
     esac
+
     mkdir -p "$CACHE_DIR" || \
         log_error "Cannot create cache directory: $CACHE_DIR"
+
     [ -w "$CACHE_DIR" ] || \
         log_error "Cache directory: $CACHE_DIR is not writable"
 
     mkdir -p "${INSTALL_ROOT:-}/${PACKAGE_CACHE:?}"
+
+    [ ! -f "${INSTALL_ROOT:-}/${WORLD:?}" ] && \
+        mkdir -p "$(dirname "${INSTALL_ROOT:-}/${WORLD:?}")" && \
+        touch "${INSTALL_ROOT:-}/${WORLD:?}" || \
+        log_error "Could not create world file"
 )
 
 ###############
@@ -286,7 +297,7 @@ backend_build_source() (
     _url_list="$(echo "$package_source" | awk '{print $1}')"
     _needed_tarballs=""
 
-    trap '[ "$DO_CLEANUP" = 1 ] && rm -rf ${_build_dir:?} || exit 1' INT TERM EXIT
+    trap '[ "$DO_CLEANUP" = 1 ] && rm -rf ${_build_dir:?}' INT TERM EXIT
 
     for url in $_url_list; do
         _needed_tarballs="$_needed_tarballs ${url##*/}"
@@ -418,6 +429,13 @@ backend_activate_package() (
     find "$_pkg_install_dir" -mindepth 1 | sed "s|^${_pkg_install_dir}/||" | \
     while read -r line; do
     (
+        # Hopefully this isn't needed
+        case "$line" in
+            ..|../*|*/../*) 
+                log_warn "Skipping: $line"
+                exit 0 ;;
+        esac
+
         _source="$_pkg_install_dir/$line"
         _target="${INSTALL_ROOT:-}/$line"
         

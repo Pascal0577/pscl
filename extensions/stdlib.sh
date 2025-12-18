@@ -35,7 +35,8 @@ remove_string_from_list() (
 
 list_of_dependencies() (
     for build in $1; do
-        _pkg_build="./repositories/main/$build/${build}.build"
+        _pkg_build="$(backend_get_package_build "$build")" || \
+            log_error "Failed to get build script: $build"
 
         # shellcheck source=/dev/null
         . "$_pkg_build" || log_error "Failed to source: $_pkg_build"
@@ -50,13 +51,13 @@ get_dependency_tree() (
     _order=""
     _resolved=" "
     _processing=" "
-    
+
     _queue="$_initial_packages"
-    
+
     while [ -n "$_queue" ]; do
         _current=$(echo "$_queue" | awk '{print $1}')
         _queue=$(echo "$_queue" | sed 's/^[^ ]* *//')
-        
+
         if backend_is_installed "$_current" && [ "$INSTALL_FORCE" = 0 ]; then
             _resolved="$_resolved$_current "
             log_debug "$_current is already installed. Skipping adding it to the tree"
@@ -66,17 +67,17 @@ get_dependency_tree() (
         case $_resolved in
             *" $_current "*) continue ;;
         esac
- 
+
         _deps=$(list_of_dependencies "$_current") || {
             log_error "Failed to get dependencies for: $_current"
         }
-        
+
         log_debug "Dependencies for $_current are: $_deps"
-        
+
         # Check if all dependencies are resolved
         _all_resolved=1
         _unresolved_deps=""
-        
+
         for dep in $_deps; do
             case $_resolved in
                 *" $dep "*) ;;
@@ -85,14 +86,14 @@ get_dependency_tree() (
                     _unresolved_deps="$_unresolved_deps $dep" ;;
             esac
         done
-        
+
         if [ "$_all_resolved" -eq 0 ]; then
             # Check for circular dependency only when we need to re-queue
             case $_processing in
                 *" $_current "*)
                     log_error "Circular dependency detected involving: $_current" ;;
             esac
-            
+
             # Mark as processing and re-queue after dependencies
             _processing="$_processing$_current "
             _queue="$_unresolved_deps $_current $_queue"
@@ -100,43 +101,16 @@ get_dependency_tree() (
             # All dependencies resolved, add to order
             _resolved="$_resolved$_current "
             _order="$_order $_current"
-            
+
             # Remove from processing since it's now resolved
             _processing=$(echo "$_processing" | sed "s| $_current | |")
-            
+
             log_debug "Adding $_current to dependency graph"
         fi
     done
-    
+
     log_debug "Dependency tree is: $_order"
     trim_string_and_return "$_order"
-)
-
-run_in_parallel() (
-    _job_num="$1"
-    _data="$2"
-    _cmd="$3"
-
-    # shellcheck disable=SC2154
-    trap 'for p in $_pids; do kill -- -\$p 2>/dev/null; done; exit 1' INT TERM EXIT
-
-    for singleton in $_data; do
-        (
-            set -m
-            $_cmd "$singleton" || log_error "$_cmd $singleton"
-        ) &
-
-        _pids="$_pids $!"
-        _job_count=$((_job_count + 1))
-
-        if [ "$_job_count" -ge "$PARALLEL_DOWNLOADS" ]; then
-            wait -n 2>/dev/null || wait
-            _job_count=$((_job_count - 1))
-        fi
-    done
-
-    wait
-    trap - INT TERM EXIT
 )
 
 # Hook system
