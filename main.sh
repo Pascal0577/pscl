@@ -133,6 +133,7 @@ parse_arguments() {
                     i) readonly SHOW_INFO=1 ;;
                     l) readonly LIST_FILES=1 ;;
                     w) readonly PRINT_WORLD=1 ;;
+                    r) readonly INSTALL_ROOT="$(realpath "$1")"; shift ;;
                     v) readonly VERBOSE=1 ;;
                     *)
                         if ! extension_parse_flag "Q" "$_char" "$@"; then
