@@ -342,6 +342,8 @@ main_activation() (
         backend_activate_package "$_requested_packages"
     elif [ "$ACTIVATION" = "down" ]; then
         backend_unactivate_package "$_requested_packages"
+    elif [ -z "$ACTIVATION" ]; then
+        log_error "Activation requested but no flag given. Use -Au or -Ad"
     fi
 )
 
