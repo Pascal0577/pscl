@@ -1,5 +1,8 @@
 #!/bin/sh
 
+# shellcheck source=./extensions/stdlib.sh
+# shellcheck source=./extensions/backend.sh
+
 readonly red="\x1b[31m"
 readonly blue="\x1b[34m"
 readonly yellow="\x1b[33m"
@@ -443,7 +446,7 @@ load_extensions() {
     . "${EXTENSION_DIR:?}/stdlib.sh" || log_error "Failed to load stdlib"
     . "${EXTENSION_DIR:?}/backend.sh" || log_error "Failed to load backend"
 
-    [ ! -d "$EXTENSION_DIR" ] || \
+    [ -d "$EXTENSION_DIR" ] || \
         log_warn "Extenstion directory does not exist: $EXTENSION_DIR"
 
     for ext in "$EXTENSION_DIR"/*.sh; do
