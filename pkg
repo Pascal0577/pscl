@@ -6,13 +6,14 @@ readonly yellow="\x1b[33m"
 readonly green="\x1b[32m"
 readonly def="\x1b[39m"
 
-readonly PKGDIR="${PKGDIR:-/home/pascal/src/lfs/package-management/}"
-readonly METADATA_DIR="$PKGDIR/metadata"
+readonly PKGDIR="${PKGDIR:-"$(realpath "$(dirname "$0")")"}"
+readonly METADATA_DIR="${PKGDIR}/metadata"
 readonly WORLD="$METADATA_DIR/world"
-readonly LOCKFILE="$PKGDIR/pkg.lock"
-readonly CACHE_DIR="${CACHE_DIR:-$PKGDIR/source_cache}"
-readonly PACKAGE_CACHE="${PACKAGE_CACHE:-$PKGDIR/package_cache}"
-readonly REPOSITORY_LIST="${REPOSITORY_LIST:-$PKGDIR/repositories/*}"
+readonly LOCKFILE="${PKGDIR}/pkg.lock"
+readonly CACHE_DIR="${CACHE_DIR:-${PKGDIR}/source_cache}"
+readonly PACKAGE_CACHE="${PACKAGE_CACHE:-${PKGDIR}/package_cache}"
+readonly REPOSITORY_LIST="${REPOSITORY_LIST:-${PKGDIR}/repositories/*}"
+readonly EXTENSION_DIR="${PKGDIR:?}/extensions"
 
 parse_arguments() {
     _flag="$1"
@@ -437,13 +438,12 @@ main_query() (
 )
 
 load_extensions() {
-    log_debug "Loading extensions"
-    _ext_dir="${EXTENSION_DIR:-${PKGDIR:-.}/extensions}"
-    log_debug "Extension dir is: $_ext_dir"
+    log_debug "Extension dir is: $EXTENSION_DIR"
     
-    [ -d "$_ext_dir" ] || return 0
+    [ ! -d "$EXTENSION_DIR" ] || \
+        log_warn "Extenstion directory does not exist: $EXTENSION_DIR"
 
-    for ext in "$_ext_dir"/*.sh; do
+    for ext in "$EXTENSION_DIR"/*.sh; do
         log_debug "Loading extension: $ext"
         [ -f "$ext" ] || continue
         . "$ext" || log_error "Failed to load extension: $ext"
@@ -471,8 +471,8 @@ main() {
     exec 9>|"$LOCKFILE"
     flock -n 9 || log_error "In main: Another instance is running!"
 
-    . "${SCRIPT_DIR:-.}/stdlib.sh" || log_error "Failed to load stdlib"
-    . "${SCRIPT_DIR:-.}/backend.sh" || log_error "Failed to load backend"
+    . ./stdlib.sh || log_error "Failed to load stdlib"
+    . ./backend.sh || log_error "Failed to load backend"
 
     load_extensions || log_error "Failed to load extensions"
     parse_arguments "$@" || log_error "Failed to parse arguments"
