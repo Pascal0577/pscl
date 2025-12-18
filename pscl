@@ -492,8 +492,12 @@ main() {
         uninstall)  main_uninstall "$ARGUMENTS" ;;
         activation) main_activation "$ARGUMENTS" ;;
         query)      main_query "$ARGUMENTS" ;;
-        *)          extension_augment_main "$ACTION" "$ARGUMENTS" || \
-                        log_error "Invalid action: $ACTION";;
+        *)
+            if command -v extension_augment_main >/dev/null; then
+                extension_augment_main "$ACTION" "$ARGUMENTS"
+            else
+                log_error "Invalid action: $ACTION"
+            fi
     esac
 }
 
