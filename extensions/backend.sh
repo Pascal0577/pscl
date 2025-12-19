@@ -239,9 +239,6 @@ backend_want_to_build_package() (
 )
 
 backend_run_checks() (
-    [ -z "$ARGUMENTS" ] && [ "$PRINT_WORLD" = 0 ] && \
-        log_error "Arguments were expected but none were provided"
-
     case "$PARALLEL_DOWNLOADS" in
         ''|*[!0-9]*)
             log_error "Invalid parallel downloads value: $PARALLEL_DOWNLOADS"

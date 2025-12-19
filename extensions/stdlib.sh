@@ -113,25 +113,24 @@ get_dependency_tree() (
     trim_string_and_return "$_order"
 )
 
-# Hook system
-HOOKS_PRE_INSTALL=""
-HOOKS_POST_INSTALL=""
-HOOKS_PRE_BUILD=""
-HOOKS_POST_BUILD=""
-HOOKS_PRE_UNINSTALL=""
-HOOKS_POST_UNINSTALL=""
-
 register_hook() {
     _hook_point="$1"
     _hook_func="$2"
 
     case "$_hook_point" in
-        pre_install)    HOOKS_PRE_INSTALL="$HOOKS_PRE_INSTALL $_hook_func" ;;
-        post_install)   HOOKS_POST_INSTALL="$HOOKS_POST_INSTALL $_hook_func" ;;
-        pre_build)      HOOKS_PRE_BUILD="$HOOKS_PRE_BUILD $_hook_func" ;;
-        post_build)     HOOKS_POST_BUILD="$HOOKS_POST_BUILD $_hook_func" ;;
-        pre_uninstall)  HOOKS_PRE_UNINSTALL="$HOOKS_PRE_UNINSTALL $_hook_func" ;;
-        post_uninstall) HOOKS_POST_UNINSTALL="$HOOKS_POST_UNINSTALL $_hook_func" ;;
+        pre_install)     HOOK_PRE_INSTALL="${HOOK_PRE_INSTALL:-} $_hook_func" ;;
+        post_install)    HOOK_POST_INSTALL="${HOOK_POST_INSTALL:-} $_hook_func" ;;
+        pre_build)       HOOK_PRE_BUILD="${HOOK_PRE_BUILD:-} $_hook_func" ;;
+        post_build)      HOOK_POST_BUILD="${HOOK_POST_BUILD:-} $_hook_func" ;;
+        pre_uninstall)   HOOK_PRE_UNINSTALL="${HOOK_PRE_UNINSTALL:-} $_hook_func" ;;
+        post_uninstall)  HOOK_POST_UNINSTALL="${HOOK_POST_UNINSTALL:-} $_hook_func" ;;
+        pre_query)       HOOK_PRE_QUERY="${HOOK_PRE_QUERY:-} $_hook_func" ;;
+        prost_query)     HOOK_POST_QUERY="${HOOK_POST_QUERY:-} $_hook_func" ;;
+        pre_activation)  HOOK_PRE_ACTIVATION="${HOOK_PRE_ACTIVATION:-} $_hook_func" ;;
+        post_activation) HOOK_POST_ACTIVATION="${HOOK_POST_ACTIVATION:-} $_hook_func" ;;
+        action)          HOOK_ACTION="${HOOK_ACTION:-} $_hook_func" ;;
+        flag)            HOOK_FLAG="${HOOK_FLAG:-} $_hook_func" ;;
+        main)            HOOK_MAIN="${HOOK_MAIN:-} $_hook_func" ;;
         *) log_error "Unknown hook point: $_hook_point" ;;
     esac
 }
@@ -141,14 +140,23 @@ run_hooks() {
     shift
 
     case "$_hook_point" in
-        pre_install)    _hooks="$HOOKS_PRE_INSTALL" ;;
-        post_install)   _hooks="$HOOKS_POST_INSTALL" ;;
-        pre_build)      _hooks="$HOOKS_PRE_BUILD" ;;
-        post_build)     _hooks="$HOOKS_POST_BUILD" ;;
-        pre_uninstall)  _hooks="$HOOKS_PRE_UNINSTALL" ;;
-        post_uninstall) _hooks="$HOOKS_POST_UNINSTALL" ;;
+        pre_install)     _hooks="$HOOK_PRE_INSTALL" ;;
+        post_install)    _hooks="$HOOK_POST_INSTALL" ;;
+        pre_build)       _hooks="$HOOK_PRE_BUILD" ;;
+        post_build)      _hooks="$HOOK_POST_BUILD" ;;
+        pre_uninstall)   _hooks="$HOOK_PRE_UNINSTALL" ;;
+        post_uninstall)  _hooks="$HOOK_POST_UNINSTALL" ;;
+        pre_query)       _hooks="$HOOK_PRE_QUERY" ;;
+        post_query)      _hooks="$HOOK_POST_QUERY" ;;
+        pre_activation)  _hooks="$HOOK_PRE_ACTIVATION" ;;
+        post_activation) _hooks="$HOOK_POST_ACTIVATION" ;;
+        action)          _hooks="$HOOK_ACTION" ;;
+        flag)            _hooks="$HOOK_FLAG" ;;
+        main)            _hooks="$HOOK_MAIN" ;;
         *) return 0 ;;
     esac
+
+    log_debug "Hooks to run: [$_hooks]"
 
     for hook in $_hooks; do
         log_debug "Running hook: $hook"
