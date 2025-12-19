@@ -4,7 +4,7 @@ package_name="btrfs-progs"
 package_version="6.16"
 package_description="Contains administration and debugging tools for the B-tree file system"
 package_source="https://www.kernel.org/pub/linux/kernel/people/kdave/btrfs-progs/btrfs-progs-v6.16.tar.xz 2954d539b75beb912a0c0c98783ba5f3"
-package_dependencies="lzo"
+pkg_deps="lzo"
 
 source_dir="$package_name-v$package_version"
 

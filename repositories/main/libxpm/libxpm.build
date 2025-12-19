@@ -4,7 +4,7 @@ package_name="libxpm"
 package_version="3.5.17"
 package_description="X.Org libxpm library"
 package_source="https://www.x.org/pub/individual/lib/libXpm-3.5.17.tar.xz 05b5667aadd476d77e9b5ba1a1de213e"
-package_dependencies="libx11 libxext libxt xorg-util-macros"
+pkg_deps="libx11 libxext libxt xorg-util-macros"
 
 source_dir="libXpm-$package_version"
 

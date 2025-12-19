@@ -4,7 +4,7 @@ package_name="libpciaccess"
 package_version="0.18.1"
 package_description="X.Org libpciaccess library"
 package_source="https://www.x.org/pub/individual/lib/libpciaccess-0.18.1.tar.xz 57c7efbeceedefde006123a77a7bc825"
-package_dependencies="zlib meson xorg-util-macros"
+pkg_deps="zlib meson xorg-util-macros"
 
 source_dir="$package_name-$package_version"
 

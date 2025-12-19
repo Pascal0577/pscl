@@ -4,7 +4,7 @@ package_name="libxi"
 package_version="1.8.2"
 package_description="X.Org libxi library"
 package_source="https://www.x.org/pub/individual/lib/libXi-1.8.2.tar.xz 95a960c1692a83cc551979f7ffe28cf4"
-package_dependencies="libx11 libxext libxfixes xorgproto xorg-util-macros"
+pkg_deps="libx11 libxext libxfixes xorgproto xorg-util-macros"
 
 source_dir="libXi-$package_version"
 

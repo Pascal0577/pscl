@@ -4,7 +4,7 @@ package_name="xorg-font-adobe-utopia-type1"
 package_version="1.0.5"
 package_description="X.Org xorg-font-adobe-utopia-type1 library"
 package_source="https://www.x.org/pub/individual/font//font-adobe-utopia-type1-1.0.5.tar.xz 546d17feab30d4e3abcf332b454f58ed"
-package_dependencies="xorg-font-alias xorg-bdftopcf xorg-font-util xorg-mkfontscale xorg-util-macros"
+pkg_deps="xorg-font-alias xorg-bdftopcf xorg-font-util xorg-mkfontscale xorg-util-macros"
 
 source_dir="font-adobe-utopia-type1-$package_version"
 

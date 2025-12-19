@@ -4,7 +4,7 @@ package_name="libfs"
 package_version="1.0.10"
 package_description="X.Org libfs library"
 package_source="https://www.x.org/pub/individual/lib/libFS-1.0.10.tar.xz c5cc0942ed39c49b8fcd47a427bd4305"
-package_dependencies="xtrans xorgproto xorg-util-macros"
+pkg_deps="xtrans xorgproto xorg-util-macros"
 
 source_dir="libFS-$package_version"
 

@@ -4,7 +4,7 @@ package_name="libxtst"
 package_version="1.2.5"
 package_description="X.Org libxtst library"
 package_source="https://www.x.org/pub/individual/lib/libXtst-1.2.5.tar.xz b62dc44d8e63a67bb10230d54c44dcb7"
-package_dependencies="libx11 libxext libxi xorgproto xorg-util-macros"
+pkg_deps="libx11 libxext libxi xorgproto xorg-util-macros"
 
 source_dir="libXtst-$package_version"
 

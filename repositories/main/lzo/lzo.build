@@ -4,7 +4,7 @@ package_name="lzo"
 package_version="2.10"
 package_description="Data compression library which is suitable for data decompression and compression in real-time"
 package_source="https://www.oberhumer.com/opensource/lzo/download/lzo-2.10.tar.gz 39d3f3f9c55c87b1e5d6888e1420f4b5"
-package_dependencies=""
+pkg_deps=""
 
 source_dir="$package_name-$package_version"
 

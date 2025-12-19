@@ -4,7 +4,7 @@ package_name="icu"
 package_version="77.1"
 package_description="A mature, widely used set of C/C++ libraries providing Unicode and Globalization support for software applications"
 package_source="https://github.com/unicode-org/icu/releases/download/release-77-1/icu4c-77_1-src.tgz bc0132b4c43db8455d2446c3bae58898"
-package_dependencies=""
+pkg_deps=""
 
 source_dir="icu"
 

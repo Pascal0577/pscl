@@ -4,7 +4,7 @@ package_name="xcb-util-cursor"
 package_version="0.1.5"
 package_description="Extensions for xcb-util"
 package_source="https://xcb.freedesktop.org/dist/xcb-util-cursor-0.1.5.tar.xz bc30cd267b11ac5803fe19929cabd230"
-package_dependencies="libxcb xcb-util"
+pkg_deps="libxcb xcb-util"
 
 source_dir="$package_name-$package_version"
 

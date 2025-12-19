@@ -4,7 +4,7 @@ package_name="libxscrnsaver"
 package_version="1.2.4"
 package_description="X.Org libxscrnsaver library"
 package_source="https://www.x.org/pub/individual/lib/libXScrnSaver-1.2.4.tar.xz e613751d38e13aa0d0fd8e0149cec057"
-package_dependencies="libx11 libxext xorgproto xorg-util-macros"
+pkg_deps="libx11 libxext xorgproto xorg-util-macros"
 
 source_dir="libXScrnSaver-$package_version"
 

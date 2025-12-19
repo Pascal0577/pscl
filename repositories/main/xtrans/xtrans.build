@@ -4,7 +4,7 @@ package_name="xtrans"
 package_version="1.6.0"
 package_description="X.Org xtrans library"
 package_source="https://www.x.org/pub/individual/lib/xtrans-1.6.0.tar.xz 6ad67d4858814ac24e618b8072900664"
-package_dependencies=""
+pkg_deps=""
 
 source_dir="$package_name-$package_version"
 

@@ -4,7 +4,7 @@ package_name="libxau"
 package_version="1.0.12"
 package_description="Contains a library implementing the X11 Authorization Protocol"
 package_source="https://www.x.org/pub/individual/lib/libXau-1.0.12.tar.xz 4c9f81acf00b62e5de56a912691bd737"
-package_dependencies="xorgproto"
+pkg_deps="xorgproto"
 
 source_dir="libXau-$package_version"
 

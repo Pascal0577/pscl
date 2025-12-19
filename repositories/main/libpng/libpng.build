@@ -4,7 +4,7 @@ package_name="libpng"
 package_version="1.6.50"
 package_description="Contains libraries used by other programs for reading and writing PNG files"
 package_source="https://downloads.sourceforge.net/libpng/libpng-1.6.50.tar.xz e583e61455c4f40d565d85c0e9a2fbf9"
-package_dependencies=""
+pkg_deps=""
 
 source_dir="$package_name-$package_version"
 

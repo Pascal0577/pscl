@@ -4,7 +4,7 @@ package_name="docutils"
 package_version="0.21.2"
 package_description="A set of Python modules and programs for processing plaintext docs into formats such as HTML, XML, or LaTeX"
 package_source="https://files.pythonhosted.org/packages/source/d/docutils/docutils-0.21.2.tar.gz c4064e1e0e3cd142951fd2b95b830874"
-package_dependencies=""
+pkg_deps=""
 
 source_dir="$package_name-$package_version"
 

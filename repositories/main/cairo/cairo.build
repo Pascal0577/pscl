@@ -4,7 +4,7 @@ package_name="cairo"
 package_version="1.18.4"
 package_description="A 2D graphics library with support for multiple output devices"
 package_source="https://www.cairographics.org/releases/cairo-1.18.4.tar.xz"
-package_dependencies="libpng pixman libxorg fontconfig glib"
+pkg_deps="libpng pixman libxorg fontconfig glib"
 
 source_dir="$package_name-$package_version"
 

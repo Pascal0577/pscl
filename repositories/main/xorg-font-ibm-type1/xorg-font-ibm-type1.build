@@ -4,7 +4,7 @@ package_name="xorg-font-ibm-type1"
 package_version="1.0.4"
 package_description="X.Org xorg-font-ibm-type1 library"
 package_source="https://www.x.org/pub/individual/font//font-ibm-type1-1.0.4.tar.xz 00f64a84b6c9886040241e081347a853"
-package_dependencies="xorg-font-alias xorg-bdftopcf xorg-font-util xorg-mkfontscale xorg-util-macros"
+pkg_deps="xorg-font-alias xorg-bdftopcf xorg-font-util xorg-mkfontscale xorg-util-macros"
 
 source_dir="font-ibm-type1-$package_version"
 

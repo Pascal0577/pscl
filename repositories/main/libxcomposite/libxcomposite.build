@@ -4,7 +4,7 @@ package_name="libxcomposite"
 package_version="0.4.6"
 package_description="X.Org libxcomposite library"
 package_source="https://www.x.org/pub/individual/lib/libXcomposite-0.4.6.tar.xz af0a5f0abb5b55f8411cd738cf0e5259"
-package_dependencies="libx11 libxfixes xorgproto xorg-util-macros"
+pkg_deps="libx11 libxfixes xorgproto xorg-util-macros"
 
 source_dir="libXcomposite-$package_version"
 

@@ -4,7 +4,7 @@ package_name="libxml"
 package_version="2.14.5"
 package_description="Contains libraries and utilities used for parsing XML files"
 package_source="https://download.gnome.org/sources/libxml2/2.14/libxml2-2.14.5.tar.xz 59aac4e5d1d350ba2c4bddf1f7bc5098"
-package_dependencies="icu"
+pkg_deps="icu"
 
 source_dir="libxml2-$package_version"
 
