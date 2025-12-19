@@ -47,9 +47,9 @@ These hooks stop executing once one returns success (0). Used for handling actio
 - `flag` - Parse custom flags within existing actions
 - `main` - Handle custom actions during main execution
 
-## Writing Extensions
+# Writing Extensions
 
-### Extension Naming Convention
+## Extension Naming Convention
 
 - Use descriptive names like `git-integration.sh`, `btrfs-support.sh`
 - Use `.sh` extension. This is required
@@ -205,7 +205,7 @@ my_main_handler gcc coreutils
 - Check if this is your action and return 0 if handled, return 1 if not your action
 - Execute the appropriate logic for the action
 
-### Example: Handling a Sync Action
+### Example: Handling an Action
 
 ```bash
 ext_mgmt_augment_main() {
