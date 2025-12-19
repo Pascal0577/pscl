@@ -54,7 +54,7 @@ parse_arguments() {
                     c) readonly DO_CLEANUP=0 ;;
                     v) readonly VERBOSE=1 ;;
                     *) 
-                        if ! extension_parse_flag "B" "$_char" "$@"; then
+                        if ! extension_parse_flag B "$_char" "$@"; then
                             log_error "Invalid option for -B: -$_char"
                         fi
                         ;;
@@ -78,7 +78,7 @@ parse_arguments() {
                     c) readonly DO_CLEANUP=0 ;;
                     v) readonly VERBOSE=1 ;;
                     *)
-                        if ! extension_parse_flag "I" "$_char" "$@"; then
+                        if ! extension_parse_flag I "$_char" "$@"; then
                             log_error "Invalid option for -I: -$_char"
                         fi
                         ;;
@@ -97,7 +97,7 @@ parse_arguments() {
                     r) readonly INSTALL_ROOT="$(realpath "$1")"; shift ;;
                     v) readonly VERBOSE=1 ;;
                     *)
-                        if ! extension_parse_flag "U" "$_char" "$@"; then
+                        if ! extension_parse_flag U "$_char" "$@"; then
                             log_error "Invalid option for -U: -$_char"
                         fi
                         ;;
@@ -118,7 +118,7 @@ parse_arguments() {
                     r) readonly INSTALL_ROOT="$(realpath "$1")"; shift ;;
                     v) readonly VERBOSE=1 ;;
                     *)
-                        if ! extension_parse_flag "A" "$_char" "$@"; then
+                        if ! extension_parse_flag A "$_char" "$@"; then
                             log_error "Invalid option for -U: -$_char"
                         fi
                         ;;
@@ -140,8 +140,7 @@ parse_arguments() {
                     r) readonly INSTALL_ROOT="$(realpath "$1")"; shift ;;
                     v) readonly VERBOSE=1 ;;
                     *)
-                        log_debug "Chatacter is: [$_char]"
-                        if ! extension_parse_flag "Q" "$_char" "$@"; then
+                        if ! extension_parse_flag Q "$_char" "$@"; then
                             log_error "Invalid option for -Q: -$_char"
                         fi
                         ;;
