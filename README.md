@@ -22,3 +22,9 @@ git clone https://github.com/Pascal0577/pscl
 ## Contributing
 
 This is just a hobby project, but feel free to send PRs if you want
+
+## Todo
+
+[] Build dependency, optional dependency, check dependency resolution
+[] Ask for confirmation before executing action
+[] Atomic BTRFS extension
