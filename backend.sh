@@ -341,7 +341,10 @@ backend_create_package() (
     cat >| "$_build_dir/PKGINFO" <<- EOF
 		package_name=${package_name:?}
 		package_version=${package_version:-unknown}
-		package_dependencies=${package_dependencies:-}
+		pkg_deps=${pkg_deps:-}
+		opt_deps=${opt_deps:-}
+		build_deps=${build_deps:-}
+		check_deps=${check_deps:-}
 		builddate=$(date +%s)
 		source="$package_source"
 	EOF
@@ -465,7 +468,10 @@ backend_resolve_uninstall_order() (
             _pkginfo="${INSTALL_ROOT:-}/${METADATA_DIR:?}/$installed_pkg/PKGINFO"
             [ -f "$_pkginfo" ] || exit 0
 
-            _deps="$(grep "^package_dependencies=" "$_pkginfo" | cut -d'=' -f2-)"
+            . "$_pkginfo" || \
+                log_error "Failed to source: $_pkginfo"
+
+            _deps="${pkg_deps:-} ${opt_deps:-} ${build_deps:-} ${check_deps:-}"
 
             # Print result to its own file to avoid race conditions
             printf "%s:%s\n" "$installed_pkg" "$_deps" > "${_map_dir:?}/$$"

@@ -40,7 +40,10 @@ list_of_dependencies() (
 
         # shellcheck source=/dev/null
         . "$_pkg_build" || log_error "Failed to source: $_pkg_build"
-        string="${string:-} ${package_dependencies:-}"
+        string="${string:-} ${pkg_deps:-}"
+        "$OPT_DEPS" && string="${string:-} ${opt_deps:-}"
+        "$CHECK_DEPS" && string="${string:-} ${check_deps:-}"
+        "$BUILD_DEPS" && string="${string:-} ${build_deps:-}"
     done
     trim_string_and_return "$string"
 )
