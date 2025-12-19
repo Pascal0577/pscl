@@ -38,13 +38,14 @@ parse_arguments() {
     LIST_FILES=0
     PRINT_WORLD=0
     INSTALL_ROOT=""
-    OPT_DEPS=true
-    BUILD_DEPS=true
-    CHECK_DEPS=false
+    OPT_DEPS="${OPT_DEPS:-true}"
+    BUILD_DEPS="${BUILD_DEPS:-false}"
+    CHECK_DEPS="${CHECK_DEPS:-true}"
 
     case "$_flag" in
         -B*)
             readonly ACTION="build"
+            readonly BUILD_DEPS=true
             _flag="${_flag#-B}"
             while [ -n "$_flag" ]; do
                 _char="${_flag%"${_flag#?}"}"
@@ -74,7 +75,8 @@ parse_arguments() {
                 _flag="${_flag#?}"
                 case "$_char" in
                     r) readonly INSTALL_ROOT="$(realpath "$1")"; shift ;;
-                    b) readonly CREATE_PACKAGE=1 ;;
+                    b) readonly CREATE_PACKAGE=1
+                        readonly BUILD_DEPS=true ;;
                     d) readonly RESOLVE_DEPENDENCIES=0 ;;
                     f) readonly INSTALL_FORCE=1 ;;
                     j) readonly PARALLEL_DOWNLOADS="$1"; shift ;;

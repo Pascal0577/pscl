@@ -224,18 +224,15 @@ backend_prepare_sources() (
 
 backend_want_to_build_package() (
     [ "$CREATE_PACKAGE" = 0 ] && return 1
+    [ "$INSTALL_FORCE" = 1 ] && return 1
 
     _pkg="$1"
     _pkg_name="$(backend_get_package_name "$_pkg")" || \
         log_error "Failed to get package name"
 
-    if [ ! -f "${INSTALL_ROOT:-}/${PACKAGE_CACHE:?}/$_pkg_name.tar.zst" ] \
-        || [ "$INSTALL_FORCE" = 1 ]
-    then
-        return 0
-    else
-        return 1
-    fi
+    [ ! -f "${INSTALL_ROOT:-}/${PACKAGE_CACHE:?}/$_pkg_name.tar.zst" ] && return 0
+
+    return 1
 )
 
 backend_run_checks() (

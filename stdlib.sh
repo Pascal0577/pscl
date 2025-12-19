@@ -71,9 +71,13 @@ get_dependency_tree() (
             *" $_current "*) continue ;;
         esac
 
-        _deps=$(list_of_dependencies "$_current") || {
-            log_error "Failed to get dependencies for: $_current"
-        }
+        if [ -f "${INSTALL_ROOT:-}/${PKGDIR:?}/installed_packages/$_current.tar.zst" ]; then
+            _deps=$(BUILD_DEPS=false list_of_dependencies "$_current") || \
+                log_error "Failed to get dependencies for: $_current"
+        else
+            _deps=$(list_of_dependencies "$_current") || \
+                log_error "Failed to get dependencies for: $_current"
+        fi
 
         log_debug "Dependencies for $_current are: $_deps"
 
