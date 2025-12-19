@@ -38,6 +38,9 @@ parse_arguments() {
     LIST_FILES=0
     PRINT_WORLD=0
     INSTALL_ROOT=""
+    OPT_DEPS=true
+    BUILD_DEPS=true
+    CHECK_DEPS=false
 
     case "$_flag" in
         -B*)
@@ -448,8 +451,8 @@ main_query() (
 load_extensions() {
     log_debug "Extension dir is: $EXTENSION_DIR"
 
-    . "./stdlib.sh" || log_error "Failed to load stdlib"
-    . "./backend.sh" || log_error "Failed to load backend"
+    . ./stdlib.sh || log_error "Failed to load stdlib"
+    . ./backend.sh || log_error "Failed to load backend"
 
     [ -d "$EXTENSION_DIR" ] || \
         log_warn "Extenstion directory does not exist: $EXTENSION_DIR"
