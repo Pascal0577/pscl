@@ -466,7 +466,6 @@ load_extensions() {
     done
 }
 
-# Default stub - extensions can override this
 extension_parse_flag() {
     _action="$1"
     shift
@@ -475,18 +474,12 @@ extension_parse_flag() {
         log_error "Failed to run flag hooks"
 }
 
-# Default stub - extensions can override this
 extension_parse_action() {
     _action="$1"
     shift
 
     run_hooks action "$_action" "$@" || \
         log_error "Failed to run flag hooks"
-}
-
-# Default stub - extensions can override this
-extension_handle_action() {
-    return 1  # Return 1 = action not handled
 }
 
 main() {
