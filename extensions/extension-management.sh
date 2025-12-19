@@ -100,6 +100,11 @@ extension_install_extension() (
             cp -a "$_ext" "$_install_path" || \
                 log_error "Failed to copy extension to extensions directory"
 
+            # Termporarily override the register_extension function
+            # so we don't execute anything when we source the extension
+            # shellcheck disable=SC2329
+            register_extension(){ :; }
+
             . "$_install_path" || \
                 log_error "Failed to source: $_install_path"
 

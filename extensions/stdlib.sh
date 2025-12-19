@@ -158,10 +158,28 @@ run_hooks() {
 
     log_debug "Hooks to run: [$_hooks]"
 
-    for hook in $_hooks; do
-        log_debug "Running hook: $hook"
-        "$hook" "$@" || return 1
-    done
+    case "$_hook_point" in
+        action|flag|main)
+            for hook in $_hooks; do
+                log_debug "Running hook: $hook"
+                if "$hook" "$@"; then
+                    log_debug "Hook $hook handled this $_hook_point"
+                    return 0
+                fi
+                log_debug "Hook $hook did not handle this $_hook_point. Trying next"
+            done
+            # No hook handled it - return failure
+            log_debug "No hook handled the request"
+            return 1
+            ;;
 
-    return 0
+        *)
+            # For other hooks, run all and fail if any fail
+            for hook in $_hooks; do
+                log_debug "Running hook: $hook"
+                "$hook" "$@" || return 1
+            done
+            return 0
+            ;;
+    esac
 }
