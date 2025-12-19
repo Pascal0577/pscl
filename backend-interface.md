@@ -70,6 +70,7 @@ Converts user-provided package identifiers into canonical package names. This ma
 - Removing duplicates
 
 **Example Input**: `/var/pkg/repositories/main/gcc/gcc.build ./repositories/main/coreutils/`
+
 **Example Output**: `gcc coreutils`
 
 ---
@@ -101,7 +102,8 @@ Returns the path to the build script that contains package metadata and build in
 - `build()` function
 - `install_files()` function
 
-**Example Inpit**: `gcc`
+**Example Input**: `gcc`
+
 **Example Output**: `/var/pkg/repositories/main/gcc/gcc.build`
 
 ---
@@ -132,6 +134,7 @@ Performs topological sort on the dependency graph to determine the correct build
 - Already-satisfied dependencies (if applicable)
 
 **Example Input**: `bash`
+
 **Example Output**: `readline ncurses bash`
 
 ---
@@ -162,7 +165,9 @@ Similar to `backend_resolve_build_order`, but may exclude already-installed pack
 - Version requirements (if supported)
 
 **Example Input**: `bash vim`
+
 **Example Output**: `readline ncurses bash vim` (if none installed)
+
 **Example Output**: `vim` (if bash and dependencies already installed)
 
 ---
@@ -192,7 +197,8 @@ Determines the order for uninstalling packages. Unlike build/install order, this
 - Orphaned dependencies (packages no longer needed)
 
 **Example Input**: `wayland`
-**Example Output**: `wayland libxml icu` (if bash and vim depend on readline)
+
+**Example Output**: `wayland libxml icu`
 
 ---
 
