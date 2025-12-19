@@ -69,6 +69,7 @@ backend_get_package_build() (
 )
 
 backend_download_sources() (
+    set -e
     _source_list="$1"
     _checksums_list="$2"
     _job_count=0
@@ -99,9 +100,10 @@ backend_download_sources() (
 
     # Kill all child processes if we recieve an interrupt
     # shellcheck disable=SC2154
-    trap 'kill 0 >/dev/null 2>/dev/null; exit 130' INT TERM EXIT
+    trap 'RUN_LOOP=false' INT TERM EXIT
 
     for source in $_source_list; do
+        "${RUN_LOOP:-true}" || break
         case "$source" in
             *.git)
                 git clone "$source" || return 1
@@ -124,7 +126,7 @@ backend_download_sources() (
                     _file="$_tarball_name"
                     trap '
                     rm -f "${CACHE_DIR:?}/${_file:?}" 2>/dev/null
-                    log_warn "Deleting cached download"' INT TERM EXIT
+                    log_warn "Deleting cached download: $_file"' INT TERM EXIT
 
                     cd "${PKGDIR:?}/source_cache" || true
 

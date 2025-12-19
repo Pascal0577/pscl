@@ -76,7 +76,7 @@ parse_arguments() {
                 case "$_char" in
                     r) readonly INSTALL_ROOT="$(realpath "$1")"; shift ;;
                     b) readonly CREATE_PACKAGE=1
-                        readonly BUILD_DEPS=true ;;
+                       readonly BUILD_DEPS=true ;;
                     d) readonly RESOLVE_DEPENDENCIES=0 ;;
                     f) readonly INSTALL_FORCE=1 ;;
                     j) readonly PARALLEL_DOWNLOADS="$1"; shift ;;
