@@ -13,16 +13,12 @@ Extensions are shell scripts (`.sh` files) placed in the `$EXTENSION_DIR` direct
 - Extend or alter the main execution flow
 - Share functionality between extensions
 
----
-
 ## Extension Loading Process
 
 - Core extensions are loaded first: `stdlib.sh` and `backend.sh`
 - All other `.sh` files in `$EXTENSION_DIR` are sourced alphabetically
 - Extensions register their hooks during sourcing
 - Hooks are called in registration order during execution
-
----
 
 ## Hook System
 
@@ -51,8 +47,6 @@ These hooks stop executing once one returns success (0). Used for handling actio
 - `flag` - Parse custom flags within existing actions
 - `main` - Handle custom actions during main execution
 
----
-
 ## Writing Extensions
 
 ### Extension Naming Convention
@@ -60,8 +54,6 @@ These hooks stop executing once one returns success (0). Used for handling actio
 - Use descriptive names like `git-integration.sh`, `btrfs-support.sh`
 - Use `.sh` extension. This is required
 - Don't use names that conflict with core files: `stdlib.sh`, `backend.sh`
-
----
 
 ## Action Hooks
 
@@ -138,8 +130,6 @@ register_hook "action" my_parse_sync_action
 # ARGUMENTS="extension.sh"
 ```
 
----
-
 ## Flag Hooks
 
 Flag hooks allow extensions to add new flags to existing actions (like adding `-e` to `-Q` to query extensions). Register them like so:
@@ -196,8 +186,6 @@ register_hook "flag" my_flag_parser
 # LIST_EXTENSION=true
 ```
 
----
-
 ## Main Hooks
 
 Main hooks handle the execution of custom actions defined by action hooks. Register them like so:
@@ -245,8 +233,6 @@ register_hook "main" ext_mgmt_augment_main
 # Main hook receives:
 # $*=extension.sh
 ```
-
----
 
 ## Lifecycle Hooks
 
@@ -309,8 +295,6 @@ register_hook "post_install" extension_query_extensions
 - Returning non-zero aborts the operation for pre- hooks
 - Multiple extensions can register the same hook, all will run
 
----
-
 ## Accessing Package Manager State
 
 Extensions have access to all global variables set by the package manager:
@@ -366,8 +350,6 @@ my_pre_build() {
 }
 ```
 
----
-
 ## Using stdlib.sh and Backend Functions
 
 Extensions can use utility functions from `stdlib.sh` and call backend functions to interact with the package database.
@@ -389,8 +371,6 @@ backend_query "gcc"  # Respects SHOW_INFO, LIST_FILES, etc.
 ```
 
 See the Backend API Specification for complete function documentation.
-
----
 
 ## Logging Functions
 
@@ -414,13 +394,9 @@ log_debug "Detailed information"
 - Use `log_debug` liberally for troubleshooting
 - Let the logging functions handle formatting
 
----
-
 ## Complete Extension Example
 
 See `extensions/extension-management.sh` for an example implemenation of an extension
-
----
 
 ## Extension Best Practices
 
@@ -459,11 +435,9 @@ See `extensions/extension-management.sh` for an example implemenation of an exte
    - Don't depend on other extensions being loaded first
    - Use hook registration, not direct function calls
 
----
-
 ## Extension Installation
 
-Extensions can provide post-install hooks to set themselves up:
+To install an extension you need to simply move your `.sh` script to the `EXTENSION_DIR`. By default this is `extensions/`. Extensions can also provide post-install hooks to set themselves up:
 
 ```bash
 #!/bin/sh
@@ -510,8 +484,6 @@ extension_post_uninstall() {
 
 These functions are automatically called by `extension-management.sh` during install/uninstall.
 
----
-
 ## Debugging Extensions
 
 Setting `VERBOSE=1` is recommended to debug argument parsing
@@ -549,8 +521,6 @@ Look for these patterns in verbose output:
 [DEBUG] Running hook: my_function
 [DEBUG] Hook my_function handled this action
 ```
-
----
 
 ## Extension Security Considerations
 

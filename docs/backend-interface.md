@@ -13,8 +13,6 @@ All backend functions are prefixed with `backend_`. They are called by the main 
 - **Errors**: Use `log_error` for fatal errors (will exit), `log_warn` for warnings
 - **Logging**: Use `log_debug` for debug messages (respects `VERBOSE` setting)
 
----
-
 ## Required Functions
 
 ### `backend_run_checks`
