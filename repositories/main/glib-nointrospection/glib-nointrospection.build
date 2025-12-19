@@ -4,7 +4,7 @@ package_name="glib-nointrospection"
 package_version="2.84.4"
 package_description="Contains low-level libraries useful for providing data structure handling for C"
 package_source="https://download.gnome.org/sources/glib/2.84/glib-2.84.4.tar.xz 5655d0ff809b98dd77c02490609fadde"
-package_dependencies="docutils libxslt"
+pkg_deps="docutils libxslt"
 
 source_dir="glib-$package_version"
 

@@ -4,7 +4,7 @@ package_name="libxmu"
 package_version="1.2.1"
 package_description="X.Org libxmu library"
 package_source="https://www.x.org/pub/individual/lib/libXmu-1.2.1.tar.xz 85edefb7deaad4590a03fccba517669f"
-package_dependencies="libx11 libxt libxext xorgproto xorg-util-macros"
+pkg_deps="libx11 libxt libxext xorgproto xorg-util-macros"
 
 source_dir="libXmu-$package_version"
 

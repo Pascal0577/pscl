@@ -4,7 +4,7 @@ package_name="python3"
 package_version="3.13.7"
 package_description="An interpretted computer language"
 package_source="https://www.python.org/ftp/python/3.13.7/Python-3.13.7.tar.xz 256cdb3bbf45cdce7499e52ba6c36ea3"
-package_dependencies="expat"
+pkg_deps="expat"
 
 source_dir="Python-3.13.7"
 

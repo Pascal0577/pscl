@@ -4,7 +4,7 @@ package_name="pango"
 package_version="1.56.4"
 package_description="A library for laying out and rendering text, with an emphasis on internationalization"
 package_source="https://download.gnome.org/sources/pango/1.56/pango-1.56.4.tar.xz 3db267bc07bfd96615c652e9187b85b5"
-package_dependencies="fontconfig fribidi glib cairo libxorg"
+pkg_deps="fontconfig fribidi glib cairo libxorg"
 
 source_dir="$package_name-$package_version"
 

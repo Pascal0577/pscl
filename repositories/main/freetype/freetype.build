@@ -4,7 +4,7 @@ package_name="freetype"
 package_version="2.13.3"
 package_description="Contains a library which allows applications to properly render TrueType fonts"
 package_source="https://downloads.sourceforge.net/freetype/freetype-2.13.3.tar.xz f3b4432c4212064c00500e1ad63fbc64"
-package_dependencies="harfbuzz libpng which"
+pkg_deps="harfbuzz libpng which"
 
 source_dir="$package_name-$package_version"
 

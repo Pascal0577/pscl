@@ -4,7 +4,7 @@ package_name="pixman"
 package_version="0.46.4"
 package_description="Contains a library that provides low-level pixel manipulation features such as image compositing and trapezoid rasterization"
 package_source="https://www.cairographics.org/releases/pixman-0.46.4.tar.gz c08173c8e1d2cc79428d931c13ffda59"
-package_dependencies=""
+pkg_deps=""
 
 source_dir="$package_name-$package_version"
 

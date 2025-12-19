@@ -4,7 +4,7 @@ package_name="xcb-util-renderutil"
 package_version="0.3.10"
 package_description="Extensions for xcb-util"
 package_source="https://xcb.freedesktop.org/dist/xcb-util-renderutil-0.3.10.tar.xz 193b890e2a89a53c31e2ece3afcbd55f"
-package_dependencies="libxcb xcb-util"
+pkg_deps="libxcb xcb-util"
 
 source_dir="$package_name-$package_version"
 

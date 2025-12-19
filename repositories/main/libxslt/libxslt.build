@@ -4,7 +4,7 @@ package_name="libxslt"
 package_version="1.1.43"
 package_description="Contains XSLT libraries used for extending libxml2 libraries to support XSLT files"
 package_source="https://download.gnome.org/sources/libxslt/1.1/libxslt-1.1.43.tar.xz 5dc0179c81be7a3082b43030ecfdebd4"
-package_dependencies="libxml"
+pkg_deps="libxml"
 
 source_dir="$package_name-$package_version"
 

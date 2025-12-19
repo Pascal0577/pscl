@@ -4,7 +4,7 @@ package_name="libsm"
 package_version="1.2.6"
 package_description="X.Org libsm library"
 package_source="https://www.x.org/pub/individual/lib/libSM-1.2.6.tar.xz 3aeeea05091db1c69e6f768e0950a431"
-package_dependencies="libice util-linux xorgproto xorg-util-macros xtrans"
+pkg_deps="libice util-linux xorgproto xorg-util-macros xtrans"
 
 source_dir="libSM-$package_version"
 

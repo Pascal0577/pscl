@@ -4,7 +4,7 @@ package_name="fribidi"
 package_version="1.0.16"
 package_description="An implementation of the Unicode Bidirectional Algorithm (BIDI)"
 package_source="https://github.com/fribidi/fribidi/releases/download/v1.0.16/fribidi-1.0.16.tar.xz 333ad150991097a627755b752b87f9ff"
-package_dependencies=""
+pkg_deps=""
 
 source_dir="$package_name-$package_version"
 

@@ -4,7 +4,7 @@ package_name="libxdmcp"
 package_version="1.1.5"
 package_description="Contains a library implementing the X Display Manager Control Protocol"
 package_source="https://www.x.org/pub/individual/lib/libXdmcp-1.1.5.tar.xz ce0af51de211e4c99a111e64ae1df290"
-package_dependencies="xorgproto"
+pkg_deps="xorgproto"
 
 source_dir="libXdmcp-$package_version"
 
