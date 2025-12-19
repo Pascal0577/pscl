@@ -448,8 +448,8 @@ main_query() (
 load_extensions() {
     log_debug "Extension dir is: $EXTENSION_DIR"
 
-    . "${EXTENSION_DIR:?}/stdlib.sh" || log_error "Failed to load stdlib"
-    . "${EXTENSION_DIR:?}/backend.sh" || log_error "Failed to load backend"
+    . "./stdlib.sh" || log_error "Failed to load stdlib"
+    . "./backend.sh" || log_error "Failed to load backend"
 
     [ -d "$EXTENSION_DIR" ] || \
         log_warn "Extenstion directory does not exist: $EXTENSION_DIR"
