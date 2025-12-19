@@ -26,7 +26,7 @@ parse_arguments() {
     ACTION=""
     ARGUMENTS=""
     ACTIVATION=""
-    VERBOSE=0
+    VERBOSE="${VERBOSE:-0}"
     RESOLVE_DEPENDENCIES=1
     PARALLEL_DOWNLOADS=5
     DO_CLEANUP=1
@@ -118,7 +118,7 @@ parse_arguments() {
                     r) readonly INSTALL_ROOT="$(realpath "$1")"; shift ;;
                     v) readonly VERBOSE=1 ;;
                     *)
-                        if ! extension_parse_flag "U" "$_char" "$@"; then
+                        if ! extension_parse_flag "A" "$_char" "$@"; then
                             log_error "Invalid option for -U: -$_char"
                         fi
                         ;;
@@ -140,6 +140,7 @@ parse_arguments() {
                     r) readonly INSTALL_ROOT="$(realpath "$1")"; shift ;;
                     v) readonly VERBOSE=1 ;;
                     *)
+                        log_debug "Chatacter is: [$_char]"
                         if ! extension_parse_flag "Q" "$_char" "$@"; then
                             log_error "Invalid option for -Q: -$_char"
                         fi
@@ -231,12 +232,9 @@ print_usage() {
 	    # Activate/deactivate packages
 	    pkg -Au gcc
 	    pkg -Ad bash
-
-	    # Install extension
-	    pkg -Ei my-extension.sh
 	EOF
 
-    exit 1
+    exit 0
 }
 
 log_error() {
@@ -435,9 +433,17 @@ main_activation() (
 main_query() (
     _pkg_name="$1"
 
+    log_debug "Running pre-query hooks for: $_pkg_name"
+    run_hooks pre_query "$_pkg_name" || \
+        log_error "Pre-query hook failed for: $_pkg_name"
+
     log_debug "Querying package: $_pkg_name"
     backend_query "$_pkg_name" || \
         log_error "Failed to query package: $_pkg_name"
+
+    log_debug "Running post-query hooks for: $_pkg_name"
+    run_hooks post_query "$_pkg_name" || \
+        log_error "Pre-query hook failed for: $_pkg_name"
 )
 
 load_extensions() {
@@ -463,14 +469,20 @@ load_extensions() {
 
 # Default stub - extensions can override this
 extension_parse_flag() {
-    # Args: action, flag_char, remaining_args...
-    return 1  # Return 1 = flag not handled
+    _action="$1"
+    shift
+
+    run_hooks flag "$_action" "$@" || \
+        log_error "Failed to run flag hooks"
 }
 
 # Default stub - extensions can override this
 extension_parse_action() {
-    # Args: flag, remaining_args...
-    return 1  # Return 1 = action not handled
+    _action="$1"
+    shift
+
+    run_hooks action "$_action" "$@" || \
+        log_error "Failed to run flag hooks"
 }
 
 # Default stub - extensions can override this
@@ -492,12 +504,7 @@ main() {
         uninstall)  main_uninstall "$ARGUMENTS" ;;
         activation) main_activation "$ARGUMENTS" ;;
         query)      main_query "$ARGUMENTS" ;;
-        *)
-            if command -v extension_augment_main >/dev/null; then
-                extension_augment_main "$ACTION" "$ARGUMENTS"
-            else
-                log_error "Invalid action: $ACTION"
-            fi
+        *)          run_hooks main "$ARGUMENTS"
     esac
 }
 

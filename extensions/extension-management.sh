@@ -7,10 +7,11 @@
 # shellcheck source=./stdlib.sh
 # shellcheck source=../pscl
 
-extension_parse_action() {
+ext_mgmt_parse_action() {
     log_debug "Parsing arguments in extension: Extension Management"
     INSTALL_EXTENSION=0
     UNINSTALL_EXTENSION=0
+    LIST_EXTENSION=false
 
     _flag="$1"
     shift
@@ -30,27 +31,33 @@ extension_parse_action() {
             done
             readonly ARGUMENTS="$*"
             ;;
+
+        *) return 1 ;;
     esac
 }
 
-extension_parse_flag() {
+ext_mgmt_parse_flag() {
     _action="$1"
     _char="$2"
-    _args="$*"
+
+    log_debug "Parsing flag: action=[$_action] char=[$_char]"
+
     case "$_action" in
         Q)
             case "$_char" in
-                e) readonly LIST_EXTENSION=1 ;;
-                *) log_error "Invalid option for -Q: -$_char"
+                e) readonly LIST_EXTENSION=true ;;
+                *) return 1 ;;
             esac
             ;;
-        *) log_error "Invalid action: $_action"
+
+        *) return 1 ;;
     esac
 }
 
-extension_augment_main() {
+ext_mgmt_augment_main() {
     case "${ACTION:-}" in
         extension) extension_main_extension "$ARGUMENTS" ;;
+        *) return 1 ;;
     esac
 }
 
@@ -136,7 +143,7 @@ extension_uninstall_extension() (
 
             if command -v extension_post_uninstall 2>/dev/null; then
                 extension_post_uninstall || \
-                    log_error "Failed to execute post-uninstall commands for $_ext_name"
+                    log_error "Failed to execute post-uninstall cmds for $_ext_name"
             fi
 
             rm "$_install_path" || \
@@ -150,3 +157,14 @@ extension_uninstall_extension() (
         fi
     done
 )
+
+extension_query_extensions() (
+    if "${LIST_EXTENSION:-false}"; then
+        ls "${EXTENSION_DIR:?}"
+    fi
+)
+
+register_hook "pre_query" extension_query_extensions 
+register_hook "action" ext_mgmt_parse_action 
+register_hook "flag" ext_mgmt_parse_flag
+register_hook "main" ext_mgmt_augment_main
