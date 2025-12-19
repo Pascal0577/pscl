@@ -41,6 +41,34 @@ Called once at startup, before any package operations
 
 ---
 
+### `backend_ask_confirmation`
+
+**Purpose**: Ask from the user confirmation for package transactions
+
+**Signature**:
+```bash
+backend_run_checks <transaction_type> <packages_list>
+```
+
+**Parameters**:
+- $1: The type of transaction being performed.
+- $*: The list of packages for the user to confirm the transaction for
+
+**Returns**:
+- 0: User confirmed transaction
+- 1: User did not confirm transaction
+
+**Description**: 
+Asks the user for confirmation to perform the given transation on the specified packages. Required transaction types are:
+- **build** to confirm building packages
+- **install** to confirm installing packages
+- **uninstall** to confirm uninstalling packages
+- **activation** to confirm changing activation status of packages
+
+Called before package transactions take place, but after dependency resolution occurs
+
+---
+
 ### `backend_get_package_name`
 
 **Purpose**: Transform input into package names for consistency
