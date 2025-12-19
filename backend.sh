@@ -4,6 +4,34 @@
 # Helpers #
 ###########
 
+backend_ask_confirmation() (
+    # If we don't want to ask for confirmation, exit immediately
+    "$ASK_CONFIRMATION" || return 0
+    _type="$1"
+    shift
+    _packages="$*"
+
+    _msg=""
+    case "$_type" in 
+        build)
+            _msg="Do you want to build these packages:" ;;
+        install)
+            _msg="Do you want to install these packages:" ;;
+        uninstall)
+            _msg="Do you want to uninstall these packages:" ;;
+        activation)
+            _msg="Do you want to alter the activation status of these packages:" ;;
+    esac
+
+    echo "$_msg $_packages"
+    read -r _ans
+
+    case "$_ans" in
+        y|yes|Y|"") return 0 ;;
+        *) return 1 ;;
+    esac
+)
+
 backend_is_installed() (
     _pkg_name="$1"
     _pkg_data_dir="${INSTALL_ROOT:-}/${METADATA_DIR:?}/$_pkg_name"

@@ -41,6 +41,7 @@ parse_arguments() {
     OPT_DEPS="${OPT_DEPS:-true}"
     BUILD_DEPS="${BUILD_DEPS:-false}"
     CHECK_DEPS="${CHECK_DEPS:-true}"
+    ASK_CONFIRMATION="${ASK_CONFIRMATION:-true}"
 
     case "$_flag" in
         -B*)
@@ -306,6 +307,9 @@ main_install() (
         return 0
     fi
 
+    backend_ask_confirmation install "$_install_order" || \
+        log_error "Not proceeding"
+
     # Prepare any sources that need building
     log_debug "Preparing source for: $_install_order"
     backend_prepare_sources "$_install_order" || \
@@ -367,6 +371,9 @@ main_build() (
         return 0
     fi
 
+    backend_ask_confirmation build "$_build_order" || \
+        log_error "Not proceeding"
+
     log_debug "Preparing sources"
     backend_prepare_sources "$_build_order" || \
         log_error "Failed to prepare sources"
@@ -416,6 +423,9 @@ main_uninstall() (
     log_debug "Getting uninstall order for packages: $_requested_packages"
     _uninstall_order="$(backend_resolve_uninstall_order "$_requested_packages")" || \
         log_error "Failed to resolve uninstall order"
+
+    backend_ask_confirmation uninstall "$_uninstall_order" || \
+        log_error "Not proceeding"
     
     for pkg in $_uninstall_order; do
         log_debug "Uninstalling package: $pkg"
@@ -425,6 +435,10 @@ main_uninstall() (
 
 main_activation() (
     _requested_packages="$*"
+
+    backend_ask_confirmation activation "$_requested_packages" || \
+        log_error "Not proceeding"
+
     if [ "$ACTIVATION" = "up" ]; then
         backend_activate_package "$_requested_packages"
     elif [ "$ACTIVATION" = "down" ]; then
