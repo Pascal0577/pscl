@@ -7,13 +7,13 @@ trim_string_and_return() {
 }
 
 string_is_in_list() {
-    _string="$1"
+    _word="$1"
     shift
-    _list=" ${*:-} "
+    set -- $*
 
-    case $_list in
-        *" $_string "*) return 0 ;;
-    esac
+    for item in "$@"; do
+        [ "$item" = "$_word" ] && return 0
+    done
     return 1
 }
 
@@ -37,6 +37,7 @@ reverse_string() {
     for word in $1; do
         _reversed="$word $_reversed"
     done
+    # shellcheck disable=SC2086
     set -- $_reversed
     echo "$*"
 }

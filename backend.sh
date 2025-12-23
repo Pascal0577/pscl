@@ -50,7 +50,7 @@ backend_get_package_name() (
     # Strips paths, .build and .tar extensions from input. Then append || to 
     # "initialize" depth 0 and empty dep_type for the struct
     for pkg in $_pkg_list; do
-        _pkg_name_list="${_pkg_name_list:-} $(basename "$pkg" | sed 's/\.build$//' | sed 's/\.tar.*$//')|0|"
+        _pkg_name_list="${_pkg_name_list:-} $(basename "$pkg" | sed 's/\.build$//' | sed 's/\.tar.*$//')|0|pkg"
     done
 
     for pkg in $_pkg_name_list; do
