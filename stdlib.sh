@@ -108,9 +108,18 @@ edit_field() (
     _field="$2"
     _replacement="$3"
 
-    echo "$_struct" | \
-        awk -F'|' -v field="$_field" -v replace="$_replacement" \
-        '{$field = replace; print}' OFS='|'
+    IFS='|'
+    i=1
+    for field in $_struct; do
+        if [ "$i" = "$_field" ]; then
+            _return_string="${_return_string:-}|$_replacement"
+        else
+            _return_string="${_return_string:-}|$field"
+        fi
+        i="$((i + 1))"
+    done
+
+    echo "${_return_string#|}"
 )
 
 get_field() (
