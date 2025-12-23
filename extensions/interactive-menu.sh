@@ -102,7 +102,7 @@ interactive_prompt() (
         content="${line##* }"
 
         if [ "$(get_field "$content" 4)" = "unselected" ]; then continue; fi
-        _return_string="$(get_field "$content" 1) ${_return_string:-}"
+        _return_string="${_return_string:-} $(get_field "$content" 1)"
     done <<- EOF
         $tree
 	EOF
