@@ -29,7 +29,7 @@ remove_string_from_list() {
         fi
     done
 
-    "${_result# }"
+    echo "${_result# }"
 }
 
 reverse_string() {
@@ -142,18 +142,31 @@ get_field() (
     echo "${_return_string# }"
 )
 
+# Uses a queue-based approach. Iterates over the queue, resolving dependencies
+# until it's empty. Dependencies get added to the front of the queue.
+# The input is a space separated string of pipe-delimited strings,
+# acting as rudimentary structs. It might look like this:
+#
+# In: "wayland|0|pkg"
+# Out: "wayland|0|pkg libxml|1|pkg icu|2|pkg gcc|1|build wayland-protocols|1|opt"
+#
+# The first field is the name of the package.
+# The second field is the depth in the dependency tree. wayland has depth 0 and
+#   depends on libxml, so libxml has depth 1.
+#   libxml depends on icu so icu has depth 2.
+# The third field is the type of dependency (regular, optional, build, check)
 get_dependency_tree() (
-    _initial_packages="$*"
-    # Spaces for easier pattern matching
+    set -- "$@"
+
+    # Spaces for pattern matching
     _order=""
     _resolved=" "
     _processing=" "
 
-    _queue="$_initial_packages"
+    while [ "$#" -gt 0 ]; do
+        _current="$1"
+        shift
 
-    while [ -n "$_queue" ]; do
-        _current="${_queue%% *}"
-        _queue="${_queue#"$_current" }"
         _current_name="${_current%%|*}"
 
         if backend_is_installed "$_current" && [ "$INSTALL_FORCE" = 0 ]; then
@@ -162,12 +175,11 @@ get_dependency_tree() (
             continue
         fi
 
-        # Skip if already resolved
         case $_resolved in
             *" $_current_name "*) continue ;;
         esac
 
-        # Now we resolve
+        # Dependencies are returned as pipe-delimited strings
         if [ -f "${INSTALL_ROOT:-}/${PKGDIR:?}/installed_packages/$_current_name.tar.zst" ]
         then
             _deps=$(BUILD_DEPS=false list_of_dependencies "$_current") || \
@@ -194,31 +206,28 @@ get_dependency_tree() (
         done
 
         if [ "$_all_resolved" -eq 0 ]; then
-            # Check for circular dependency only when we need to re-queue
+            # Check for circular dependency
             case $_processing in
                 *" $_current_name "*)
                     log_error "Circular dependency detected involving: $_current_name" ;;
             esac
 
-            # Mark as processing and re-queue after dependencies
             _processing="$_processing$_current_name "
-            _queue="$_unresolved_deps $_current $_queue"
+
+            # shellcheck disable=SC2086
+            set -- $_unresolved_deps "$_current" "$@"
         else
             # All dependencies resolved, add to order
             _resolved="$_resolved$_current_name "
             _order="$_order $_current"
-
-            # Remove from processing since it's now resolved
-            _processing="$(remove_string_from_list "$_current_name" "$_processing")"
+            _processing=$(remove_string_from_list "$_current_name" "$_processing")
 
             log_debug "Adding $_current to dependency graph"
         fi
     done
 
     log_debug "Dependency tree is: $_order"
-
-    # Return structs (or just package names if you prefer)
-    trim_string_and_return "$_order"
+    echo "${_order# }"
 )
 
 register_hook() {
