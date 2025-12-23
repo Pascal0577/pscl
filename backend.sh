@@ -377,7 +377,7 @@ backend_create_package() (
 		build_deps=${build_deps:-}
 		check_deps=${check_deps:-}
 		builddate=$(date +%s)
-		source="$package_source"
+		source="$(echo "$package_source" | awk '{print 1}')"
 	EOF
 
     log_debug "Creating package"
