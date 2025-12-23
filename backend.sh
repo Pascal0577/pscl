@@ -168,7 +168,6 @@ backend_download_sources() (
 
                     $_download_cmd "$source" || \
                         log_error "Failed to download: $source"
-                    echo ""
                     trap - INT TERM EXIT
                 ) &
                 _job_count=$((_job_count + 1))
@@ -180,7 +179,6 @@ backend_download_sources() (
                     wait -n 2>/dev/null || wait
                     _job_count=$((_job_count - 1))
                 fi
-                sleep 0.05
                 ;;
         esac
     done
@@ -444,6 +442,7 @@ backend_register_package() (
 
 backend_activate_package() (
     _pkg_name="$1"
+
     _pkg_install_dir="${INSTALL_ROOT:-}/${PKGDIR:?}/installed_packages/$_pkg_name"
 
     [ ! -d "$_pkg_install_dir" ] && \
@@ -459,7 +458,8 @@ backend_activate_package() (
                 exit 0 ;;
         esac
 
-        _source="$_pkg_install_dir/$line"
+        # Remove INSTALL_ROOT so that the links point to the right places
+        _source="${_pkg_install_dir##"${INSTALL_ROOT:-}"}/$line"
         _target="${INSTALL_ROOT:-}/$line"
         
         if [ -d "$_source" ]; then
@@ -591,7 +591,6 @@ backend_unactivate_package() (
         if [ -f "$_full_path" ] || [ -L "$_full_path" ]; then
             log_debug "Removing file: $_full_path"
             rm "${_full_path:?}" || log_warn "Failed to remove: $_full_path"
-
         fi
     ) &
     done
