@@ -616,6 +616,7 @@ backend_remove_files() (
     _pkg="$1"
     _pkg_install_dir="${INSTALL_ROOT:-}/${PKGDIR:?}/installed_packages/${_pkg:?}"
     [ -d "$_pkg_install_dir" ] && rm -rf "${_pkg_install_dir:?}"
+    return 0
 )
 
 backend_unregister_package() (
