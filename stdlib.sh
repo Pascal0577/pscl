@@ -117,21 +117,17 @@ get_field() (
     _struct_list="$1"
     _field="$2"
     _return_string=""
-    
-    for struct in $_struct_list; do
-        IFS='|' read -r f1 f2 f3 f4 <<- EOF
-			$struct
-		EOF
 
-        case "$_field" in
-            1) _return_string="$_return_string $f1" ;;
-            2) _return_string="$_return_string $f2" ;;
-            3) _return_string="$_return_string $f3" ;;
-            4) _return_string="$_return_string $f4" ;;
-        esac
+    for struct in $_struct_list; do
+        IFS='|'
+        # shellcheck disable=SC2086
+        set -- $struct
+        eval "_value=\$$_field"
+        # shellcheck disable=SC2154
+        _return_string="$_return_string $_value"
     done
 
-    trim_string_and_return "$_return_string"
+    echo "${_return_string# }"
 )
 
 get_dependency_tree() (
