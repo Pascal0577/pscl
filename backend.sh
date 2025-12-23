@@ -23,11 +23,11 @@ backend_ask_confirmation() (
             _msg="Do you want to alter the activation status of these packages:" ;;
     esac
 
-    echo "$_msg $_packages"
+    echo "$_msg $_packages" >&2
     read -r _ans
 
     case "$_ans" in
-        y|yes|Y|"") return 0 ;;
+        y|yes|Y|"") echo "$_packages" ;;
         *) return 1 ;;
     esac
 )
@@ -40,44 +40,54 @@ backend_is_installed() (
     return 1
 )
 
+# Returns a package "struct" from names, dirs, tar archives:
+# pkg_name|depth|dep_type
+# depth and dep_type are filled out by the install/uninstall order functions
+# For now they are empty
 backend_get_package_name() (
     _pkg_list="$1"
-    _pkg_name_list=""
 
+    # Strips paths, .build and .tar extensions from input. Then append || to 
+    # "initialize" depth 0 and empty dep_type for the struct
     for pkg in $_pkg_list; do
-        _pkg_name_list="$_pkg_name_list $(basename "$pkg" | sed 's/\.build$//' | sed 's/\.tar.*$//')"
+        _pkg_name_list="${_pkg_name_list:-} $(basename "$pkg" | sed 's/\.build$//' | sed 's/\.tar.*$//')|0|"
     done
 
     for pkg in $_pkg_name_list; do
+        _pkg_name="$(get_field "$pkg" 1)"
         _found=0
         for repo in $REPOSITORY_LIST; do
-            [ -e "$repo/$pkg/$pkg.build" ] && _found=1 && break
+            [ -e "$repo/$_pkg_name/$_pkg_name.build" ] && _found=1 && break
         done
         [ "${_found:-0}" = 0 ] && \
             log_error "Package does not exist: $pkg"
     done
 
+    # Return a package "struct" with empty depth and dep_type fields
     trim_string_and_return "$_pkg_name_list"
 )
 
 # Returns the directory containing a package's build script
 backend_get_package_dir() (
-    _pkg_list="$(backend_get_package_name "$1")" || \
-        log_error "Failed to get package name: $1"
-    _pkg_dir_list=""
-
-    for pkg in $_pkg_list; do
+    for _pkg_name in $1; do
+        log_debug "Searching for $_pkg_name"
         _to_test_against="$_pkg_dir_list"
         # Searches all repositories. Stops searching on the first valid package
         # that is found
         for repo in $REPOSITORY_LIST; do
-            if [ -d "$repo/$pkg/" ]; then
-                _pkg_dir_list="$_pkg_dir_list $repo/$pkg"
+            log_debug "Searching repository: $repo"
+            log_debug "Testing: [ -d $repo/$_pkg_name ]"
+            if [ -d "$repo/$_pkg_name" ]; then
+                log_debug "Found $_pkg_name at: $repo/$_pkg_name"
+                _pkg_dir_list="$_pkg_dir_list $repo/$_pkg_name"
                 break
             fi
         done
+
+        # If the list is the same before and after we searched for the package
+        # then it doesn't exit in the repos
         [ "$_pkg_dir_list" = "$_to_test_against" ] && \
-            log_error "Could not find build dir for: $pkg"
+            log_error "Could not find package in repository: $_pkg_name"
     done
 
     trim_string_and_return "$_pkg_dir_list"
@@ -85,12 +95,10 @@ backend_get_package_dir() (
 
 # Returns the path to the build file for a package
 backend_get_package_build() (
-    _pkg_build_list=""
-
-    for pkg in $1; do
-        _pkg_dir="$(backend_get_package_dir "$pkg")" || \
-            log_error "Failed to get package dir: $pkg"
-        _pkg_build_list="$_pkg_build_list $_pkg_dir/$pkg.build"
+    for _pkg_name in $1; do
+        _pkg_dir="$(backend_get_package_dir "$_pkg_name")" || \
+            log_error "Failed to get package dir: $_pkg_name"
+        _pkg_build_list="$_pkg_build_list $_pkg_dir/$_pkg_name.build"
     done
 
     trim_string_and_return "$_pkg_build_list"
@@ -204,8 +212,9 @@ backend_prepare_sources() (
     _checksums=""
 
     for pkg in $_package_list; do
+        log_debug "Package is: [$pkg]"
         _pkg_dir="$(backend_get_package_dir "$pkg")" ||
-            log_error "Failed to get package dir for: $_pkg_dir"
+            log_error "Failed to get package dir for: $pkg"
         _pkg_build="$(trim_string_and_return "${_pkg_dir}/${pkg}.build")"
 
         # shellcheck source=/dev/null
@@ -256,10 +265,7 @@ backend_want_to_build_package() (
     [ "$CREATE_PACKAGE" = 0 ] && return 1
     [ "$INSTALL_FORCE" = 1 ] && return 1
 
-    _pkg="$1"
-    _pkg_name="$(backend_get_package_name "$_pkg")" || \
-        log_error "Failed to get package name"
-
+    _pkg_name="$1"
     [ ! -f "${INSTALL_ROOT:-}/${PACKAGE_CACHE:?}/$_pkg_name.tar.zst" ] && return 0
 
     return 1
@@ -287,6 +293,7 @@ backend_run_checks() (
 
 backend_resolve_build_order() (
     _requested_packages="$*"
+    log_debug "Recieved packages to resolve build order for: $_requested_packages"
 
     if [ "${RESOLVE_DEPENDENCIES:-1}" = 0 ]; then
         echo "$_requested_packages"
@@ -356,8 +363,7 @@ backend_build_source() (
 
 backend_create_package() (
     _pkg="$1"
-    _pkg_name="$(backend_get_package_name "$_pkg")"
-    _build_dir="/${PKGDIR:?}/build/$_pkg_name/package"
+    _build_dir="/${PKGDIR:?}/build/$_pkg/package"
     _pkg_build="$(backend_get_package_build "$_pkg")" || \
         log_error "Failed to get build script for: $_pkg"
 
@@ -381,8 +387,8 @@ backend_create_package() (
 
     find . -type f -exec strip --strip-unneeded {} + 2>/dev/null || true
 
-    tar -cpf - . | zstd > "${INSTALL_ROOT:-}/${PACKAGE_CACHE:?}/$_pkg_name.tar.zst" \
-        || log_error "Failed to create compressed tar archive: $_pkg_name.tar.zst"
+    tar -cpf - . | zstd > "${INSTALL_ROOT:-}/${PACKAGE_CACHE:?}/$_pkg.tar.zst" \
+        || log_error "Failed to create compressed tar archive: $_pkg.tar.zst"
 )
 
 
@@ -395,12 +401,10 @@ backend_resolve_install_order() (
 )
 
 backend_install_files() (
-    _pkg="$1"
+    _pkg_name="$1"
 
-    _pkg_dir="$(backend_get_package_dir "$_pkg")" || \
-        log_error "Failed to get package directory for: $_pkg"
-    _pkg_name="$(backend_get_package_name "$_pkg")" || \
-        log_error "Failed to get package name for: $_pkg"
+    _pkg_dir="$(backend_get_package_dir "$_pkg_name")" || \
+        log_error "Failed to get package directory for: $_pkg_name"
     _package_archive="${INSTALL_ROOT:-}/$PACKAGE_CACHE/$_pkg_name.tar.zst"
     _data_dir="${INSTALL_ROOT:-}/${METADATA_DIR:?}/$_pkg_name"
     _install_dir="${INSTALL_ROOT:-}/${PKGDIR:?}/installed_packages/$_pkg_name"
@@ -424,9 +428,7 @@ backend_install_files() (
 )
 
 backend_register_package() (
-    _pkg="$1"
-    _pkg_name="$(backend_get_package_name "$_pkg")" || \
-        log_error "Failed to get package name for: $_pkg"
+    _pkg_name="$1"
     _data_dir="${INSTALL_ROOT:-}/${METADATA_DIR:?}/$_pkg_name"
     _install_dir="${INSTALL_ROOT:-}/${PKGDIR:?}/installed_packages/$_pkg_name"
 
@@ -441,12 +443,11 @@ backend_register_package() (
 )
 
 backend_activate_package() (
-    _pkg="$1"
-    _pkg_name="$(backend_get_package_name "$_pkg")"
+    _pkg_name="$1"
     _pkg_install_dir="${INSTALL_ROOT:-}/${PKGDIR:?}/installed_packages/$_pkg_name"
 
     [ ! -d "$_pkg_install_dir" ] && \
-        log_error "Package not installed: $_pkg"
+        log_error "Package not installed: $_pkg_name"
 
     find "$_pkg_install_dir" -mindepth 1 | sed "s|^${_pkg_install_dir}/||" | \
     while read -r line; do

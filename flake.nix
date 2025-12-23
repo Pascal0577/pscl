@@ -19,6 +19,7 @@
             shellHook = ''
                 echo "Welcome to the devShell!"
                 export SHELL="${pkgs.zsh}/bin/zsh"
+                export MAKEFLAGS="-j$(nproc)"
                 exec ${pkgs.zsh}/bin/zsh
             '';
         };
