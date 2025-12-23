@@ -1,19 +1,19 @@
 #!/bin/sh
 
-trim_string_and_return() (
+trim_string_and_return() {
     set -f
     set -- $*
     echo "$*"
-)
+}
 
-string_is_in_list_v2() {
-    _word="$1"
+string_is_in_list() {
+    _string="$1"
     shift
-    set -- $*
+    _list=" ${*:-} "
 
-    for item in "$@"; do
-        [ "$item" = "$_word" ] && return 0
-    done
+    case $_list in
+        *" $_string "*) return 0 ;;
+    esac
     return 1
 }
 
