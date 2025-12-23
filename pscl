@@ -1,7 +1,7 @@
 #!/bin/sh
 
-# shellcheck source=./extensions/stdlib.sh
-# shellcheck source=./extensions/backend.sh
+# shellcheck source=./stdlib.sh
+# shellcheck source=./backend.sh
 
 readonly red="\x1b[31m"
 readonly blue="\x1b[34m"
@@ -15,7 +15,7 @@ readonly WORLD="$METADATA_DIR/world"
 readonly LOCKFILE="${PKGDIR}/pkg.lock"
 readonly CACHE_DIR="${CACHE_DIR:-${PKGDIR}/source_cache}"
 readonly PACKAGE_CACHE="${PACKAGE_CACHE:-${PKGDIR}/package_cache}"
-readonly REPOSITORY_LIST="${REPOSITORY_LIST:-${PKGDIR}/repositories/*}"
+readonly REPOSITORY_LIST="${REPOSITORY_LIST:-${PKGDIR}/repositories/main}"
 readonly EXTENSION_DIR="${PKGDIR:?}/extensions"
 
 parse_arguments() {
@@ -302,13 +302,15 @@ main_install() (
     _install_order="$(backend_resolve_install_order "$_requested_packages")" || \
         log_error "Failed to resolve install order"
 
+    _install_order="$(backend_ask_confirmation install "$_install_order")" || \
+        log_error "Not proceeding"
+
+    log_debug "Install order is: [$_install_order]"
+
     if [ -z "$_install_order" ]; then
         echo "Nothing to do."
         return 0
     fi
-
-    backend_ask_confirmation install "$_install_order" || \
-        log_error "Not proceeding"
 
     # Prepare any sources that need building
     log_debug "Preparing source for: $_install_order"
@@ -424,9 +426,14 @@ main_uninstall() (
     _uninstall_order="$(backend_resolve_uninstall_order "$_requested_packages")" || \
         log_error "Failed to resolve uninstall order"
 
-    backend_ask_confirmation uninstall "$_uninstall_order" || \
+    _uninstall_order="$(backend_ask_confirmation uninstall "$_uninstall_order")" || \
         log_error "Not proceeding"
-    
+
+    if [ -z "$_uninstall_order" ]; then
+        echo "Nothing to do."
+        return 0
+    fi
+
     for pkg in $_uninstall_order; do
         log_debug "Uninstalling package: $pkg"
         uninstall_package "$pkg" || log_error "Failed to uninstall: $pkg"

@@ -1,13 +1,12 @@
 #!/bin/sh
 
-trim_string_and_return() (
+trim_string_and_return() {
     set -f
     set -- $*
-    var="$(printf '%s\n' "$*")"
-    echo "$var"
-)
+    echo "$*"
+}
 
-string_is_in_list() (
+string_is_in_list() {
     _string="$1"
     shift
     _list=" ${*:-} "
@@ -16,9 +15,9 @@ string_is_in_list() (
         *" $_string "*) return 0 ;;
     esac
     return 1
-)
+}
 
-remove_string_from_list() (
+remove_string_from_list() {
     _string="$1"
     shift
     _list="${*:-}"
@@ -31,9 +30,18 @@ remove_string_from_list() (
     done
 
     trim_string_and_return "$_result"
-)
+}
 
-list_of_dependencies() (
+reverse_string() {
+    _reversed=""
+    for word in $1; do
+        _reversed="$word $_reversed"
+    done
+    set -- $_reversed
+    echo "$*"
+}
+
+list_of_dependencies_og() (
     for build in $1; do
         _pkg_build="$(backend_get_package_build "$build")" || \
             log_error "Failed to get build script: $build"
@@ -46,6 +54,84 @@ list_of_dependencies() (
         "$BUILD_DEPS" && string="${string:-} ${build_deps:-}"
     done
     trim_string_and_return "$string"
+)
+
+# Takes in a list of package structs and returns a list of structs
+# that are dependencies of the input packages
+list_of_dependencies() (
+    for _pkg in $1; do
+        IFS='|' read -r _pkg_name _pkg_depth _pkg_type <<- EOF
+            $_pkg
+		EOF
+
+        _pkg_build="$(backend_get_package_build "$_pkg_name")" || \
+            log_error "Failed to get build script: $_pkg_name"
+
+        # Add one to the current package depth
+        _dep_depth="$((_pkg_depth + 1))"
+
+        # shellcheck source=/dev/null
+        . "$_pkg_build" || log_error "Failed to source: $_pkg_build"
+
+        # Dependencies of build dependencies are also build dependencies
+        for dep in $pkg_deps; do
+            if [ "$_pkg_type" = "build" ]; then
+                _dep_type="build"
+            else
+                _dep_type="pkg"
+            fi
+            result="${result:-} ${dep}|${_dep_depth}|${_dep_type}"
+        done
+
+        # Process optional, check, and build dependencies if needed
+        "$OPT_DEPS" && for dep in $opt_deps; do
+            [ -z "$dep" ] && continue 
+            result="${result:-} ${dep}|${_dep_depth}|opt"
+        done
+
+        "$CHECK_DEPS" && for dep in $check_deps; do
+            [ -z "$dep" ] && continue 
+            result="${result:-} ${dep}|${_dep_depth}|check"
+        done
+
+        "$BUILD_DEPS" && for dep in $build_deps; do
+            [ -z "$dep" ] && continue 
+            result="${result:-} ${dep}|${_dep_depth}|build"
+        done
+    done
+
+    trim_string_and_return "$result"
+)
+
+edit_field() (
+    _struct="$1"
+    _field="$2"
+    _replacement="$3"
+
+    echo "$_struct" | \
+        awk -F'|' -v field="$_field" -v replace="$_replacement" \
+        '{$field = replace; print}' OFS='|'
+)
+
+get_field() (
+    _struct_list="$1"
+    _field="$2"
+    _return_string=""
+    
+    for struct in $_struct_list; do
+        IFS='|' read -r f1 f2 f3 f4 <<- EOF
+			$struct
+		EOF
+
+        case "$_field" in
+            1) _return_string="$_return_string $f1" ;;
+            2) _return_string="$_return_string $f2" ;;
+            3) _return_string="$_return_string $f3" ;;
+            4) _return_string="$_return_string $f4" ;;
+        esac
+    done
+
+    trim_string_and_return "$_return_string"
 )
 
 get_dependency_tree() (
@@ -61,62 +147,70 @@ get_dependency_tree() (
         _current=$(echo "$_queue" | awk '{print $1}')
         _queue=$(echo "$_queue" | sed 's/^[^ ]* *//')
 
+        _current_name=$(get_field "$_current" 1)
+
         if backend_is_installed "$_current" && [ "$INSTALL_FORCE" = 0 ]; then
-            _resolved="$_resolved$_current "
+            _resolved="$_resolved$_current_name "
             log_debug "$_current is already installed. Skipping adding it to the tree"
+            continue
         fi
 
         # Skip if already resolved
         case $_resolved in
-            *" $_current "*) continue ;;
+            *" $_current_name "*) continue ;;
         esac
 
-        if [ -f "${INSTALL_ROOT:-}/${PKGDIR:?}/installed_packages/$_current.tar.zst" ]; then
+        # Now we resolve
+        if [ -f "${INSTALL_ROOT:-}/${PKGDIR:?}/installed_packages/$_current_name.tar.zst" ]
+        then
             _deps=$(BUILD_DEPS=false list_of_dependencies "$_current") || \
                 log_error "Failed to get dependencies for: $_current"
         else
             _deps=$(list_of_dependencies "$_current") || \
                 log_error "Failed to get dependencies for: $_current"
         fi
-
         log_debug "Dependencies for $_current are: $_deps"
 
         # Check if all dependencies are resolved
         _all_resolved=1
         _unresolved_deps=""
 
-        for dep in $_deps; do
+        for dep_struct in $_deps; do
+            dep_name=$(get_field "$dep_struct" 1)
             case $_resolved in
-                *" $dep "*) ;;
+                *" $dep_name "*) ;;
                 *)
                     _all_resolved=0
-                    _unresolved_deps="$_unresolved_deps $dep" ;;
+                    _unresolved_deps="$_unresolved_deps $dep_struct"
+                    ;;
             esac
         done
 
         if [ "$_all_resolved" -eq 0 ]; then
             # Check for circular dependency only when we need to re-queue
             case $_processing in
-                *" $_current "*)
-                    log_error "Circular dependency detected involving: $_current" ;;
+                *" $_current_name "*)
+                    log_error "Circular dependency detected involving: $_current_name" ;;
             esac
 
             # Mark as processing and re-queue after dependencies
-            _processing="$_processing$_current "
+            _processing="$_processing$_current_name "
             _queue="$_unresolved_deps $_current $_queue"
         else
             # All dependencies resolved, add to order
-            _resolved="$_resolved$_current "
+            _resolved="$_resolved$_current_name "
             _order="$_order $_current"
 
             # Remove from processing since it's now resolved
-            _processing=$(echo "$_processing" | sed "s| $_current | |")
+            _processing=$(echo "$_processing" | sed "s# $_current_name # #")
 
             log_debug "Adding $_current to dependency graph"
         fi
     done
 
     log_debug "Dependency tree is: $_order"
+
+    # Return structs (or just package names if you prefer)
     trim_string_and_return "$_order"
 )
 
