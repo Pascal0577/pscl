@@ -29,7 +29,7 @@ remove_string_from_list() {
         fi
     done
 
-    trim_string_and_return "$_result"
+    "${_result# }"
 }
 
 reverse_string() {
@@ -59,6 +59,8 @@ list_of_dependencies_og() (
 # Takes in a list of package structs and returns a list of structs
 # that are dependencies of the input packages
 list_of_dependencies() (
+    result=""
+
     for _pkg in $1; do
         IFS='|' read -r _pkg_name _pkg_depth _pkg_type <<- EOF
             $_pkg
@@ -80,23 +82,23 @@ list_of_dependencies() (
             else
                 _dep_type="pkg"
             fi
-            result="${result:-} ${dep}|${_dep_depth}|${_dep_type}"
+            result="$result ${dep}|${_dep_depth}|${_dep_type}"
         done
 
         # Process optional, check, and build dependencies if needed
         "$OPT_DEPS" && for dep in $opt_deps; do
             [ -z "$dep" ] && continue 
-            result="${result:-} ${dep}|${_dep_depth}|opt"
+            result="$result ${dep}|${_dep_depth}|opt"
         done
 
         "$CHECK_DEPS" && for dep in $check_deps; do
             [ -z "$dep" ] && continue 
-            result="${result:-} ${dep}|${_dep_depth}|check"
+            result="$result ${dep}|${_dep_depth}|check"
         done
 
         "$BUILD_DEPS" && for dep in $build_deps; do
             [ -z "$dep" ] && continue 
-            result="${result:-} ${dep}|${_dep_depth}|build"
+            result="$result ${dep}|${_dep_depth}|build"
         done
     done
 
@@ -122,6 +124,7 @@ edit_field() (
     echo "${_return_string#|}"
 )
 
+# Dubious but fast, and it works as intended
 get_field() (
     _struct_list="$1"
     _field="$2"
@@ -149,10 +152,9 @@ get_dependency_tree() (
     _queue="$_initial_packages"
 
     while [ -n "$_queue" ]; do
-        _current=$(echo "$_queue" | awk '{print $1}')
-        _queue=$(echo "$_queue" | sed 's/^[^ ]* *//')
-
-        _current_name=$(get_field "$_current" 1)
+        _current="${_queue%% *}"
+        _queue="${_queue#"$_current" }"
+        _current_name="${_current%%|*}"
 
         if backend_is_installed "$_current" && [ "$INSTALL_FORCE" = 0 ]; then
             _resolved="$_resolved$_current_name "
@@ -181,7 +183,7 @@ get_dependency_tree() (
         _unresolved_deps=""
 
         for dep_struct in $_deps; do
-            dep_name=$(get_field "$dep_struct" 1)
+            dep_name="${dep_struct%%|*}"
             case $_resolved in
                 *" $dep_name "*) ;;
                 *)
@@ -207,7 +209,7 @@ get_dependency_tree() (
             _order="$_order $_current"
 
             # Remove from processing since it's now resolved
-            _processing=$(echo "$_processing" | sed "s# $_current_name # #")
+            _processing="$(remove_string_from_list "$_current_name" "$_processing")"
 
             log_debug "Adding $_current to dependency graph"
         fi
