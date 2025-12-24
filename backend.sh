@@ -558,7 +558,6 @@ backend_resolve_uninstall_order() (
     _tree="$(get_dependency_tree "$_requested_packages")"
 
     log_debug "Reversing tree"
-    # Reset and build reversed tree for this package
     _reversed_tree="$(reverse_string "$_tree")"
 
     log_debug "Creating uninstall order"
@@ -566,7 +565,6 @@ backend_resolve_uninstall_order() (
         _leaf_name="${leaf%%|*}"
         log_debug "Checking lead: $_leaf_name"
         
-        # Compare name to name
         string_is_in_list "$_leaf_name" "$_uninstall_order" && continue
 
         _rdeps_list=""
@@ -585,16 +583,13 @@ backend_resolve_uninstall_order() (
         log_debug "Reverse dependencies list is: $_rdeps_list"
         _should_uninstall=1
         for rdep in $_rdeps_list; do
+            [ -z "$_rdeps_list" ] && break
             if ! string_is_in_list "$rdep" "$_uninstall_order"; then
+                log_debug "Adding $leaf to uninstall order"
+                _uninstall_order="$_uninstall_order $_leaf_name"
                 _should_uninstall=0
-                break
             fi
         done
-
-        if [ "$_should_uninstall" = 1 ] && [ -n "$_rdeps_list" ]; then
-            log_debug "Adding $leaf to uninstall order"
-            _uninstall_order="$_uninstall_order $_leaf_name"  # Add name, not struct
-        fi
     done
 
     log_debug "Uninstall order is: $_uninstall_order"
