@@ -501,6 +501,8 @@ backend_resolve_uninstall_order() (
 
     log_debug "Creating dependency map"
     # First build a map of all installed packages and their dependencies
+    # We do this with asynchronous subshells to try to do it as fast as 
+    # possible
     while read -r installed_pkg; do
         (
             _pkginfo="${INSTALL_ROOT:-}/${METADATA_DIR:?}/$installed_pkg/PKGINFO"
@@ -531,21 +533,6 @@ backend_resolve_uninstall_order() (
     # Combine all outputs of the child processes
     _map="$(cat "$_map_dir"/* 2>/dev/null || true)"
 
-    _reverse_deps=""
-    # Checks if there is a package that has a dependency of the selected package
-    log_debug "Checking if package is still needed"
-    for _pkg_name in $_requested_packages; do
-        while IFS=":" read -r installed_pkg dep; do
-            if string_is_in_list "$_pkg_name" "$dep"; then
-                _reverse_deps="$_reverse_deps $installed_pkg"
-            fi
-        done <<- EOF
-		    $_map
-		EOF
-        [ -n "$_reverse_deps" ] && \
-            log_error "Cannot remove $_pkg_name: Needed by: $_reverse_deps"
-    done
-
     # If all of a dependency's reverse dependencies are in the uninstall
     # order, add the dependency to the uninstall order. We need to start
     # at the top of the tree which is why we use the reversed dependency tree 
@@ -556,17 +543,27 @@ backend_resolve_uninstall_order() (
 
     # Now we find the reverse dependencies of everything in the dependency tree
     _uninstall_order_temp="$_uninstall_order"
+    _reverse_deps=""
     for leaf in $_uninstall_order_temp; do
+        # If the leaf is one of the requested packages, build a list of
+        # its reverse dependencies so a helpful error message can be given
+        _track_rdeps="$(string_is_in_list "$leaf" "$_requested_packages")"
+        # shellcheck disable=SC2034
         while IFS=':' read -r pkg deps junk; do
-            # If one of the dependencies has a reverse dependency, remove it from 
+            # If one of the dependencies has a reverse dependency, remove it from
             # the uninstall order. We only want to remove packages with no 
             # reverse dependencies
             if string_is_in_list "$leaf" "$deps"; then
-                _uninstall_order="$(remove_string_from_list "$pkg" $_uninstall_order)"
+                [ "$_track_rdeps" = 0 ] && _reverse_deps="$_reverse_deps $deps"
+                _uninstall_order="$(remove_string_from_list "$pkg" "$_uninstall_order")"
             fi
         done <<- EOF
             ${_map:?}
 		EOF
+
+        # The aforementioned helpful error message
+        [ -n "$_reverse_deps" ] && \
+            log_error "Cannot remove $leaf: Needed by:$_reverse_deps"
     done
 
     log_debug "Uninstall order is: $_uninstall_order"
