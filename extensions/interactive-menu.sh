@@ -114,27 +114,25 @@ backend_ask_confirmation() (
     _prompt="$1"
     shift
     _package_struct_list="$*"
+    _package_struct_list="$(reverse_string "$_package_struct_list")"
 
     # The install/build order starts with deepest dependencies in the tree first
     # The interactive prompt expects the shallowest deps in the tree to be first
     # So we need to reverse the input and then reverse the prompt's output
     case "$_prompt" in
         install)
-            _package_struct_list="$(reverse_string "$_package_struct_list")"
-            _package_list="$(interactive_prompt "Select packages to install:" "$_package_struct_list")"
-            _package_list="$(reverse_string "$_package_list")"
+            _package_list="$(interactive_prompt "Select packages to install:" \
+                "$_package_struct_list")"
             ;;
         build)
-            _package_struct_list="$(reverse_string "$_package_struct_list")"
-            _package_list="$(interactive_prompt "Select packages to build:" "$_package_struct_list")"
-            _package_list="$(reverse_string "$_package_list")"
+            _package_list="$(interactive_prompt "Select packages to build:" \
+                "$_package_struct_list")"
             ;;
         uninstall)
-            _package_struct_list="$(reverse_string "$_package_struct_list")"
-            _package_list="$(interactive_prompt "Select packages to build:" "$_package_struct_list")"
-            _package_list="$(reverse_string "$_package_list")"
+            _package_list="$(interactive_prompt "Select packages to uninstall:" \
+                "$_package_struct_list")"
             ;;
     esac
 
-    echo "$_package_list"
+    reverse_string "$_package_list"
 )
