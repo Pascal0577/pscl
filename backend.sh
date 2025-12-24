@@ -497,7 +497,7 @@ backend_resolve_uninstall_order() (
     _job_count=0
     _max_job_nums="$(nproc)"
 
-    trap 'rm -rf ${_map_dir:?}' INT TERM EXIT
+    # trap 'rm -rf ${_map_dir:?}' INT TERM EXIT
 
     log_debug "Creating dependency map"
     # First build a map of all installed packages and their dependencies
@@ -510,7 +510,7 @@ backend_resolve_uninstall_order() (
                 log_error "Failed to source: $_pkginfo"
 
             _deps="${pkg_deps:-} ${opt_deps:-} ${build_deps:-} ${check_deps:-}"
-            _deps="${_deps# }"
+            _deps="$(trim_string_and_return "$_deps")"
 
             log_debug "Adding [$_deps] to map"
             # Print result to its own file to avoid race conditions
