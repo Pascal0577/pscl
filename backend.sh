@@ -206,6 +206,7 @@ backend_download_sources() (
 )
 
 backend_prepare_sources() (
+    [ "$CREATE_PACKAGE" = 0 ] && exit 0
     _package_list="$1"
     _sources=""
     _checksums=""
