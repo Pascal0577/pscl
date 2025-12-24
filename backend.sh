@@ -526,6 +526,7 @@ backend_resolve_uninstall_order() (
         fi
     done < "${INSTALL_ROOT:-}/${WORLD:?}"
     wait
+    sleep 1
 
     # Combine all outputs of the child processes
     _map="$(cat "$_map_dir"/* 2>/dev/null || true)"
