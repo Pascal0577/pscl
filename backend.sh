@@ -538,7 +538,6 @@ backend_resolve_uninstall_order() (
     # at the top of the tree which is why we use the reversed dependency tree 
     INSTALL_FORCE=1
     _tree="$(get_dependency_tree "$_requested_packages")"
-    _tree="$(reverse_string "$_tree")"
     _uninstall_order="$_tree"
 
     # Now we find the reverse dependencies of everything in the dependency tree
