@@ -3,7 +3,7 @@
 package_name="sed"
 package_version="4.9"
 package_description="Contains a stream editor"
-package_source="https://ftp.gnu.org/gnu/sed/sed-4.9.tar.xz 6aac9b2dbafcd5b7a67a8a9bcb8036c3"
+package_source="https://mirror.team-cymru.com/gnu/sed/sed-4.9.tar.xz 6aac9b2dbafcd5b7a67a8a9bcb8036c3"
 
 source_dir="$package_name-$package_version"
 

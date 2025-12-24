@@ -3,7 +3,7 @@
 package_name="dejagnu"
 package_version="1.6.3"
 package_description="Framework for running test suites"
-package_source="https://ftp.gnu.org/gnu/dejagnu/dejagnu-1.6.3.tar.gz 68c5208c58236eba447d7d6d1326b821"
+package_source="https://mirror.team-cymru.com/gnu/dejagnu/dejagnu-1.6.3.tar.gz 68c5208c58236eba447d7d6d1326b821"
 
 source_dir="$package_name-$package_version"
 
