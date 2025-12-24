@@ -514,7 +514,8 @@ backend_resolve_uninstall_order() (
 
             log_debug "Adding [$_deps] to map"
             # Print result to its own file to avoid race conditions
-            printf "%s:%s\n" "$installed_pkg" "$_deps" > "${_map_dir:?}/$$"
+            tmpfile=$(mktemp "${_map_dir:?}/file_XXXXXX")
+            printf "%s:%s\n" "$installed_pkg" "$_deps" > "$tmpfile"
         ) &
 
         _job_count=$((_job_count + 1))
