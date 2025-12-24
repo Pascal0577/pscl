@@ -512,6 +512,7 @@ backend_resolve_uninstall_order() (
             _deps="${pkg_deps:-} ${opt_deps:-} ${build_deps:-} ${check_deps:-}"
             _deps="${_deps# }"
 
+            log_debug "Adding [$_deps] to map"
             # Print result to its own file to avoid race conditions
             printf "%s:%s\n" "$installed_pkg" "$_deps" > "${_map_dir:?}/$$"
         ) &
@@ -567,8 +568,6 @@ backend_resolve_uninstall_order() (
         
         # Compare name to name
         string_is_in_list "$_leaf_name" "$_uninstall_order" && continue
-
-        log_debug "Map is: $_map"
 
         _rdeps_list=""
         while IFS=':' read -r pkg deps; do
