@@ -510,6 +510,7 @@ backend_resolve_uninstall_order() (
                 log_error "Failed to source: $_pkginfo"
 
             _deps="${pkg_deps:-} ${opt_deps:-} ${build_deps:-} ${check_deps:-}"
+            _deps="${_deps# }"
 
             # Print result to its own file to avoid race conditions
             printf "%s:%s\n" "$installed_pkg" "$_deps" > "${_map_dir:?}/$$"
@@ -527,6 +528,8 @@ backend_resolve_uninstall_order() (
 
     # Combine all outputs of the child processes
     _map="$(cat "$_map_dir"/* 2>/dev/null || true)"
+
+    log_debug "dependency map is: $_map"
 
     _reverse_deps=""
     # Checks if there is a package that has a dependency of the selected package
@@ -559,12 +562,29 @@ backend_resolve_uninstall_order() (
     _reversed_tree="$(reverse_string "$_tree")"
 
     log_debug "Creating uninstall order"
-    for dep in $_reversed_tree; do
-        # Skip if it's one of the requested packages (already in uninstall order)
-        string_is_in_list "$dep" "$_uninstall_order" && continue
+    for leaf in $_reversed_tree; do
+        _leaf_name="${leaf%%|*}"
         
-        _rdeps_list="$(echo "$_map" | awk -F: -v dep="$dep" '$1 == dep {print $2}')"
-        
+        # Compare name to name
+        string_is_in_list "$_leaf_name" "$_uninstall_order" && continue
+
+        log_debug "Map is: $_map"
+
+        _rdeps_list=""
+        while IFS=':' read -r pkg deps; do
+            pkg="$(trim_string_and_return "$pkg")"
+            deps="$(trim_string_and_return "$deps")"
+            log_debug "Package is: [$pkg]"
+            log_debug "dependencies are: [$deps]"
+            if string_is_in_list "$_leaf_name" "$deps"; then
+                log_debug "$pkg depends on $_leaf_name"
+                _rdeps_list="$_rdeps_list $pkg"
+            fi
+        done <<- EOF
+            ${_map:?}
+		EOF
+
+        log_debug "Reverse dependencies list is: $_rdeps_list"
         _should_uninstall=1
         for rdep in $_rdeps_list; do
             if ! string_is_in_list "$rdep" "$_uninstall_order"; then
@@ -572,10 +592,11 @@ backend_resolve_uninstall_order() (
                 break
             fi
         done
-        
-        [ "$_should_uninstall" = 1 ] && [ -n "$_rdeps_list" ] && \
-            log_debug "Adding $dep to uninstall order"
-            _uninstall_order="$_uninstall_order $dep"
+
+        if [ "$_should_uninstall" = 1 ] && [ -n "$_rdeps_list" ]; then
+            log_debug "Adding $leaf to uninstall order"
+            _uninstall_order="$_uninstall_order $_leaf_name"  # Add name, not struct
+        fi
     done
 
     log_debug "Uninstall order is: $_uninstall_order"
