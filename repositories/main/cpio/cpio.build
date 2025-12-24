@@ -3,7 +3,7 @@
 package_name="cpio"
 package_version="2.15"
 package_description=""
-package_source="https://mirror.team-cymru.com/gnu/cpio/cpio-2.15.tar.bz2 3394d444ca1905ea56c94b628b706a0b"
+package_source="https://ftp.gnu.org/gnu/cpio/cpio-2.15.tar.bz2 3394d444ca1905ea56c94b628b706a0b"
 
 source_dir="$package_name-$package_version"
 
