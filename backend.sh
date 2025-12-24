@@ -551,12 +551,27 @@ backend_resolve_uninstall_order() (
         # shellcheck disable=SC2034
         while IFS=':' read -r pkg deps junk; do
             # If one of the dependencies has a reverse dependency, remove it from
-            # the uninstall order. We only want to remove packages with no 
-            # reverse dependencies
+            # the uninstall order if any of those reverse dependencies are not
+            # already in the uninstall order. We only want to remove packages with no 
+            # external reverse dependencies
             if string_is_in_list "$_leaf_name" "$deps"; then
-                [ "$_track_rdeps" = 0 ] && _reverse_deps="$_reverse_deps $deps"
-                log_debug "Removing from uninstall order: $leaf"
-                _uninstall_order="$(remove_string_from_list "$leaf" "$_uninstall_order")"
+                case "$_uninstall_order" in
+                    *"$pkg|"*|*" $pkg|"*) continue ;;
+                    *)
+                        [ "$_track_rdeps" = 0 ] && _reverse_deps="$_reverse_deps $pkg"
+                        log_debug "Removing from uninstall order: $leaf"
+                        _uninstall_order="$(remove_string_from_list "$leaf" "$_uninstall_order")"
+                        break
+                        ;;
+                esac
+
+                if string_is_in_list "$pkg|*|*" "$_uninstall_order"; then
+                     continue
+                else
+                    [ "$_track_rdeps" = 0 ] && _reverse_deps="$_reverse_deps $deps"
+                    log_debug "Removing from uninstall order: $leaf"
+                    _uninstall_order="$(remove_string_from_list "$leaf" "$_uninstall_order")"
+                fi
             fi
         done <<- EOF
             ${_map:?}
