@@ -1,7 +1,7 @@
 #!/bin/sh
 
-# shellcheck source=stdlib.sh
-# shellcheck source=backend.sh
+# shellcheck source=./stdlib.sh
+# shellcheck source=./backend.sh
 
 readonly PKGDIR="${PKGDIR:-"$(realpath "$(dirname "$0")")"}"
 readonly METADATA_DIR="${PKGDIR}/metadata"
