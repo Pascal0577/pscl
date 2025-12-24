@@ -23,7 +23,7 @@ configure() {
         -D firstboot=false       \
         -D install-tests=false   \
         -D ldconfig=false        \
-        -D man=auto              \
+        -D man=false             \
         -D sysusers=false        \
         -D rpmmacrosdir=no       \
         -D homed=disabled        \
