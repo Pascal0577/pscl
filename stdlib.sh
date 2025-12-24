@@ -9,7 +9,6 @@ trim_string_and_return() {
 string_is_in_list() {
     _word="$1"
     shift
-    set -- $*
 
     for item in "$@"; do
         [ "$item" = "$_word" ] && return 0

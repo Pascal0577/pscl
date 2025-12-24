@@ -46,24 +46,27 @@ backend_is_installed() (
 # For now they are empty
 backend_get_package_name() (
     _pkg_list="$1"
+    _pkg_name_list=""
 
-    # Strips paths, .build and .tar extensions from input. Then append || to 
-    # "initialize" depth 0 and empty dep_type for the struct
+    # Get basename
     for pkg in $_pkg_list; do
-        _pkg_name_list="${_pkg_name_list:-} $(basename "$pkg" | sed 's/\.build$//' | sed 's/\.tar.*$//')|0|pkg"
+        _name="${pkg##*/}"
+        _name="${_name%.build}"
+        _name="${_name%.tar*}"
+
+        _pkg_name_list="$_pkg_name_list $_name|0|pkg"
     done
 
-    for pkg in $_pkg_name_list; do
-        _pkg_name="$(get_field "$pkg" 1)"
+    # Search all repos for it
+    for pkg_struct in $_pkg_name_list; do
+        _pkg_name="${pkg_struct%%|*}"
         _found=0
         for repo in $REPOSITORY_LIST; do
             [ -e "$repo/$_pkg_name/$_pkg_name.build" ] && _found=1 && break
         done
-        [ "${_found:-0}" = 0 ] && \
-            log_error "Package does not exist: $pkg"
+        [ "$_found" = 0 ] && log_error "Package does not exist: $_pkg_name"
     done
 
-    # Return a package "struct" with empty depth and dep_type fields
     trim_string_and_return "$_pkg_name_list"
 )
 
@@ -119,6 +122,7 @@ backend_download_sources() (
         log_debug "Using $_download_cmd"
         break
     done
+    [ -z "$_download_cmd" ] && log_error "No suitable download tools found"
 
     case "$_download_cmd" in
         wget|wget2)
@@ -130,14 +134,9 @@ backend_download_sources() (
             [ "$CERTIFICATE_CHECK" = 0 ] && _download_cmd="$_download_cmd -k"
             _download_cmd="$_download_cmd -L -O" ;;
     esac
-
-    [ -z "$_download_cmd" ] && log_error "No suitable download tools found"
     [ "$CERTIFICATE_CHECK" = 0 ] && log_warn "Certificate check disabled"
 
-    # Kill all child processes if we recieve an interrupt
-    # shellcheck disable=SC2154
     trap 'RUN_LOOP=false' INT TERM EXIT
-
     for source in $_source_list; do
         "${RUN_LOOP:-true}" || break
         case "$source" in
@@ -159,7 +158,7 @@ backend_download_sources() (
                     # modification from affecting what is removed by the trap.
                     # The trap ensures that no tarballs are partially downloaded 
                     # to the cache
-                    _file="$_tarball_name"
+                    readonly _file="$_tarball_name"
                     trap '
                     rm -f "${CACHE_DIR:?}/${_file:?}" 2>/dev/null
                     log_warn "Deleting cached download: $_file"' INT TERM EXIT
@@ -168,6 +167,21 @@ backend_download_sources() (
 
                     $_download_cmd "$source" || \
                         log_error "Failed to download: $source"
+
+                    # Verify checksums if enabled.
+                    # Compares every checksum to tarball
+                    if [ "$CHECKSUM_CHECK" = 1 ]; then
+                        log_debug "Verifying checksums"
+                        _md5sum="$(md5sum "$CACHE_DIR/$_file")"
+                        _md5sum="${_md5sum%% *}"
+                        _verified=0
+                        for checksum in $_checksums_list; do
+                            [ "$_md5sum" = "$checksum" ] && _verified=1 && break
+                        done
+                        [ "${_verified:?}" = 0 ] && \
+                            log_error "Checksum failed: $_file"
+                    fi
+
                     trap - INT TERM EXIT
                 ) &
                 _job_count=$((_job_count + 1))
@@ -185,21 +199,6 @@ backend_download_sources() (
 
     # Wait for the child processes to complete then remove the trap
     wait || log_error "A download failed"
-
-    # Verify checksums if enabled. Compares every checksum to every tarball
-    if [ "$CHECKSUM_CHECK" = 1 ]; then
-        log_debug "Verifying checksums"
-        for tarball in $_tarball_list; do
-            _md5sum="$(md5sum "$CACHE_DIR/$tarball" | awk '{print $1}')"
-            _verified=0
-            for checksum in $_checksums_list; do
-                [ "$_md5sum" = "$checksum" ] && _verified=1 && break
-            done
-            [ "${_verified:?}" = 0 ] && \
-                log_error "Checksum failed: $tarball"
-        done
-    fi
-
     trap - INT TERM EXIT
     return 0
 )
@@ -213,7 +212,7 @@ backend_prepare_sources() (
         log_debug "Package is: [$pkg]"
         _pkg_dir="$(backend_get_package_dir "$pkg")" ||
             log_error "Failed to get package dir for: $pkg"
-        _pkg_build="$(trim_string_and_return "${_pkg_dir}/${pkg}.build")"
+        _pkg_build="${_pkg_dir}/${pkg}.build"
 
         # shellcheck source=/dev/null
         . "$_pkg_build" || log_error "Failed to source: $_pkg_build"
@@ -221,8 +220,17 @@ backend_prepare_sources() (
         [ -z "${package_source:-}" ] && \
             log_error "package_source not defined in $_pkg_build"
 
-        _pkg_sources="$(echo "${package_source:?}" | awk '{print $1}')"
-        _pkg_checksums="$(echo "${package_source:?}" | awk '{print $2}')"
+        # Extract the list of sources and sums provided by the build script
+        _pkg_sources=""
+        _pkg_sums=""
+        while IFS=' ' read -r src sum junk; do
+            _pkg_sources="$_pkg_sources $src"
+            _pkg_sums="$_pkg_sums $sum"
+        done <<- EOF
+            ${package_source:?}
+		EOF
+        _pkg_sources="${_pkg_sources# }"
+        _pkg_sums="${_pkg_sums# }"
 
         # Skip package if ALL its sources already exist
         skip_pkg=true
@@ -240,12 +248,12 @@ backend_prepare_sources() (
         }
 
         _sources="$_sources $_pkg_sources"
-        _checksums="$_checksums $_pkg_checksums"
+        _checksums="$_checksums $_pkg_sums"
     done
 
     # Trim spaces
-    _sources="$(trim_string_and_return "$_sources")"
-    _checksums="$(trim_string_and_return "$_checksums")"
+    _sources="${_sources# }"
+    _checksums="${_checksums# }"
 
     log_debug "Sources are $_sources"
     log_debug "Sums are $_checksums"
@@ -306,10 +314,9 @@ backend_resolve_build_order() (
 
 backend_build_source() (
     _pkg="$1"
-    _pkg_dir="$(backend_get_package_dir "$_pkg")" || \
-        log_error "Failed to get package directory for: $_pkg"
     _pkg_build="$(backend_get_package_build "$_pkg")" || \
         log_error "Failed to get build script for: $_pkg"
+    _pkg_dir="${_pkg_build%/*}"
 
     # shellcheck source=/dev/null
     . "$(realpath "$_pkg_build")" || \
@@ -317,16 +324,16 @@ backend_build_source() (
 
     # These come from the packages build script
     _pkg_name="${package_name:?}"
-    _build_dir="/${PKGDIR:?}/build/$_pkg_name"
-    _url_list="$(echo "$package_source" | awk '{print $1}')"
-    _needed_tarballs=""
+    _build_dir="${PKGDIR:?}/build/$_pkg_name"
+
+    while read -r url sum junk; do
+        _needed_tarballs="$_needed_tarballs ${url##*/}"
+    done <<- EOF
+        ${package_source:?}
+	EOF
+    _needed_tarballs="${_needed_tarballs# }"
 
     trap '[ "$DO_CLEANUP" = 1 ] && rm -rf ${_build_dir:?}' INT TERM EXIT
-
-    for url in $_url_list; do
-        _needed_tarballs="$_needed_tarballs ${url##*/}"
-    done
-    _needed_tarballs="$(echo "$_needed_tarballs" | xargs)"
 
     # Create build directory and cd to it
     mkdir -p "$_build_dir"
@@ -346,16 +353,20 @@ backend_build_source() (
         cp -a "$patch" "$_build_dir"
     done
 
-    # These commands are provided by the build script which was sourced in main_build
-    log_debug "Building package"
-    _pkg_creation_dir="$(realpath "$_build_dir/package")"
+    # Create staging directory
+    _pkg_creation_dir="$_build_dir/package"
     mkdir -p "$_pkg_creation_dir"
     export DESTDIR="$_pkg_creation_dir"
     log_debug "DESTDIR is: $DESTDIR"
+
+    # The configure, build, and install_files
+    # functions are provided by the build script
+    # The install_files function respects DESTDIR
+    log_debug "Building package"
     configure || log_error "Configure failed!"
     build || log_error "Build failed!"
     install_files || log_error "Installing files to package creation dir failed!"
-    
+
     trap - INT TERM EXIT
 )
 
