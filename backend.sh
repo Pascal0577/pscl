@@ -564,12 +564,14 @@ backend_resolve_uninstall_order() (
     log_debug "Creating uninstall order"
     for leaf in $_reversed_tree; do
         _leaf_name="${leaf%%|*}"
+        log_debug "Checking lead: $_leaf_name"
         
         # Compare name to name
         string_is_in_list "$_leaf_name" "$_uninstall_order" && continue
 
         _rdeps_list=""
         while IFS=':' read -r pkg deps; do
+            pkg="$(trim_string_and_return "$pkg")"
             log_debug "Package is: [$pkg]"
             log_debug "dependencies are: [$deps]"
             if IFS=' ' string_is_in_list "$_leaf_name" "$deps"; then
