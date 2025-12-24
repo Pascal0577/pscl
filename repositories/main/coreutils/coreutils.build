@@ -3,7 +3,7 @@
 package_name="coreutils"
 package_version="9.7"
 package_description="Basic utility programs needed by every operating system"
-package_source="https://ftp.gnu.org/gnu/coreutils/coreutils-9.7.tar.xz 6b7285faf7d5eb91592bdd689270d3f1"
+package_source="https://mirror.team-cymru.com/gnu/coreutils/coreutils-9.7.tar.xz 6b7285faf7d5eb91592bdd689270d3f1"
 
 source_dir="$package_name-$package_version"
 
