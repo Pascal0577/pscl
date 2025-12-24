@@ -3,7 +3,7 @@
 package_name="glibc"
 package_version="2.42"
 package_description="GNU C Libraries"
-package_source="https://ftp.gnu.org/gnu/glibc/glibc-2.42.tar.xz 23c6f5a27932b435cae94e087cb8b1f5"
+package_source="https://ftpmirror.gnu.org/glibc/glibc-2.42.tar.xz 23c6f5a27932b435cae94e087cb8b1f5"
 
 source_dir="glibc-2.42"
 
