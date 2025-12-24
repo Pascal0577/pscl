@@ -288,23 +288,16 @@ main_install() (
         log_error "Failed to prepare sources"
 
     log_debug "Install order is: $_install_order"
-    _install_order_temp="$_install_order"
-    for pkg in $_install_order_temp; do
+    for pkg in $_install_order; do
         log_debug "Checking if we should build $pkg"
         if backend_want_to_build_package "$pkg"; then
             log_debug "We should! Trying to build package: $pkg"
             build_package "$pkg" || log_error "Failed to build: $pkg"
-            # Some packages may be build dependencies of others,
-            # so we need to install everything in order right now
             install_package "$pkg" || log_error "Failed to install: $pkg"
-            remove_string_from_list "$pkg" "$_install_order"
+        else
+            log_debug "Installing package: $pkg"
+            install_package "$pkg" || log_error "Failed to install: $pkg"
         fi
-    done
-
-    # Install all packages
-    for pkg in $_install_order; do
-        log_debug "Installing package: $pkg"
-        install_package "$pkg" || log_error "Failed to install: $pkg"
     done
 )
 
