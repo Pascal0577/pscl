@@ -492,13 +492,12 @@ backend_resolve_uninstall_order() (
     _requested_packages="$*"
     _uninstall_order=""
 
-    _map_file="$(mktemp)"
     _map_dir="$(mktemp -d)"
 
     _job_count=0
     _max_job_nums="$(nproc)"
 
-    trap 'rm -rf ${_map_file:?} ${_map_dir:?} || true' INT TERM EXIT
+    trap 'rm -rf ${_map_dir:?}' INT TERM EXIT
 
     log_debug "Creating dependency map"
     # First build a map of all installed packages and their dependencies
@@ -527,11 +526,9 @@ backend_resolve_uninstall_order() (
     wait
 
     # Combine all outputs of the child processes
-    cat "$_map_dir"/* > "$_map_file" 2>/dev/null
-    _map="$(cat "$_map_file")"
+    _map="$(cat "$_map_dir"/* 2>/dev/null || true)"
 
     _reverse_deps=""
-
     # Checks if there is a package that has a dependency of the selected package
     log_debug "Checking if package is still needed"
     for _pkg_name in $_requested_packages; do
@@ -541,7 +538,7 @@ backend_resolve_uninstall_order() (
                 _reverse_deps_temp="${_reverse_deps_temp:-} $installed_pkg"
             fi
         done <<- EOF
-		$_map
+		    $_map
 		EOF
         [ -n "$_reverse_deps_temp" ] && \
             log_error "Cannot remove $_pkg_name: Needed by: $_reverse_deps_temp"
@@ -559,9 +556,7 @@ backend_resolve_uninstall_order() (
 
     log_debug "Reversing tree"
     # Reset and build reversed tree for this package
-    for dep in $_tree; do
-        _reversed_tree="${_reversed_tree:-} $dep"
-    done
+    _reversed_tree="$(reverse_string "$_tree")"
 
     log_debug "Creating uninstall order"
     for dep in $_reversed_tree; do
