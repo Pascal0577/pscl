@@ -287,8 +287,20 @@ main_install() (
     backend_prepare_sources "$_install_order" || \
         log_error "Failed to prepare sources"
 
-    log_debug "Install order is: $_install_order"
+    _install_order_no_build_deps="$_install_order"
+    # We need to go through and install all build dependencies to the host
     for pkg in $_install_order; do
+        if [ "$(get_field "$pkg" 3)" = "build" ]; then
+            build_package "$pkg" || log_error "Failed to build: $pkg"
+            INSTALL_ROOT="" install_package "$pkg" || \
+                log_error "Failed to install: $pkg"
+            _install_order_no_build_deps="$(remove_string_from_list \
+                "$pkg" "$_install_order_no_build_deps")"
+        fi
+    done
+
+    log_debug "Install order is: $_install_order"
+    for pkg in $(get_field "$_install_order_no_build_deps" 1); do
         log_debug "Checking if we should build $pkg"
         if backend_want_to_build_package "$pkg"; then
             log_debug "We should! Trying to build package: $pkg"
