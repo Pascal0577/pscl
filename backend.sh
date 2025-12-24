@@ -555,6 +555,7 @@ backend_resolve_uninstall_order() (
             # reverse dependencies
             if string_is_in_list "$_leaf_name" "$deps"; then
                 [ "$_track_rdeps" = 0 ] && _reverse_deps="$_reverse_deps $deps"
+                log_debug "Removing from uninstall order: $leaf"
                 _uninstall_order="$(remove_string_from_list "$leaf" "$_uninstall_order")"
             fi
         done <<- EOF
