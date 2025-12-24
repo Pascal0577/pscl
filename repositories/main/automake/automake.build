@@ -3,7 +3,7 @@
 package_name="automake"
 package_version="1.18.1"
 package_description="Programs for generating Makefiles for use with Autoconf"
-package_source="https://mirror.team-cymru.com/gnu/automake/automake-1.18.1.tar.xz cea31dbf1120f890cbf2a3032cfb9a68"
+package_source="https://ftp.gnu.org/gnu/automake/automake-1.18.1.tar.xz cea31dbf1120f890cbf2a3032cfb9a68"
 
 source_dir="$package_name-$package_version"
 
