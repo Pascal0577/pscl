@@ -448,8 +448,8 @@ main_query() (
 
 load_extensions() {
 
-    . ./stdlib.sh || exit 1
-    . ./backend.sh || log_error "Failed to load backend"
+    . "${PKGDIR}/stdlib.sh" || exit 1
+    . "${PKGDIR}/backend.sh" || log_error "Failed to load backend"
 
     [ -d "$EXTENSION_DIR" ] || \
         log_warn "Extenstion directory does not exist: $EXTENSION_DIR"
