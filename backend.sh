@@ -497,7 +497,7 @@ backend_resolve_uninstall_order() (
     _job_count=0
     _max_job_nums="$(nproc)"
 
-    # trap 'rm -rf ${_map_dir:?}' INT TERM EXIT
+    trap 'rm -rf ${_map_dir:?}' INT TERM EXIT
 
     log_debug "Creating dependency map"
     # First build a map of all installed packages and their dependencies
@@ -527,12 +527,9 @@ backend_resolve_uninstall_order() (
         fi
     done < "${INSTALL_ROOT:-}/${WORLD:?}"
     wait
-    sleep 1
 
     # Combine all outputs of the child processes
     _map="$(cat "$_map_dir"/* 2>/dev/null || true)"
-
-    log_debug "dependency map is: $_map"
 
     _reverse_deps=""
     # Checks if there is a package that has a dependency of the selected package
@@ -573,11 +570,9 @@ backend_resolve_uninstall_order() (
 
         _rdeps_list=""
         while IFS=':' read -r pkg deps; do
-            pkg="$(trim_string_and_return "$pkg")"
-            deps="$(trim_string_and_return "$deps")"
             log_debug "Package is: [$pkg]"
             log_debug "dependencies are: [$deps]"
-            if string_is_in_list "$_leaf_name" "$deps"; then
+            if IFS=' ' string_is_in_list "$_leaf_name" "$deps"; then
                 log_debug "$pkg depends on $_leaf_name"
                 _rdeps_list="$_rdeps_list $pkg"
             fi
