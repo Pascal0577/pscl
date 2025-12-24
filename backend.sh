@@ -574,7 +574,7 @@ backend_resolve_uninstall_order() (
             pkg="$(trim_string_and_return "$pkg")"
             log_debug "Package is: [$pkg]"
             log_debug "dependencies are: [$deps]"
-            if IFS=' ' string_is_in_list "$_leaf_name" "$deps"; then
+            if IFS=' ' string_is_in_list "$_leaf_name" $deps; then
                 log_debug "$pkg depends on $_leaf_name"
                 _rdeps_list="$_rdeps_list $pkg"
             fi
