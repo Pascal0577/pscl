@@ -348,8 +348,9 @@ main_build() (
         return 0
     fi
 
-    backend_ask_confirmation build "$_build_order" || \
+    _build_order="$(backend_ask_confirmation build "$_build_order")" || \
         log_error "Not proceeding"
+    _build_order="$(get_field "$_build_order" 1)"
 
     log_debug "Preparing sources"
     backend_prepare_sources "$_build_order" || \
@@ -409,6 +410,8 @@ main_uninstall() (
         return 0
     fi
 
+    _uninstall_order="$(get_field "$_uninstall_order" 1)"
+
     for pkg in $_uninstall_order; do
         log_debug "Uninstalling package: $pkg"
         uninstall_package "$pkg" || log_error "Failed to uninstall: $pkg"
@@ -418,8 +421,10 @@ main_uninstall() (
 main_activation() (
     _requested_packages="$*"
 
-    backend_ask_confirmation activation "$_requested_packages" || \
+    _activation_order="$(backend_ask_confirmation activation "$_requested_packages")" || \
         log_error "Not proceeding"
+
+    _activation_order="$(get_field "$_activation_order" 1)"
 
     if [ "$ACTIVATION" = "up" ]; then
         backend_activate_package "$_requested_packages"
