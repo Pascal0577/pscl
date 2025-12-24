@@ -1,5 +1,7 @@
 #!/bin/sh
 
+# shellcheck disable=SC3045
+
 ###########
 # Helpers #
 ###########
@@ -160,7 +162,7 @@ backend_download_sources() (
                     # to the cache
                     readonly _file="$_tarball_name"
                     trap '
-                    rm -f "${CACHE_DIR:?}/${_file:?}" 2>/dev/null
+                    rm -f "${CACHE_DIR:?}/${_file:?}" 2>/dev/null || true
                     log_warn "Deleting cached download: $_file"' INT TERM EXIT
 
                     cd "${PKGDIR:?}/source_cache" || true
@@ -491,23 +493,21 @@ backend_activate_package() (
 backend_resolve_uninstall_order() (
     _requested_packages="$*"
     _uninstall_order=""
-
     _map_dir="$(mktemp -d)"
-
     _job_count=0
     _max_job_nums="$(nproc)"
 
     trap 'rm -rf ${_map_dir:?}' INT TERM EXIT
-
-    log_debug "Creating dependency map"
     # First build a map of all installed packages and their dependencies
     # We do this with asynchronous subshells to try to do it as fast as 
     # possible
+    log_debug "Creating dependency map"
     while read -r installed_pkg; do
         (
             _pkginfo="${INSTALL_ROOT:-}/${METADATA_DIR:?}/$installed_pkg/PKGINFO"
             [ -f "$_pkginfo" ] || exit 0
 
+            # shellcheck source=/dev/null
             . "$_pkginfo" || \
                 log_error "Failed to source: $_pkginfo"
 
@@ -538,24 +538,24 @@ backend_resolve_uninstall_order() (
     # at the top of the tree which is why we use the reversed dependency tree 
     INSTALL_FORCE=1
     _tree="$(get_dependency_tree "$_requested_packages")"
-    _reversed_tree="$(reverse_string "$_tree")"
-    _uninstall_order="$(get_field "$_reversed_tree" 1)"
+    _uninstall_order="$_tree"
 
     # Now we find the reverse dependencies of everything in the dependency tree
-    _uninstall_order_temp="$_uninstall_order"
     _reverse_deps=""
-    for leaf in $_uninstall_order_temp; do
+    for leaf in $_tree; do
+        _leaf_name="${leaf%%|*}"
         # If the leaf is one of the requested packages, build a list of
         # its reverse dependencies so a helpful error message can be given
-        _track_rdeps="$(string_is_in_list "$leaf" "$_requested_packages")"
+        string_is_in_list "$_leaf_name" "$_requested_packages" && \
+            _track_rdeps=0 || _track_rdeps=1
         # shellcheck disable=SC2034
         while IFS=':' read -r pkg deps junk; do
             # If one of the dependencies has a reverse dependency, remove it from
             # the uninstall order. We only want to remove packages with no 
             # reverse dependencies
-            if string_is_in_list "$leaf" "$deps"; then
+            if string_is_in_list "$_leaf_name" "$deps"; then
                 [ "$_track_rdeps" = 0 ] && _reverse_deps="$_reverse_deps $deps"
-                _uninstall_order="$(remove_string_from_list "$pkg" "$_uninstall_order")"
+                _uninstall_order="$(remove_string_from_list "$leaf" "$_uninstall_order")"
             fi
         done <<- EOF
             ${_map:?}
@@ -578,8 +578,10 @@ backend_unactivate_package() (
     _package_metadata_dir="${INSTALL_ROOT:-}/$METADATA_DIR/$_pkg"
     _pkgfiles="$(sort -r "$_package_metadata_dir/PKGFILES")"
 
-    # Remove files in reverse order (deepest first)
-    echo "$_pkgfiles" | while IFS= read -r file; do
+    # We need to remove individual files first, and then do a second pass
+    # to remove empty directories to avoid race conditions. Despite having
+    # to run the loop twice, it is indeed faster than doing it synchronously
+    while IFS= read -r file; do
     (
         _full_path="${INSTALL_ROOT:-}/$file"
         if [ -f "$_full_path" ] || [ -L "$_full_path" ]; then
@@ -587,10 +589,12 @@ backend_unactivate_package() (
             rm "${_full_path:?}" || log_warn "Failed to remove: $_full_path"
         fi
     ) &
-    done
+    done <<- EOF
+        $_pkgfiles
+	EOF
     wait
     
-    echo "$_pkgfiles" | while IFS= read -r file; do
+    while IFS= read -r file; do
     (
         _full_path="${INSTALL_ROOT:-}/$file"
         if [ -d "$_full_path" ]; then
@@ -602,7 +606,9 @@ backend_unactivate_package() (
             fi
         fi
     ) &
-    done
+    done <<- EOF
+        $_pkgfiles
+	EOF
     wait
 )
 

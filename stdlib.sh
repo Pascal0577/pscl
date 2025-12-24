@@ -23,9 +23,12 @@ remove_string_from_list() {
 
     _result=""
     for word in $_list; do
-        if [ "$word" != "$_string" ]; then
-            _result="$_result $word"
-        fi
+        # We specifically want pattern matching
+        # shellcheck disable=SC2254
+        case "$word" in
+            $_string) ;;
+            *) _result="$_result $word" ;;
+        esac
     done
 
     echo "${_result# }"
