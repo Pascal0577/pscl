@@ -1,5 +1,41 @@
 #!/bin/sh
 
+readonly red="\x1b[31m"
+readonly blue="\x1b[34m"
+readonly yellow="\x1b[33m"
+readonly def="\x1b[39m"
+
+# shellcheck disable=SC3028
+# shellcheck disable=SC3054
+# shellcheck disable=SC2154
+log_error() {
+    if [ -n "${BASH_VERSION+x}" ]; then
+        _msg_prefix=" In ${FUNCNAME[1]}: (line ${BASH_LINENO[0]})"
+    elif [ -n "${ZSH_VERSION+x}" ]; then
+        _msg_prefix=" In ${funcstack[2]}:"
+    fi
+
+    printf "%b[ERROR]%b%s: %s\n" "$red" "$def" "${_msg_prefix:-}" "$1" >&2
+    exit 1
+}
+
+# shellcheck disable=SC3028
+# shellcheck disable=SC3054
+log_debug() {
+    [ "$VERBOSE" = 0 ] && return 0
+    if [ -n "${BASH_VERSION+x}" ]; then
+        _msg_prefix=" In ${FUNCNAME[1]}: (line ${BASH_LINENO[0]})"
+    elif [ -n "${ZSH_VERSION+x}" ]; then
+        _msg_prefix=" In ${funcstack[2]}:"
+    fi
+
+    printf "%b[DEBUG]%b%s: %s\n" "$blue" "$def" "${_msg_prefix:-}" "$1" >&2
+}
+
+log_warn() {
+    printf "%b[WARNING]%b: %s\n" "$yellow" "$def" "$1" >&2
+}
+
 trim_string_and_return() {
     set -f
     set -- $*
