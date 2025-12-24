@@ -130,7 +130,9 @@ backend_ask_confirmation() (
             _package_list="$(reverse_string "$_package_list")"
             ;;
         uninstall)
-            _package_list="$(interactive_prompt "Select packages to uninstall:" "$_package_struct_list")"
+            _package_struct_list="$(reverse_string "$_package_struct_list")"
+            _package_list="$(interactive_prompt "Select packages to build:" "$_package_struct_list")"
+            _package_list="$(reverse_string "$_package_list")"
             ;;
     esac
 
