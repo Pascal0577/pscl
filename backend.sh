@@ -550,6 +550,7 @@ backend_resolve_uninstall_order() (
             _track_rdeps=0 || _track_rdeps=1
         # shellcheck disable=SC2034
         while IFS=':' read -r pkg deps junk; do
+            pkg="$(trim_string_and_return "$pkg")"
             # If one of the dependencies has a reverse dependency, remove it from
             # the uninstall order if any of those reverse dependencies are not
             # already in the uninstall order. We only want to remove packages with no 
