@@ -579,6 +579,7 @@ backend_resolve_uninstall_order() (
         done <<- EOF
             ${_map:?}
 		EOF
+        _rdeps_list="${_rdeps_list# }"
 
         log_debug "Reverse dependencies list is: $_rdeps_list"
         _should_uninstall=1
