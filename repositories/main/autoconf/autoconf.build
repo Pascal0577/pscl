@@ -3,7 +3,7 @@
 package_name="autoconf"
 package_version="2.72"
 package_description="Programs for producing shell scripts that can automatically configure source code"
-package_source="https://ftp.gnu.org/gnu/autoconf/autoconf-2.72.tar.xz 1be79f7106ab6767f18391c5e22be701"
+package_source="https://mirror.team-cymru.com/gnu/autoconf/autoconf-2.72.tar.xz 1be79f7106ab6767f18391c5e22be701"
 
 source_dir="$package_name-$package_version"
 
