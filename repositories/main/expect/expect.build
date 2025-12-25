@@ -25,6 +25,6 @@ build() {
 
 install_files() {
     make install
-    mkdir "$DESTDIR/usr/lib"
+    mkdir -p "$DESTDIR/usr/lib"
     ln -sf expect5.45.4/libexpect5.45.4.so "$DESTDIR/usr/lib"
 }
