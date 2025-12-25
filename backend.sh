@@ -380,7 +380,7 @@ backend_create_package() (
     _pkg_build="$(backend_get_package_build "$_pkg")" || \
         log_error "Failed to get build script for: $_pkg"
 
-    _post_install_script="$(get_package_dir "$_pkg")/post-install.sh"
+    _post_install_script="$(backeend_get_package_dir "$_pkg")/post-install.sh"
     log_debug "Looking for post-install script: $_post_install_script"
     if [ -f "$_post_install_script" ]; then
         mv "$_post_install_script" "$_build_dir"
