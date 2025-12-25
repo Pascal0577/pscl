@@ -3,7 +3,7 @@
 package_name="e2fsprogs"
 package_version="1.47.3"
 package_description="the utilities for handling the ext2 file system. It also supports the ext3 and ext4 journaling file systems"
-package_source="https://downloads.sourceforge.net/project/e2fsprogs/e2fsprogs/v1.47.3/e2fsprogs-1.47.3.tar.gz b8509610cde6a7448a4ed2d869b5dc67"
+package_source="https://downloads.sourceforge.net/project/e2fsprogs/e2fsprogs/v1.47.3/e2fsprogs-1.47.3.tar.gz 113d7a7ee0710d2a670a44692a35fd2e"
 
 source_dir="$package_name-$package_version"
 
