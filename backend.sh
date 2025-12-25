@@ -384,7 +384,7 @@ backend_create_package() (
     log_debug "Looking for post-install script: $_post_install_script"
     if [ -f "$_post_install_script" ]; then
         log_debug "Found post-install script"
-        mv "$_post_install_script" "$_build_dir"
+        cp -a "$_post_install_script" "$_build_dir"
     fi
 
     # shellcheck source=/dev/null
@@ -474,7 +474,7 @@ backend_activate_package() (
     _post_install_script="${_pkg_install_dir}/post-install.sh"
     log_debug "Looking for post-install script: $_post_install_script"
     if [ -f "$_post_install_script" ]; then
-        mv "$_post_install_script" "$_data_dir"
+        cp -a "$_post_install_script" "$_data_dir"
         register_hook post_install "$_post_install_script"
     fi
 
