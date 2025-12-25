@@ -3,7 +3,7 @@
 package_name="lz4"
 package_version="1.10.0"
 package_description="A speedy compression and decompression algorithm"
-package_source="https://github.com/lz4/lz4/releases/download/v1.10.0/lz4-1.10.0.tar.gz d41d8cd98f00b204e9800998ecf8427e"
+package_source="https://github.com/lz4/lz4/releases/download/v1.10.0/lz4-1.10.0.tar.gz dead9f5f1966d9ae56e1e32761e4e675"
 
 source_dir="$package_name-$package_version"
 

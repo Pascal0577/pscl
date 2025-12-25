@@ -3,7 +3,7 @@
 package_name="expect"
 package_version="5.45.4"
 package_description="Tools for automating, via scripted dialogues, interactive applications"
-package_source="https://prdownloads.sourceforge.net/expect/expect5.45.4.tar.gz 18de38a9c769da4667a0898e1dfc0fa7"
+package_source="https://prdownloads.sourceforge.net/expect/expect5.45.4.tar.gz 00fce8de158422f5ccd2666512329bd2"
 
 source_dir="$package_name$package_version"
 

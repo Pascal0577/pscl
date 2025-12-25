@@ -3,7 +3,7 @@
 package_name="tcl"
 package_version="8.6.16"
 package_description="Installed for test suites"
-package_source="https://downloads.sourceforge.net/tcl/tcl8.6.16-src.tar.gz ba54dcda86caf30d1bd42a6573e77d17"
+package_source="https://downloads.sourceforge.net/tcl/tcl8.6.16-src.tar.gz eaef5d0a27239fb840f04af8ec608242"
 
 source_dir="$package_name$package_version"
 
