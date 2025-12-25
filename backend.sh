@@ -317,9 +317,9 @@ backend_resolve_build_order() (
 
 backend_build_source() (
     _pkg="$1"
-    _pkg_build="$(backend_get_package_build "$_pkg")" || \
-        log_error "Failed to get build script for: $_pkg"
-    _pkg_dir="${_pkg_build%/*}"
+    _pkg_dir="$(backend_get_package_dir "$_pkg")" || \
+        log_error "Failed to get package directory: $_pkg"
+    _pkg_build="${_pkg_dir}/${_pkg}.build"
 
     # shellcheck source=/dev/null
     . "$(realpath "$_pkg_build")" || \
@@ -360,6 +360,7 @@ backend_build_source() (
     _pkg_creation_dir="$_build_dir/package"
     mkdir -p "$_pkg_creation_dir"
     export DESTDIR="$_pkg_creation_dir"
+    export PKGROOT="$_pkg_dir"
     log_debug "DESTDIR is: $DESTDIR"
 
     # The configure, build, and install_files
