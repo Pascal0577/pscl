@@ -3,7 +3,7 @@
 package_name="iana-etc"
 package_version="20250807"
 package_description="/etc/protocols and /etc/services"
-package_source="https://github.com/Mic92/iana-etc/releases/download/20250807/iana-etc-20250807.tar.gz d41d8cd98f00b204e9800998ecf8427e"
+package_source="https://github.com/Mic92/iana-etc/releases/download/20250807/iana-etc-20250807.tar.gz de0a909103d4ff59d1424c5ec7ac9e4a"
 
 source_dir="iana-etc-20250807"
 
