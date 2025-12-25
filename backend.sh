@@ -394,10 +394,10 @@ backend_create_package() (
     cat >| "$_build_dir/PKGINFO" <<- EOF
 		package_name=${package_name:?}
 		package_version=${package_version:-unknown}
-		pkg_deps=${pkg_deps:-}
-		opt_deps=${opt_deps:-}
-		build_deps=${build_deps:-}
-		check_deps=${check_deps:-}
+		pkg_deps="${pkg_deps:-}"
+		opt_deps="${opt_deps:-}"
+		build_deps="${build_deps:-}"
+		check_deps="${check_deps:-}"
 		builddate=$(date +%s)
 		source="$(echo "$package_source" | awk '{print $1}')"
 	EOF
