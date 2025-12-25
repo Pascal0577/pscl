@@ -3,7 +3,7 @@
 package_name="texinfo"
 package_version="7.2"
 package_description="Programs for reading, writing, and converting info pages"
-package_source="https://ftp.gnu.org/gnu/texinfo/texinfo-7.2.tar.xz 11939a7624572814912a18e76c8d8972"
+package_source="https://ftpmirror.gnu.org/texinfo/texinfo-7.2.tar.xz 11939a7624572814912a18e76c8d8972"
 
 source_dir="$package_name-$package_version"
 

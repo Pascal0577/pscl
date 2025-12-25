@@ -3,7 +3,7 @@
 package_name="patch"
 package_version="2.8"
 package_description="A program for modifying or creating files by applying a “patch” file typically created by the diff program"
-package_source="https://ftp.gnu.org/gnu/patch/patch-2.8.tar.xz 149327a021d41c8f88d034eab41c039f"
+package_source="https://ftpmirror.gnu.org/patch/patch-2.8.tar.xz 149327a021d41c8f88d034eab41c039f"
 
 source_dir="$package_name-$package_version"
 

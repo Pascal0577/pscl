@@ -3,7 +3,7 @@
 package_name="gettext"
 package_version="0.26"
 package_description="Utilities for internationalization and localization"
-package_source="https://ftp.gnu.org/gnu/gettext/gettext-0.26.tar.xz 8e14e926f088e292f5f2bce95b81d10e"
+package_source="https://ftpmirror.gnu.org/gettext/gettext-0.26.tar.xz 8e14e926f088e292f5f2bce95b81d10e"
 
 source_dir="$package_name-$package_version"
 
