@@ -4,7 +4,7 @@
 package_name="markupsafe"
 package_version="3.0.2"
 package_description="a Python module that implements an XML/HTML/XHTML Markup safe string"
-package_source="https://pypi.org/packages/source/M/MarkupSafe/markupsafe-3.0.2.tar.gz c4b03aebf52fd043c763b575f0530217"
+package_source="https://pypi.org/packages/source/M/MarkupSafe/markupsafe-3.0.2.tar.gz cb0071711b573b155cc8f86e1de72167"
 
 build_deps="python3"
 
