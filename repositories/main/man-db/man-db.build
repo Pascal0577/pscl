@@ -3,7 +3,7 @@
 package_name="man-db"
 package_version="2.13.1"
 package_description="programs for finding and viewing man pages"
-package_source="https://download.savannah.gnu.org/releases/man-db/man-db-2.13.1.tar.xz d41d8cd98f00b204e9800998ecf8427e"
+package_source="https://download.savannah.gnu.org/releases/man-db/man-db-2.13.1.tar.xz b6335533cbeac3b24cd7be31fdee8c83"
 
 source_dir="$package_name-$package_version"
 
