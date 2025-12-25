@@ -4,7 +4,7 @@
 package_name="p11-kit"
 package_version="0.25.10"
 package_description=""
-package_source="https://github.com/p11-glue/p11-kit/releases/download/0.25.10/p11-kit-0.25.10.tar.xz d41d8cd98f00b204e9800998ecf8427e"
+package_source="https://github.com/p11-glue/p11-kit/releases/download/0.25.10/p11-kit-0.25.10.tar.xz 46fb4aa4faf0e18c036715f103e6c429"
 
 pkg_deps="libtasn1"
 

@@ -4,7 +4,7 @@
 package_name="libpsl"
 package_version="0.21.5"
 package_description="A library for accessing and resolving information from the Public Suffix List"
-package_source="https://github.com/rockdaboot/libpsl/releases/download/0.21.5/libpsl-0.21.5.tar.gz d41d8cd98f00b204e9800998ecf8427e"
+package_source="https://github.com/rockdaboot/libpsl/releases/download/0.21.5/libpsl-0.21.5.tar.gz 870a798ee9860b6e77896548428dba7b"
 
 build_deps="meson ninja"
 
