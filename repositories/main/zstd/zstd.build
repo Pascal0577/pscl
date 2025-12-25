@@ -3,7 +3,7 @@
 package_name="zstd"
 package_version="1.5.7"
 package_description="Zstd compression library"
-package_source="https://github.com/facebook/zstd/releases/download/v1.5.7/zstd-1.5.7.tar.gz d41d8cd98f00b204e9800998ecf8427e"
+package_source="https://github.com/facebook/zstd/releases/download/v1.5.7/zstd-1.5.7.tar.gz 780fc1896922b1bc52a4e90980cdda48"
 
 source_dir="$package_name-$package_version"
 

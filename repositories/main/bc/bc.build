@@ -3,7 +3,7 @@
 package_name="bc"
 package_version="7.0.3"
 package_description="An arbitrary precision numeric processing language"
-package_source="https://github.com/gavinhoward/bc/releases/download/7.0.3/bc-7.0.3.tar.xz d41d8cd98f00b204e9800998ecf8427e"
+package_source="https://github.com/gavinhoward/bc/releases/download/7.0.3/bc-7.0.3.tar.xz ad4db5a0eb4fdbb3f6813be4b6b3da74"
 
 source_dir="$package_name-$package_version"
 

@@ -3,7 +3,7 @@
 package_name="flex"
 package_version="2.6.4"
 package_description="A utility for generating programs that recognize patterns in text"
-package_source="https://github.com/westes/flex/releases/download/v2.6.4/flex-2.6.4.tar.gz d41d8cd98f00b204e9800998ecf8427e"
+package_source="https://github.com/westes/flex/releases/download/v2.6.4/flex-2.6.4.tar.gz 2882e3179748cc9f9c23ec593d6adc8d"
 
 source_dir="$package_name-$package_version"
 
