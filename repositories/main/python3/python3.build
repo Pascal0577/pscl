@@ -26,5 +26,6 @@ build() {
 
 install_files() {
     make install
+    mkdir -p "$DESTDIR/etc/profile.d/"
     cp -a "$PKGROOT/70-pythonhome-fix.sh" "$DESTDIR/etc/profile.d/"
 }
