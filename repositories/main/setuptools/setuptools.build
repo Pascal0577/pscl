@@ -3,7 +3,7 @@
 package_name="setuptools"
 package_version="80.9.0"
 package_description="a tool used to download, build, install, upgrade, and uninstall Python packages"
-package_source="https://pypi.org/packages/source/s/setuptools/setuptools-80.9.0.tar.gz 84b9e8efafdfc7d899c880aed8626e41"
+package_source="https://pypi.org/packages/source/s/setuptools/setuptools-80.9.0.tar.gz 82e1d67883b713f9493659b50d13b436"
 
 source_dir="$package_name-$package_version"
 

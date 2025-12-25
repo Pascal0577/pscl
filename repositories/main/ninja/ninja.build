@@ -4,7 +4,7 @@
 package_name="ninja"
 package_version="1.12.1"
 package_description="a small build system with a focus on speed"
-package_source="https://github.com/ninja-build/ninja/archive/v1.12.1/ninja-1.12.1.tar.gz d41d8cd98f00b204e9800998ecf8427e"
+package_source="https://github.com/ninja-build/ninja/archive/v1.12.1/ninja-1.12.1.tar.gz 6288992b05e593a391599692e2f7e490"
 
 build_deps="python3"
 
