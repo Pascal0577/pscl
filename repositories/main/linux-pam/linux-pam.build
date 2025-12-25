@@ -1,9 +1,12 @@
 #!/bin/sh
+# shellcheck disable=SC2034
 
 package_name="linux-pam"
 package_version="1.7.1"
 package_description="Contains Pluggable Authentication Modules used by the local system administrator to control how application programs authenticate users"
 package_source="https://github.com/linux-pam/linux-pam/releases/download/v1.7.1/Linux-PAM-1.7.1.tar.xz 92812d7dd414d816fba8d649e84e68ca"
+
+build_deps="libxml"
 
 source_dir="Linux-PAM-$package_version"
 
