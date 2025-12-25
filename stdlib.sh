@@ -312,6 +312,7 @@ run_hooks() {
         *) return 0 ;;
     esac
 
+    _hooks="${_hooks# }"
     log_debug "Hooks to run: [$_hooks]"
 
     case "$_hook_point" in
