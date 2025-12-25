@@ -3,7 +3,7 @@
 package_name="openssl"
 package_version="3.5.2"
 package_description="A robust, commercial-grade, full-featured toolkit for general-purpose cryptography and secure communication."
-package_source="https://github.com/openssl/openssl/releases/download/openssl-3.5.2/openssl-3.5.2.tar.gz d41d8cd98f00b204e9800998ecf8427e"
+package_source="https://github.com/openssl/openssl/releases/download/openssl-3.5.2/openssl-3.5.2.tar.gz 890fc59f86fc21b5e4d1c031a698dbde"
 
 source_dir="$package_name-$package_version"
 

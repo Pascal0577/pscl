@@ -3,7 +3,7 @@
 package_name="libffi"
 package_version="3.5.2"
 package_description="A portable, high level programming interface to various calling conventions"
-package_source="https://github.com/libffi/libffi/releases/download/v3.5.2/libffi-3.5.2.tar.gz d41d8cd98f00b204e9800998ecf8427e"
+package_source="https://github.com/libffi/libffi/releases/download/v3.5.2/libffi-3.5.2.tar.gz 92af9efad4ba398995abf44835c5d9e9"
 
 source_dir="$package_name-$package_version"
 
