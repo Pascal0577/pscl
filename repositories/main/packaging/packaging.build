@@ -4,7 +4,7 @@
 package_name="packaging"
 package_version="25.0"
 package_description="a Python library that provides utilities that implement the interoperability specifications which have clearly one correct behaviour (PEP440) or benefit greatly from having a single shared implementation (PEP425)"
-package_source="https://files.pythonhosted.org/packages/source/p/packaging/packaging-25.0.tar.gz d41d8cd98f00b204e9800998ecf8427e"
+package_source="https://files.pythonhosted.org/packages/source/p/packaging/packaging-25.0.tar.gz ab0ef21ddebe09d1803575120d3f99f8"
 
 build_deps="python3"
 
