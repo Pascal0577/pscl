@@ -3,7 +3,7 @@
 package_name="libxcrypt"
 package_version="4.4.38"
 package_description="A modern library for one-way hashing of passwords"
-package_source="https://github.com/besser82/libxcrypt/releases/download/v4.4.38/libxcrypt-4.4.38.tar.xz d41d8cd98f00b204e9800998ecf8427e"
+package_source="https://github.com/besser82/libxcrypt/releases/download/v4.4.38/libxcrypt-4.4.38.tar.xz 1796a5d20098e9dd9e3f576803c83000"
 
 source_dir="$package_name-$package_version"
 

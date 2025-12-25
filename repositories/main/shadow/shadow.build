@@ -4,7 +4,7 @@
 package_name="shadow"
 package_version="4.18.0"
 package_description="Programs for handling passwords in a secure way"
-package_source="https://github.com/shadow-maint/shadow/releases/download/4.18.0/shadow-4.18.0.tar.xz d41d8cd98f00b204e9800998ecf8427e"
+package_source="https://github.com/shadow-maint/shadow/releases/download/4.18.0/shadow-4.18.0.tar.xz 30ef46f54363db1d624587be68794ef2"
 
 pkg_deps="linux-pam"
 
