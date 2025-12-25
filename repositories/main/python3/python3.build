@@ -26,5 +26,5 @@ build() {
 
 install_files() {
     make install
-    cp -a "$ROOT/70-pythonhome-fix.sh" "$DESTDIR/etc/profile.d/"
+    cp -a "$PKGROOT/70-pythonhome-fix.sh" "$DESTDIR/etc/profile.d/"
 }
