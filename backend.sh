@@ -462,10 +462,16 @@ backend_register_package() (
         echo "$_pkg_name" >> "$_world"
 )
 
-backend_activate_package() (
+backend_activate_package() {
     _pkg_name="$1"
     _data_dir="${INSTALL_ROOT:-}/${METADATA_DIR:?}/$_pkg_name"
     _pkg_install_dir="${INSTALL_ROOT:-}/${PKGDIR:?}/installed_packages/$_pkg_name"
+
+    trap '
+    unset _pkg_name
+    unset _data_dir
+    unset _pkg_install_dir
+    ' INT TERM EXIT
 
     [ ! -d "$_pkg_install_dir" ] && \
         log_error "Package not installed: $_pkg_name"
@@ -501,7 +507,7 @@ backend_activate_package() (
     ) &
     done
     wait
-)
+}
 
 ###################
 # Uninstall Steps #
