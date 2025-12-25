@@ -465,6 +465,7 @@ backend_activate_package() (
 
     # Make sure to register a hook for the post-install script
     _post_install_script="${_pkg_install_dir}/post-install.sh"
+    log_debug "Looking for post-install script: $_post_install_script"
     if [ -f "$_post_install_script" ]; then
         mv "$_post_install_script" "$_data_dir"
         register_hook post_install "$_post_install_script"
