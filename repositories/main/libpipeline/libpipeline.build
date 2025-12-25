@@ -3,7 +3,7 @@
 package_name="libpipeline"
 package_version="1.5.8"
 package_description="contains a library for manipulating pipelines of subprocesses in a flexible and convenient way"
-package_source="https://download.savannah.gnu.org/releases/libpipeline/libpipeline-1.5.8.tar.gz d41d8cd98f00b204e9800998ecf8427e"
+package_source="https://download.savannah.gnu.org/releases/libpipeline/libpipeline-1.5.8.tar.gz 17ac6969b2015386bcb5d278a08a40b5"
 
 source_dir="$package_name-$package_version"
 
