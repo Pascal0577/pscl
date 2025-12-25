@@ -457,11 +457,18 @@ backend_register_package() (
 
 backend_activate_package() (
     _pkg_name="$1"
-
+    _data_dir="${INSTALL_ROOT:-}/${METADATA_DIR:?}/$_pkg_name"
     _pkg_install_dir="${INSTALL_ROOT:-}/${PKGDIR:?}/installed_packages/$_pkg_name"
 
     [ ! -d "$_pkg_install_dir" ] && \
         log_error "Package not installed: $_pkg_name"
+
+    # Make sure to register a hook for the post-install script
+    _post_install_script="${_pkg_install_dir}/post-install.sh"
+    if [ -f "$_post_install_script" ]; then
+        mv "$_post_install_script" "$_data_dir"
+        register_hook post_install "$_post_install_script"
+    fi
 
     find "$_pkg_install_dir" -mindepth 1 | sed "s|^${_pkg_install_dir}/||" | \
     while read -r line; do
