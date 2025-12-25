@@ -383,6 +383,7 @@ backend_create_package() (
     _post_install_script="$(backend_get_package_dir "$_pkg")/post-install.sh"
     log_debug "Looking for post-install script: $_post_install_script"
     if [ -f "$_post_install_script" ]; then
+        log_debug "Found post-install script"
         mv "$_post_install_script" "$_build_dir"
     fi
 
