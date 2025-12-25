@@ -3,7 +3,7 @@
 package_name="make"
 package_version="4.4.1"
 package_description="A program for controlling the generation of executables and other non-source files of a package from source files"
-package_source=""https://ftp.gnu.org/gnu/make/make-4.4.1.tar.gz
+package_source="https://ftpmirror.gnu.org/make/make-4.4.1.tar.gz"
 
 source_dir="$package_name-$package_version"
 
