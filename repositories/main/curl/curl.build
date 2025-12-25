@@ -1,9 +1,12 @@
 #!/bin/sh
+# shellcheck disable=SC2034
 
 package_name="curl"
 package_version="8.16.0"
 package_description=""
 package_source="https://curl.se/download/curl-8.16.0.tar.xz 3b5aae755714b338af0f66726bceb62a"
+
+pkg_deps="libpsl make-ca"
 
 source_dir="$package_name-$package_version"
 

@@ -1,0 +1,36 @@
+#!/bin/sh
+# shellcheck disable=SC2034
+
+package_name="polkit"
+package_version="126"
+package_description="A toolkit for defining and handling authorizations"
+package_source="https://github.com/polkit-org/polkit/archive/126/polkit-126.tar.gz db4ce0a42d5bf8002061f8e34ee9bdd0"
+
+pkg_deps="duktape glib linux-pam libxslt systemd"
+opt_deps=""
+build_deps=""
+check_deps="dbus-python dbusmock"
+
+source_dir="$package_name-$package_version"
+
+configure() {
+    :
+}
+
+build() {
+    mkdir build
+    cd build || exit 1
+
+    meson setup ..                 \
+        --prefix=/usr              \
+        --buildtype=release        \
+        -D man=true                \
+        -D session_tracking=logind \
+        -D tests=true
+
+    ninja
+}
+
+install_files() {
+    ninja install
+}

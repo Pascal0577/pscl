@@ -1,9 +1,11 @@
 #!/bin/sh
+# shellcheck disable=SC2034
 
 package_name="libxcb"
 package_version="1.17.0"
 package_description="Provides an interface to the X Window System protocol"
 package_source="https://xorg.freedesktop.org/archive/individual/lib/libxcb-1.17.0.tar.xz 96565523e9f9b701fcb35d31f1d4086e"
+
 pkg_deps="libxau xcb-proto libxdmcp"
 
 source_dir="$package_name-$package_version"

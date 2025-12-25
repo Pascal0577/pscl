@@ -1,9 +1,12 @@
 #!/bin/sh
+# shellcheck disable=SC2034
 
 package_name="systemd"
 package_version="257.8"
 package_description="programs for controlling the startup, running, and shutdown of the system"
 package_source="https://github.com/systemd/systemd/archive/v257.8/systemd-257.8.tar.gz 25fe5d328e22641254761f1baa74cee0"
+pkg_deps="linux-pam"
+opt_deps="btrfs-progs"
 
 source_dir="$package_name-$package_version"
 
@@ -45,4 +48,31 @@ build() {
 install_files() {
     echo 'NAME="Linux From Scratch"' > /etc/os-release
     ninja install
+
+    cat >> "$DESTDIR/etc/pam.d/system-session" <<- "EOF"
+        # Begin Systemd addition
+
+        session  required    pam_loginuid.so
+        session  optional    pam_systemd.so
+
+        # End Systemd addition
+	EOF
+    
+    cat > "$DESTDIR/etc/pam.d/systemd-user" <<- "EOF"
+        # Begin /etc/pam.d/systemd-user
+
+        account  required    pam_access.so
+        account  include     system-account
+
+        session  required    pam_env.so
+        session  required    pam_limits.so
+        session  required    pam_loginuid.so
+        session  optional    pam_keyinit.so force revoke
+        session  optional    pam_systemd.so
+
+        auth     required    pam_deny.so
+        password required    pam_deny.so
+
+        # End /etc/pam.d/systemd-user
+	EOF
 }

@@ -1,9 +1,12 @@
 #!/bin/sh
+# shellcheck disable=SC2034
 
 package_name="ninja"
 package_version="1.12.1"
 package_description="a small build system with a focus on speed"
 package_source="https://github.com/ninja-build/ninja/archive/v1.12.1/ninja-1.12.1.tar.gz d41d8cd98f00b204e9800998ecf8427e"
+
+build_deps="python3"
 
 source_dir="$package_name-$package_version"
 

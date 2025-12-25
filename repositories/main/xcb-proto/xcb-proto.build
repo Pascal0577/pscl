@@ -5,6 +5,9 @@ package_version="1.17.0"
 package_description="Provides the XML-XCB protocol"
 package_source="https://xorg.freedesktop.org/archive/individual/proto/xcb-proto-1.17.0.tar.xz c415553d2ee1a8cea43c3234a079b53f"
 
+pkg_deps="libxml"
+build_deps="python3"
+
 source_dir="$package_name-$package_version"
 
 configure() {

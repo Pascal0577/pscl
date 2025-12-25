@@ -1,9 +1,12 @@
 #!/bin/sh
+# shellcheck disable=SC2034
 
 package_name="jinja2"
 package_version="3.1.6"
 package_description="a Python module that implements a simple pythonic template language"
 package_source="https://pypi.org/packages/source/J/Jinja2/jinja2-3.1.6.tar.gz bf1360aee5429932406f63ba350cef09"
+
+build_deps="python3"
 
 source_dir="$package_name-$package_version"
 

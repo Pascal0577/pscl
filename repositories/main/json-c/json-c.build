@@ -1,9 +1,12 @@
 #!/bin/sh
+# shellcheck disable=SC2034
 
 package_name="json-c"
 package_version="0.18"
 package_description=""
 package_source="https://s3.amazonaws.com/json-c_releases/releases/json-c-0.18.tar.gz e6593766de7d8aa6e3a7e67ebf1e522f"
+
+build_deps="cmake"
 
 source_dir="$package_name-$package_version"
 
@@ -15,8 +18,8 @@ configure() {
     cd build || true
 
     cmake -D CMAKE_INSTALL_PREFIX=/usr \
-	-D CMAKE_BUILD_TYPE=Release  \
-	-D BUILD_STATIC_LIBS=OFF ..
+	    -D CMAKE_BUILD_TYPE=Release  \
+	    -D BUILD_STATIC_LIBS=OFF ..
 }
 
 build() {

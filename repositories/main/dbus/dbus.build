@@ -1,9 +1,12 @@
 #!/bin/sh
+# shellcheck disable=SC2034
 
 package_name="dbus"
 package_version="1.16.2"
 package_description="a message bus system, a simple way for applications to talk to one another"
 package_source="https://dbus.freedesktop.org/releases/dbus/dbus-1.16.2.tar.xz 97832e6f0a260936d28536e5349c22e5"
+
+opt_deps="libxorg systemd"
 
 source_dir="$package_name-$package_version"
 

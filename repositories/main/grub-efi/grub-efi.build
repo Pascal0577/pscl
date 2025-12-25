@@ -1,9 +1,12 @@
 #!/bin/sh
+# shellcheck disable=SC2034
 
 package_name="grub-efi"
 package_version="2.12"
 package_description="GRand Unified Bootloader"
 package_source="https://ftp.gnu.org/gnu/grub/grub-2.12.tar.xz 60c564b1bdc39d8e43b3aab4bc0fb140"
+
+pkg_deps="efibootmgr"
 
 source_dir="grub-$package_version"
 

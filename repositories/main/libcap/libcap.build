@@ -1,9 +1,12 @@
 #!/bin/sh
+# shellcheck disable=SC2034
 
 package_name="libcap"
 package_version="2.76"
 package_description="The userspace interface to the POSIX 1003.1e capabilities available in Linux kernels"
 package_source="https://www.kernel.org/pub/linux/libs/security/linux-privs/libcap2/libcap-2.76.tar.xz 449ade7d620b5c4eeb15a632fbaa4f74"
+
+pkg_deps="linux-pam"
 
 source_dir="$package_name-$package_version"
 
@@ -13,9 +16,27 @@ configure() {
 }
 
 build() {
-    make prefix=/usr lib=lib
+    make prefix=/usr lib=lib -C pam_cap
 }
 
 install_files() {
     make prefix=/usr lib=lib install
+    install -v -m755 pam_cap/pam_cap.so      "$DESTDIR/usr/lib/security"
+    install -v -m644 pam_cap/capability.conf "$DESTDIR/etc/security"
+}
+
+post_install() {
+    trap 'if [ -e /etc/pam.d/system-auth.bak ]; then
+            mv /etc/pam.d/system-auth.bak /etc/pam.d/system-auth
+        fi' INT TERM EXIT
+
+    mv /etc/pam.d/system-auth /etc/pam.d/system-auth.bak
+    cat > /etc/pam.d/system-auth <<- "EOF"
+        # Begin /etc/pam.d/system-auth
+
+        auth      optional    pam_cap.so
+	EOF
+    cat /etc/pam.d/system-auth.bak >> /etc/pam.d/system-auth
+    rm /etc/pam.d/system-auth.bak
+    trap - INT TERM EXIT
 }
