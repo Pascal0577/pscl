@@ -1,0 +1,33 @@
+#!/bin/sh
+# shellcheck disable=SC2034
+
+package_name="sqlite"
+package_version="3.50.4"
+package_description="A software library that implements a self-contained, serverless, zero-configuration, transactional SQL database engine"
+package_source="https://sqlite.org/2025/sqlite-autoconf-3500400.tar.gz d74bbdca4ab1b2bd46d3b3f8dbb0f3db"
+
+pkg_deps=""
+opt_deps=""
+build_deps=""
+check_deps=""
+
+source_dir="$package_name-$package_version"
+
+configure() {
+    ./configure --prefix=/usr     \
+            --disable-static  \
+            --enable-fts4 \
+            --enable-fts5 \
+            CPPFLAGS="-D SQLITE_ENABLE_COLUMN_METADATA=1 \
+                      -D SQLITE_ENABLE_UNLOCK_NOTIFY=1   \
+                      -D SQLITE_ENABLE_DBSTAT_VTAB=1     \
+                      -D SQLITE_SECURE_DELETE=1"
+}
+
+build() {
+    make
+}
+
+install_files() {
+    make install
+}
