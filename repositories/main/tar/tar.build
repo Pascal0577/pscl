@@ -3,7 +3,7 @@
 package_name="tar"
 package_version="1.35"
 package_description="Provides the ability to create tar archives as well as perform various other kinds of archive manipulation"
-package_source="https://ftp.gnu.org/gnu/tar/tar-1.35.tar.xz a2d8042658cfd8ea939e6d911eaf4152"
+package_source="https://ftpmirror.gnu.org/tar/tar-1.35.tar.xz a2d8042658cfd8ea939e6d911eaf4152"
 
 source_dir="$package_name-$package_version"
 
