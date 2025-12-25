@@ -3,7 +3,7 @@
 package_name="findutils"
 package_version="4.10.0"
 package_description="Programs to find files"
-package_source="https://ftp.gnu.org/gnu/findutils/findutils-4.10.0.tar.xz 870cfd71c07d37ebe56f9f4aaf4ad872"
+package_source="https://ftpmirror.gnu.org/findutils/findutils-4.10.0.tar.xz 870cfd71c07d37ebe56f9f4aaf4ad872"
 
 source_dir="$package_name-$package_version"
 
