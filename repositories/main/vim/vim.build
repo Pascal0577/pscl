@@ -3,7 +3,7 @@
 package_name="vim"
 package_version="9.1.1629"
 package_description="vim text editor"
-package_source="https://github.com/vim/vim/archive/v9.1.1629/vim-9.1.1629.tar.gz d41d8cd98f00b204e9800998ecf8427e"
+package_source="https://github.com/vim/vim/archive/v9.1.1629/vim-9.1.1629.tar.gz 4f856c3233c1c4570bc17572e4f9e8e4"
 
 source_dir="$package_name-$package_version"
 
