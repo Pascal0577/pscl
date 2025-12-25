@@ -1,19 +1,21 @@
 #!/bin/sh
+# shellcheck disable=SC2034
 
 package_name="lvm2"
 package_version="2.03.36"
 package_description="A set of tools that manage logical partitions"
 package_source="https://sourceware.org/ftp/lvm2/LVM2.2.03.36.tgz 62a7c701fe07a5c30ff9fcb624cd3437"
 
+pkg_deps="libaio"
+
 source_dir="LVM2.2.03.36"
 
 configure() {
     cd "$source_dir" || log_error "In $package_name.build: Failed to cd to $source_dir"
-    PATH+=:/usr/sbin                \
-    ./configure --prefix=/usr       \
-    --enable-cmdlib     \
-    --enable-pkgconfig  \
-    --enable-udev_sync
+    PATH+=:/usr/sbin ./configure --prefix=/usr \
+        --enable-cmdlib     \
+        --enable-pkgconfig  \
+        --enable-udev_sync
 }
 
 build() {

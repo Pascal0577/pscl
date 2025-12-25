@@ -1,9 +1,12 @@
 #!/bin/sh
+# shellcheck disable=SC2034
 
 package_name="markupsafe"
 package_version="3.0.2"
 package_description="a Python module that implements an XML/HTML/XHTML Markup safe string"
 package_source="https://pypi.org/packages/source/M/MarkupSafe/markupsafe-3.0.2.tar.gz c4b03aebf52fd043c763b575f0530217"
+
+build_deps="python3"
 
 source_dir="$package_name-$package_version"
 

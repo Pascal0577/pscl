@@ -1,0 +1,27 @@
+#!/bin/sh
+# shellcheck disable=SC2034
+
+package_name="duktape"
+package_version="2.7.0"
+package_description="An embeddable Javascript engine"
+package_source="https://duktape.org/duktape-2.7.0.tar.xz"
+
+pkg_deps=""
+opt_deps=""
+build_deps=""
+check_deps=""
+
+source_dir="$package_name-$package_version"
+
+configure() {
+    :
+}
+
+build() {
+    sed -i 's/-Os/-O2/' Makefile.sharedlibrary
+    make -f Makefile.sharedlibrary INSTALL_PREFIX=/usr
+}
+
+install_files() {
+    make -f Makefile.sharedlibrary INSTALL_PREFIX=/usr install
+}

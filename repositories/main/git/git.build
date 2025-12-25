@@ -1,9 +1,12 @@
 #!/bin/sh
+# shellcheck disable=SC2034
 
 package_name="git"
 package_version="2.51.2"
 package_description=""
 package_source="https://www.kernel.org/pub/software/scm/git/git-2.51.2.tar.xz 6d73314753ba69d826c4b33e9ee3a8fc"
+
+pkg_deps="curl"
 
 source_dir="$package_name-$package_version"
 

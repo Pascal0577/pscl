@@ -1,9 +1,12 @@
 #!/bin/sh
+# shellcheck disable=SC2034
 
 package_name="wheel"
 package_version="0.46.1"
 package_description="a Python library that is the reference implementation of the Python wheel packaging standard"
 package_source="https://pypi.org/packages/source/w/wheel/wheel-0.46.1.tar.gz d2c38a67e9f4cd012b9c589ad63392e8"
+
+build_deps="python3"
 
 source_dir="$package_name-$package_version"
 

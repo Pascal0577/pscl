@@ -1,22 +1,25 @@
 #!/bin/sh
+# shellcheck disable=SC2034
 
 package_name="libpsl"
 package_version="0.21.5"
 package_description="A library for accessing and resolving information from the Public Suffix List"
 package_source="https://github.com/rockdaboot/libpsl/releases/download/0.21.5/libpsl-0.21.5.tar.gz d41d8cd98f00b204e9800998ecf8427e"
 
+build_deps="meson ninja"
+
 source_dir="libpsl-0.21.5"
 
 configure() {
     cd "$source_dir" || log_error "In $package_name.build: Failed to cd to $source_dir"
     mkdir build
-    cd build || true
+    cd build || exit 1
 
-    ../configure --prefix=/usr DESTDIR="$DESTDIR"
+    meson setup --prefix=/usr --buildtype=release
 } 
 build() {
-    make
+    ninja
 }
 install_files() {
-    make install
+    ninja install
 }

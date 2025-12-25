@@ -1,9 +1,12 @@
 #!/bin/sh
+# shellcheck disable=SC2034
 
 package_name="cmake"
 package_version="4.1.2"
 package_description="cmake build systemd"
 package_source="https://cmake.org/files/v4.1/cmake-4.1.2.tar.gz 679304270e6e368de5e949a594d2e871"
+
+pkg_deps=""
 
 source_dir="$package_name-$package_version"
 
@@ -13,11 +16,11 @@ configure() {
 
     ./bootstrap --prefix=/usr        \
         --system-libs        \
-	--mandir=/share/man  \
-	--no-system-jsoncpp  \
-	--no-system-cppdap   \
-	--no-system-librhash \
-	--docdir=/share/doc/cmake-4.1.2
+	    --mandir=/share/man  \
+	    --no-system-jsoncpp  \
+	    --no-system-cppdap   \
+	    --no-system-librhash \
+	    --docdir=/share/doc/cmake-4.1.2
 }
 
 build() {

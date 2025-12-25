@@ -1,9 +1,12 @@
 #!/bin/sh
+# shellcheck disable=SC2034
 
 package_name="cryptsetup"
 package_version="2.8.1"
 package_description=""
 package_source="https://www.kernel.org/pub/linux/utils/cryptsetup/v2.8/cryptsetup-2.8.1.tar.xz 92b51ffa30e98447dccece6e4a055e3b"
+
+pkg_deps="json-c lvm2 popt"
 
 source_dir="$package_name-$package_version"
 

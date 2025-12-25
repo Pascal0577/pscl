@@ -1,9 +1,12 @@
 #!/bin/sh
+# shellcheck disable=SC2034
 
 package_name="flit-core"
 package_version="3.12.0"
 package_description="The distribution-building parts of Flit"
 package_source="https://pypi.org/packages/source/f/flit-core/flit_core-3.12.0.tar.gz 7da8534a9640ebc3de052c766e1e88cc"
+
+build_deps="python3"
 
 source_dir="flit_core-$package_version"
 
