@@ -40,7 +40,7 @@ interactive_prompt() (
     line_num=0
 
     items="$(printf '%s\n' "$items" | tr ' ' '\n')"
-    tree="$(echo "$items" | awk -f ./tree.awk)"
+    tree="$(echo "$items" | awk -f "${PKGDIR}/tree.awk")"
     total=$(echo "$items" | wc -l)
 
     # Print initial prompt
