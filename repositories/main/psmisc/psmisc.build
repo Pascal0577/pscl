@@ -3,7 +3,7 @@
 package_name="psmisc"
 package_version="23.7"
 package_description="Programs for displaying information about running processes"
-package_source="https://sourceforge.net/projects/psmisc/files/psmisc/psmisc-23.7.tar.xz b5f382b0c280b8cb988690d663e5db2c"
+package_source="https://sourceforge.net/projects/psmisc/files/psmisc/psmisc-23.7.tar.xz 53eae841735189a896d614cba440eb10"
 
 source_dir="$package_name-$package_version"
 
