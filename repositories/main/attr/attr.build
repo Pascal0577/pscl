@@ -3,7 +3,7 @@
 package_name="attr"
 package_version="2.5.2"
 package_description="Utilities to administer the extended attributes of filesystem objects"
-package_source="https://download.savannah.gnu.org/releases/attr/attr-2.5.2.tar.gz d41d8cd98f00b204e9800998ecf8427e"
+package_source="https://download.savannah.gnu.org/releases/attr/attr-2.5.2.tar.gz 227043ec2f6ca03c0948df5517f9c927"
 
 source_dir="$package_name-$package_version"
 
