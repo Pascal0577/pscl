@@ -12,7 +12,6 @@ source_dir="$package_name-$package_version"
 
 configure() {
     cd "$source_dir" || log_error "In $package_name.build: Failed to cd to $source_dir"
-    sed -i '/install -m.*STA/d' libcap/Makefile
 }
 
 build() {
@@ -20,7 +19,6 @@ build() {
 }
 
 install_files() {
-    make prefix=/usr lib=lib install
     install -v -m755 pam_cap/pam_cap.so      "$DESTDIR/usr/lib/security"
     install -v -m644 pam_cap/capability.conf "$DESTDIR/etc/security"
 }
