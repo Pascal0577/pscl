@@ -4,7 +4,7 @@
 package_name="efibootmgr"
 package_version="18"
 package_description=""
-package_source="https://github.com/rhboot/efibootmgr/archive/18/efibootmgr-18.tar.gz d41d8cd98f00b204e9800998ecf8427e"
+package_source="https://github.com/rhboot/efibootmgr/archive/18/efibootmgr-18.tar.gz e170147da25e1d5f72721ffc46fe4e06"
 
 pkg_deps="efivar popt"
 
