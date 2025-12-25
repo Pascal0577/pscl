@@ -3,7 +3,7 @@
 package_name="gzip"
 package_version="1.14"
 package_description="Programs for compressing and decompressing files"
-package_source="https://ftp.gnu.org/gnu/gzip/gzip-1.14.tar.xz 4bf5a10f287501ee8e8ebe00ef62b2c2"
+package_source="https://ftpmirror.gnu.org/gzip/gzip-1.14.tar.xz 4bf5a10f287501ee8e8ebe00ef62b2c2"
 
 source_dir="$package_name-$package_version"
 
