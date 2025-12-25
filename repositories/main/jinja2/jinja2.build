@@ -4,7 +4,7 @@
 package_name="jinja2"
 package_version="3.1.6"
 package_description="a Python module that implements a simple pythonic template language"
-package_source="https://pypi.org/packages/source/J/Jinja2/jinja2-3.1.6.tar.gz bf1360aee5429932406f63ba350cef09"
+package_source="https://pypi.org/packages/source/J/Jinja2/jinja2-3.1.6.tar.gz 66d4c25ff43d1deaf9637ccda523dec8"
 
 build_deps="python3"
 
