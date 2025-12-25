@@ -3,7 +3,7 @@
 package_name="lddtree"
 package_version="1.27"
 package_description=""
-package_source="https://github.com/ncopa/lddtree/archive/refs/tags/v1.27.tar.gz d41d8cd98f00b204e9800998ecf8427e"
+package_source="https://github.com/ncopa/lddtree/archive/refs/tags/v1.27.tar.gz c0ed1c032e6614e7426af06f6fc04cd7"
 
 source_dir="$package_name-$package_version"
 
