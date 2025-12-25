@@ -3,7 +3,7 @@
 package_name="xz"
 package_version="5.8.1"
 package_description="It's xz. You know what it does"
-package_source="https://github.com//tukaani-project/xz/releases/download/v5.8.1/xz-5.8.1.tar.xz d41d8cd98f00b204e9800998ecf8427e"
+package_source="https://github.com//tukaani-project/xz/releases/download/v5.8.1/xz-5.8.1.tar.xz cf5e1feb023d22c6bdaa30e84ef3abe3"
 
 source_dir="$package_name-$package_version"
 
