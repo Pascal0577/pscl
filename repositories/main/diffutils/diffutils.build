@@ -3,7 +3,7 @@
 package_name="diffutils"
 package_version="3.12"
 package_description="Programs that show the differences between files or directories"
-package_source="https://ftp.gnu.org/gnu/diffutils/diffutils-3.12.tar.xz d1b18b20868fb561f77861cd90b05de4"
+package_source="https://ftpmirror.gnu.org/diffutils/diffutils-3.12.tar.xz d1b18b20868fb561f77861cd90b05de4"
 
 source_dir="$package_name-$package_version"
 
