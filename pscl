@@ -297,6 +297,7 @@ main_install() (
     for pkg in $_install_order; do
         _pkg_name="${pkg%%|*}"
         if [ "$(get_field "$pkg" 3)" = "build" ]; then
+            log_debug "Installing build dependency: $pkg"
             build_package "$_pkg_name" || log_error "Failed to build: $_pkg_name"
             INSTALL_ROOT="" install_package "$_pkg_name" || \
                 log_error "Failed to install: $_pkg_name"
