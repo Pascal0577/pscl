@@ -1,0 +1,30 @@
+#!/bin/sh
+# shellcheck disable=SC2034
+
+package_name="luit"
+package_version="20240102"
+package_description=""
+package_source="https://invisible-mirror.net/archives/luit/luit-20240102.tgz b69a0819905ad8dc4bf82d25f24037a4"
+
+pkg_deps="libfontenc"
+opt_deps=""
+build_deps="libx11"
+check_deps=""
+
+source_dir="$package_name-$package_version"
+
+configure() {
+    cd "$source_dir" || log_error "Failed to cd: $source_dir"
+    ./configure --prefix=/usr \
+        --sysconfdir=/etc \
+        --localstatedir=/var \
+        --disable-static
+}
+
+build() {
+    make
+}
+
+install_files() {
+    make install
+}

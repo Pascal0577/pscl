@@ -1,0 +1,27 @@
+#!/bin/sh
+# shellcheck disable=SC2034
+
+package_name="xcursor-themes"
+package_version="1.0.7"
+package_description=""
+package_source="https://www.x.org/pub/individual/data/xcursor-themes-1.0.7.tar.xz 070993be1f010b09447ea24bab2c9846"
+
+pkg_deps=""
+opt_deps=""
+build_deps="make pkgconf xorg-util-macros xorg-xcursorgen"
+check_deps=""
+
+source_dir="$package_name-$package_version"
+
+configure() {
+    cd "$source_dir" || log_error "Failed to cd: $source_dir"
+    ./configure --prefix=/usr
+}
+
+build() {
+    make
+}
+
+install_files() {
+    make install
+}
