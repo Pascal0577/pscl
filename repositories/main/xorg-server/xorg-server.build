@@ -6,7 +6,7 @@ package_version="21.1.13"
 package_description="The core of the X Window System"
 package_source="https://www.x.org/pub/individual/xserver/xorg-server-21.1.13.tar.xz 69dbed93746d0af6b46de76d711614e4"
 
-pkg_deps="libxcvt pixman xorg-font-util xkeyboard-config libepoxy libtirpc xorg-libinput"
+pkg_deps="libxcvt pixman xorg-font-util xkeyboard-config libepoxy libtirpc"
 opt_deps=""
 build_deps="xcb-util-keysyms xcb-util-image xcb-util-renderutil xcb-util-wm meson ninja"
 check_deps=""
