@@ -1,14 +1,14 @@
 #!/bin/sh
 # shellcheck disable=SC2034
 
-package_name="xorg-mkfontscale"
-package_version="1.2.3"
+package_name="xorg-smproxy"
+package_version="1.0.8"
 package_description=""
-package_source="https://www.x.org/archive//individual/app/mkfontscale-1.2.3.tar.xz 7dcf5f702781bdd4aaff02e963a56270"
+package_source="https://www.x.org/archive/individual/app/smproxy-1.0.7.tar.xz 9f7a4305f0e79d5a46c3c7d02df9437d"
 
-pkg_deps="freetype zlib libfontenc"
+pkg_deps=""
 opt_deps=""
-build_deps="make xorgproto xorg-util-macros"
+build_deps=""
 check_deps=""
 
 source_dir="$package_name-$package_version"
@@ -19,7 +19,7 @@ configure() {
         --sysconfdir=/etc \
         --localstatedir=/var \
         --disable-static
-}
+} 
 
 build() {
     make

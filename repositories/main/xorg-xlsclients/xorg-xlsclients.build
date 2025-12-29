@@ -1,14 +1,14 @@
 #!/bin/sh
 # shellcheck disable=SC2034
 
-package_name="xorg-mkfontscale"
-package_version="1.2.3"
+package_name="xorg-xlsclients"
+package_version="1.1.5"
 package_description=""
-package_source="https://www.x.org/archive//individual/app/mkfontscale-1.2.3.tar.xz 7dcf5f702781bdd4aaff02e963a56270"
+package_source="https://www.x.org/archive/individual/app/xlsclients-1.1.5.tar.xz ab4b3c47e848ba8c3e47c021230ab23a"
 
-pkg_deps="freetype zlib libfontenc"
+pkg_deps="libxcb"
 opt_deps=""
-build_deps="make xorgproto xorg-util-macros"
+build_deps="xorgproto xorg-util-macros"
 check_deps=""
 
 source_dir="$package_name-$package_version"

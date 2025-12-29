@@ -1,14 +1,14 @@
 #!/bin/sh
 # shellcheck disable=SC2034
 
-package_name="xorg-mkfontscale"
-package_version="1.2.3"
+package_name="xorg-xinput"
+package_version="1.6.4"
 package_description=""
-package_source="https://www.x.org/archive//individual/app/mkfontscale-1.2.3.tar.xz 7dcf5f702781bdd4aaff02e963a56270"
+package_source="https://www.x.org/archive/individual/app/xinput-1.6.4.tar.xz 8e4d14823b7cbefe1581c398c6ab0035"
 
-pkg_deps="freetype zlib libfontenc"
+pkg_deps="libx11 libxi libxinerama xorg-xrandr"
 opt_deps=""
-build_deps="make xorgproto xorg-util-macros"
+build_deps="libxfixes xorg-util-macros xorgproto"
 check_deps=""
 
 source_dir="$package_name-$package_version"
