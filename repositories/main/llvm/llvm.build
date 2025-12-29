@@ -19,10 +19,10 @@ source_dir="$package_name-${package_version}.src"
 
 configure() {
     cd "$source_dir" || log_error "Failed to cd: $source_dir"
-    mv ../llvm-cmake-20.1.8.src .
+    mv ../cmake-20.1.8.src .
     sed '/LLVM_COMMON_CMAKE_UTILS/s@../cmake@cmake-20.1.8.src@' -i CMakeLists.txt
 
-    mv ../llvm-third-party-20.1.8.src .
+    mv ../third-party-20.1.8.src .
     sed '/LLVM_THIRD_PARTY_DIR/s@../third-party@third-party-20.1.8.src@' -i cmake/modules/HandleLLVMOptions.cmake
 
     mv ../clang-20.1.8.src ./tools/clang
