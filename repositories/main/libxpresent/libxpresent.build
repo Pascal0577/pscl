@@ -6,7 +6,7 @@ package_description="X.Org libxpresent library"
 package_source="https://www.x.org/pub/individual/lib/libXpresent-1.0.1.tar.xz bdd3ec17c6181fd7b26f6775886c730d"
 pkg_deps="libx11 libxext libxfixes libxrandr xorgproto xorg-util-macros"
 
-source_dir="libxpresent-$package_version"
+source_dir="libXpresent-$package_version"
 
 configure() {
     cd "$source_dir" || log_error "Failed to cd to $source_dir"
