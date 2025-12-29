@@ -6,7 +6,7 @@ package_description="X.Org libxshmfence library"
 package_source="https://www.x.org/pub/individual/lib/libXshmfence-1.3.3.tar.xz 9805be7e18f858bed9938542ed2905dc"
 pkg_deps="xorgproto xorg-util-macros"
 
-source_dir="$package_name-$package_version"
+source_dir="libXshmfence-$package_version"
 
 configure() {
     cd "$source_dir" || log_error "Failed to cd to $source_dir"
