@@ -1,0 +1,30 @@
+#!/bin/sh
+# shellcheck disable=SC2034
+
+package_name="libepoxy"
+package_version="1.5.10"
+package_description=""
+package_source="https://download.gnome.org/sources/libepoxy/1.5/libepoxy-1.5.10.tar.xz 10c635557904aed5239a4885a7c4efb7"
+
+pkg_deps="mesa"
+opt_deps=""
+build_deps="meson ninja"
+check_deps=""
+
+source_dir="$package_name-$package_version"
+
+configure() {
+    cd "$source_dir" || log_error "Failed to cd: $source_dir"
+    mkdir build
+    cd build || exit 1
+
+    meson setup --prefix=/usr --buildtype=release ..
+}
+
+build() {
+    ninja
+}
+
+install_files() {
+    ninja install
+}
