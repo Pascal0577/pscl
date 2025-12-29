@@ -331,6 +331,11 @@ backend_build_source() (
     . "$(realpath "$_pkg_build")" || \
         log_error "Failed to source: $_pkg_build"
 
+    # Handle the special case where we use N/A to create a metapackage
+    # See libxorg.build
+    [ "${package_source}" = 'N/A' ] && \
+        exit 0
+
     # These come from the packages build script
     _pkg_name="${package_name:?}"
     _build_dir="${PKGDIR:?}/build/$_pkg_name"
