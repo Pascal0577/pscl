@@ -23,6 +23,7 @@ configure() {
         -D ALLOW_EXTERNAL_SPIRV_TOOLS=ON \
         -D BUILD_SHARED_LIBS=ON          \
         -D GLSLANG_TESTS=ON              \
+        -D CMAKE_CXX_FLAGS="-include cstdint" \
         -G Ninja ..
 }
 
