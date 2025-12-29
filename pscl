@@ -241,6 +241,10 @@ print_usage() {
 install_package() (
     _pkg_name="$1"
 
+    if backend_is_installed "$_pkg_name" && [ "$INSTALL_FORCE" = 0 ]; then
+        log_warn "Package already installed: $_pkg_name. Skipping."
+    fi
+
     log_debug "Running pre-install hooks for: $_pkg_name"
     run_hooks pre_install "$_pkg_name" || \
         log_error "Pre-install hook failed for: $_pkg_name"
