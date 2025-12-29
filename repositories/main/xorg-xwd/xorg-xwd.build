@@ -11,7 +11,7 @@ opt_deps=""
 build_deps="libxt xorg-util-macros"
 check_deps=""
 
-source_dir="$package_name-$package_version"
+source_dir="xwd-$package_version"
 
 configure() {
     cd "$source_dir" || log_error "Failed to cd: $source_dir"
