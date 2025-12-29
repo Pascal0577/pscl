@@ -1,0 +1,35 @@
+#!/bin/sh
+# shellcheck disable=SC2034
+
+package_name="xorg-xwayland"
+package_version="24.1.2"
+package_description=""
+package_source="https://www.x.org/pub/individual/xserver/xwayland-24.1.2.tar.xz 312c5cf17d1b147df1b787fd170958e1"
+
+pkg_deps="glibc libepoxy libtirpc mesa wayland xorg-font-util"
+opt_deps=""
+build_deps="meson ninja"
+check_deps=""
+
+source_dir="$package_name-$package_version"
+
+configure() {
+    cd "$source_dir" || log_error "Failed to cd: $source_dir"
+    sed -i '/install_man/,$d' meson.build
+
+    mkdir build
+    cd build || exit 1
+
+    meson setup ..                     \
+        --prefix=/usr                  \
+        --buildtype=release            \
+        -D xkb_output_dir=/var/lib/xkb
+}
+
+build() {
+    ninja
+}
+
+install_files() {
+    ninja install
+}

@@ -1,0 +1,30 @@
+#!/bin/sh
+# shellcheck disable=SC2034
+
+package_name="xf86-input-wacom"
+package_version="1.2.2"
+package_description=""
+package_source="https://github.com/linuxwacom/xf86-input-wacom/releases/download/xf86-input-wacom-1.2.2/xf86-input-wacom-1.2.2.tar.bz2 bd72f813b094b79b450e50a95476977b"
+
+pkg_deps="xorg-server"
+opt_deps=""
+build_deps="make"
+check_deps=""
+
+source_dir="$package_name-$package_version"
+
+configure() {
+    cd "$source_dir" || log_error "Failed to cd: $source_dir"
+    ./configure --prefix=/usr \
+        --sysconfdir=/etc \
+        --localstatedir=/var \
+        --disable-static
+}
+
+build() {
+    make
+}
+
+install_files() {
+    make install
+}

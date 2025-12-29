@@ -1,0 +1,33 @@
+#!/bin/sh
+# shellcheck disable=SC2034
+
+package_name="libevdev"
+package_version="1.13.2"
+package_description=""
+package_source="https://www.freedesktop.org/software/libevdev/libevdev-1.13.2.tar.xz ddb1d798e0f2b4d0bd17c892b7d4aed3"
+
+pkg_deps="glibc"
+opt_deps=""
+build_deps="meson ninja"
+check_deps=""
+
+source_dir="$package_name-$package_version"
+
+configure() {
+    cd "$source_dir" || log_error "Failed to cd: $source_dir"
+    mkdir build
+    cd build || exit 1
+
+    meson setup ..                  \
+          --prefix=/usr             \
+          --buildtype=release       \
+          -D documentation=disabled
+}
+
+build() {
+    ninja
+}
+
+install_files() {
+    ninja install
+}

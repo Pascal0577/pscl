@@ -1,0 +1,30 @@
+#!/bin/sh
+# shellcheck disable=SC2034
+
+package_name="xorg-xclock"
+package_version="1.1.1"
+package_description=""
+package_source="https://www.x.org/pub/individual/app/xclock-1.1.1.tar.xz 1273e3f4c85f1801be11a5247c382d07"
+
+pkg_deps="libx11 libxaw libxft libxkbfile libxmu libxrender"
+opt_deps=""
+build_deps="xorg-util-macros"
+check_deps=""
+
+source_dir="$package_name-$package_version"
+
+configure() {
+    cd "$source_dir" || log_error "Failed to cd: $source_dir"
+    ./configure --prefix=/usr \
+        --sysconfdir=/etc \
+        --localstatedir=/var \
+        --disable-static
+}
+
+build() {
+    make
+}
+
+install_files() {
+    make install
+}

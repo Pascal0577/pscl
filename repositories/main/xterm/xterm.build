@@ -1,0 +1,46 @@
+#!/bin/sh
+# shellcheck disable=SC2034
+
+package_name="xterm"
+package_version="393"
+package_description=""
+package_source="https://invisible-mirror.net/archives/xterm/xterm-393.tgz 1ac5147362addade51c4e627d8cb328f"
+
+pkg_deps="luit"
+opt_deps=""
+build_deps="make"
+check_deps=""
+
+source_dir="$package_name-$package_version"
+
+configure() {
+    cd "$source_dir" || log_error "Failed to cd: $source_dir"
+    sed -i '/v0/{n;s/new:/new:kb=^?:/}' termcap
+    printf '\tkbs=\\177,\n' >> terminfo
+
+    TERMINFO=/usr/share/terminfo \
+    ./configure --prefix=/usr \
+        --sysconfdir=/etc     \
+        --localstatedir=/var  \
+        --disable-static      \
+        --with-app-defaults=/etc/X11/app-defaults
+}
+
+build() {
+    make
+}
+
+install_files() {
+    make install
+    mkdir -pv "$DESTDIR/usr/share/applications"
+    cp -v *.desktop "$DESTDIR/usr/share/applications/"
+
+    mkdir -pv "$DESTDIR/etc/X11/app-defaults/"
+    cat >> /etc/X11/app-defaults/XTerm <<- "EOF"
+		*VT100*locale: true
+		*VT100*faceName: Monospace
+		*VT100*faceSize: 10
+		*backarrowKeyIsErase: true
+		*ptyInitialErase: true
+	EOF
+}
