@@ -1,0 +1,34 @@
+#!/bin/sh
+# shellcheck disable=SC2034
+
+package_name="libdrm"
+package_version="2.4.122"
+package_description=""
+package_source="https://dri.freedesktop.org/libdrm/libdrm-2.4.122.tar.xz 143c8df50e09cd1eeb1fb53f05ecb64a"
+
+pkg_deps="libxorg"
+opt_deps=""
+build_deps=""
+check_deps=""
+
+source_dir="$package_name-$package_version"
+
+configure() {
+    cd "$source_dir" || log_error "Failed to cd: $source_dir"
+    mkdir build
+    cd build || exit 1
+
+    meson setup --prefix=/usr \
+        --buildtype=release   \
+        -D udev=true          \
+        -D valgrind=disabled  \
+        ..
+}
+
+build() {
+    ninja
+}
+
+install_files() {
+    ninja install
+}

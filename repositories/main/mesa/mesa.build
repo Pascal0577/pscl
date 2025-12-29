@@ -1,0 +1,37 @@
+#!/bin/sh
+# shellcheck disable=SC2034
+
+package_name="mesa"
+package_version="24.1.5"
+package_description=""
+package_source="https://mesa.freedesktop.org/archive/mesa-24.1.5.tar.xz 0f4de2192e63b438637b98937ac85a10"
+
+pkg_deps="libxorg libdrm mako glslang libva libvdpau llvm wayland-protocols libclc vulkan-loader ply"
+opt_deps=""
+build_deps=""
+check_deps=""
+
+source_dir="$package_name-$package_version"
+
+configure() {
+    cd "$source_dir" || log_error "Failed to cd: $source_dir"
+    mkdir build
+    cd build || exit 1
+
+    meson setup ..                 \
+        --prefix=/usr    \
+        --buildtype=release      \
+        -D platforms=x11,wayland \
+        -D gallium-drivers=auto  \
+        -D vulkan-drivers=auto   \
+        -D valgrind=disabled     \
+        -D libunwind=disabled
+}
+
+build() {
+    ninja
+}
+
+install_files() {
+    ninja install
+}
