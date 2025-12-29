@@ -297,6 +297,8 @@ backend_run_checks() (
         log_error "Cache directory: $CACHE_DIR is not writable"
 
     mkdir -p "${INSTALL_ROOT:-}/${PACKAGE_CACHE:?}"
+
+    [ ! -d "$LOG_DIR" ] && mkdir -p "$LOG_DIR"
 )
 
 ###############
