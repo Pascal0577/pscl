@@ -3,7 +3,7 @@
 package_name="libxorg"
 package_version=""
 package_description="Libraries for xorg"
-package_source=""
+package_source="N/A"
 pkg_deps="libx11 libxau libxaw libxcb libxcomposite libxcrypt libxcursor libxdamage libxdmcp libxext libxfixes libxfont2 libxft libxi libxinerama libxkbfile libxml libxmu libxpm libxpresent libxrandr libxrender libxres libxscrnsaver libxshmfence libxslt libxt libxtst libxv libxvmc libxxf86dga libxxf86vm"
 
 source_dir="$package_name-$package_version"

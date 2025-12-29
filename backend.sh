@@ -223,6 +223,9 @@ backend_prepare_sources() (
         [ -z "${package_source:-}" ] && \
             log_error "package_source not defined in $_pkg_build"
 
+        [ "${package_source:-}" = 'N/A' ] && \
+            exit 0
+
         # Extract the list of sources and sums provided by the build script
         _pkg_sources=""
         _pkg_sums=""
