@@ -16,7 +16,7 @@ log_error() {
     fi
 
     printf "%b[ERROR]%b%s: %s\n" "$red" "$def" "${_msg_prefix:-}" "$1" >&2
-    printf "[ERROR]%s: %s\n" "${_msg_prefix:-}" "$1" >"${LOG_FILE:-/dev/null}"
+    printf "[ERROR]%s: %s\n" "${_msg_prefix:-}" "$1" >>"${LOG_FILE:-/dev/null}"
     exit 1
 }
 
@@ -31,12 +31,12 @@ log_debug() {
     fi
 
     printf "%b[DEBUG]%b%s: %s\n" "$blue" "$def" "${_msg_prefix:-}" "$1" >&2
-    printf "[DEBUG]%s: %s\n" "${_msg_prefix:-}" "$1" >"${LOG_FILE:-/dev/null}"
+    printf "[DEBUG]%s: %s\n" "${_msg_prefix:-}" "$1" >>"${LOG_FILE:-/dev/null}"
 }
 
 log_warn() {
     printf "%b[WARNING]%b: %s\n" "$yellow" "$def" "$1" >&2
-    printf "[WARNING]%s: %s\n" "${_msg_prefix:-}" "$1" >"${LOG_FILE:-/dev/null}"
+    printf "[WARNING]%s: %s\n" "${_msg_prefix:-}" "$1" >>"${LOG_FILE:-/dev/null}"
 }
 
 trim_string_and_return() {
