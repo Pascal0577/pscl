@@ -1,0 +1,41 @@
+#!/bin/sh
+# shellcheck disable=SC2034
+
+package_name="openssh"
+package_version="10.0p1"
+package_description=""
+package_source="https://ftp.openbsd.org/pub/OpenBSD/OpenSSH/portable/openssh-10.0p1.tar.gz 689148621a2eaa734497b12bed1c5202"
+
+pkg_deps=""
+opt_deps=""
+build_deps="make"
+check_deps=""
+
+source_dir="$package_name-$package_version"
+
+configure() {
+    cd "$source_dir" || log_error "Failed to cd: $source_dir"
+    ./configure --prefix=/usr                            \
+        --sysconfdir=/etc/ssh                    \
+        --with-privsep-path=/var/lib/sshd        \
+        --with-default-path=/usr/bin             \
+        --with-superuser-path=/usr/sbin:/usr/bin \
+        --with-pid-dir=/run
+}
+
+build() {
+    make
+}
+
+install_files() {
+    make install
+    make install-sshd
+
+    mkdir -p "$DESTDIR/usr/bin"
+    mkdir -p "$DESTDIR/usr/share/man/man1"
+
+    install -v -m755 contrib/ssh-copy-id "$DESTDIR/usr/bin"
+    install -v -m644 contrib/ssh-copy-id.1 "$DESTDIR/usr/share/man/man1"
+    install -v -m755 -d "$DESTDIR/usr/share/doc/openssh-10.0p1"
+    install -v -m644 INSTALL LICENCE OVERVIEW README* "$DESTDIR/usr/share/doc/openssh-10.0p1"
+}
