@@ -1,0 +1,24 @@
+#!/bin/sh
+# shellcheck disable=SC2034
+
+package_name="xorg-mkfontscale"
+package_version="1.2.3"
+package_description=""
+package_source="https://www.x.org/archive//individual/app/mkfontscale-1.2.3.tar.xz 7dcf5f702781bdd4aaff02e963a56270"
+
+pkg_deps="freetype zlib libfontenc"
+opt_deps=""
+build_deps=""
+check_deps=""
+
+source_dir="$package_name-$package_version"
+
+configure() {
+    cd "$source_dir" || log_error "Failed to cd: $source_dir"
+}
+
+build() {
+}
+
+install_files() {
+}
