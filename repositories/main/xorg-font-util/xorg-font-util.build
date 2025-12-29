@@ -3,7 +3,7 @@
 package_name="xorg-font-util"
 package_version="1.4.1"
 package_description="X.Org xorg-font-util library"
-package_source="https://www.x.org/pub/individual/font//font-util-1.4.1.tar.xz a6541d12ceba004c0c1e3df900324642"
+package_source="https://www.x.org/pub/individual/font/font-util-1.4.1.tar.xz a6541d12ceba004c0c1e3df900324642"
 pkg_deps="xorg-util-macros"
 
 source_dir="font-util-$package_version"
