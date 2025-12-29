@@ -29,7 +29,6 @@ build() {
 
 install_files() {
     make install
-    make install-sshd
 
     mkdir -p "$DESTDIR/usr/bin"
     mkdir -p "$DESTDIR/usr/share/man/man1"
