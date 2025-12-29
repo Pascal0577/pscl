@@ -1,0 +1,30 @@
+#!/bin/sh
+# shellcheck disable=SC2034
+
+package_name="freetype-before-harfbuzz"
+package_version="2.13.3"
+package_description=""
+package_source="https://downloads.sourceforge.net/freetype/freetype-2.13.3.tar.xz f3b4432c4212064c00500e1ad63fbc64"
+
+pkg_deps=""
+opt_deps=""
+build_deps=""
+check_deps=""
+
+source_dir="$package_name-$package_version"
+
+configure() {
+    cd "$source_dir" || log_error "Failed to cd: $source_dir"
+    sed -ri "s:.*(AUX_MODULES.*valid):\1:" modules.cfg
+    sed -r "s:.*(#.*SUBPIXEL_RENDERING) .*:\1:" -i include/freetype/config/ftoption.h
+
+    ./configure --prefix=/usr --enable-freetype-config --disable-static
+}
+
+build() {
+    make
+}
+
+install_files() {
+    make install
+}
