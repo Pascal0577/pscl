@@ -1,0 +1,30 @@
+#!/bin/sh
+# shellcheck disable=SC2034
+
+package_name="xf86-input-libinput"
+package_version="1.4.0"
+package_description=""
+package_source="https://www.x.org/pub/individual/driver/xf86-input-libinput-1.4.0.tar.xz b52a1fc7456cf6595a9a1004287551a3"
+
+pkg_deps="libinput xorg-server"
+opt_deps=""
+build_deps="make"
+check_deps=""
+
+source_dir="$package_name-$package_version"
+
+configure() {
+    cd "$source_dir" || log_error "Failed to cd: $source_dir"
+    ./configure --prefix=/usr \
+        --sysconfdir=/etc \
+        --localstatedir=/var \
+        --disable-static
+}
+
+build() {
+    make
+}
+
+install_files() {
+    make install
+}

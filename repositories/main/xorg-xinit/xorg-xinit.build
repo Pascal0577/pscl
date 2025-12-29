@@ -1,0 +1,31 @@
+#!/bin/sh
+# shellcheck disable=SC2034
+
+package_name="xorg-xinit"
+package_version="1.4.2"
+package_description=""
+package_source="https://www.x.org/pub/individual/app/xinit-1.4.2.tar.xz 0e9a1b9a82b84ab229c709c0f939c113"
+
+pkg_deps="xorg-xauth xorg-xmodmap xorg-xrdb xorg-xclock"
+opt_deps="twm xterm"
+build_deps="xorg-util-macros"
+check_deps=""
+
+source_dir="$package_name-$package_version"
+
+configure() {
+    cd "$source_dir" || log_error "Failed to cd: $source_dir"
+    ./configure --prefix=/usr \
+        --sysconfdir=/etc \
+        --localstatedir=/var \
+        --disable-static \
+        --with-xinitdir=/etc/X11/app-defaults
+}
+
+build() {
+    make
+}
+
+install_files() {
+    make install
+}

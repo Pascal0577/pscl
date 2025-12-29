@@ -1,0 +1,30 @@
+#!/bin/sh
+# shellcheck disable=SC2034
+
+package_name="xf86-input-synaptics"
+package_version="1.9.2"
+package_description=""
+package_source="https://www.x.org/pub/individual/driver/xf86-input-synaptics-1.9.2.tar.xz 3b95e7baf4428b114e9910f999e96601"
+
+pkg_deps="libevdev xorg-server"
+opt_deps=""
+build_deps="make"
+check_deps=""
+
+source_dir="$package_name-$package_version"
+
+configure() {
+    cd "$source_dir" || log_error "Failed to cd: $source_dir"
+    ./configure --prefix=/usr \
+        --sysconfdir=/etc \
+        --localstatedir=/var \
+        --disable-static
+}
+
+build() {
+    make
+}
+
+install_files() {
+    make install
+}

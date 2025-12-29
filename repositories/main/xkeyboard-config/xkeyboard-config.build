@@ -1,0 +1,30 @@
+#!/bin/sh
+# shellcheck disable=SC2034
+
+package_name="xkeyboard-config"
+package_version="2.42"
+package_description=""
+package_source="https://www.x.org/pub/individual/data/xkeyboard-config/xkeyboard-config-2.42.tar.xz 2d3b7e43e597f4c607ad6261e2b3d77f"
+
+pkg_deps=""
+opt_deps=""
+build_deps="libxslt meson python3 xorg-xkbcomp"
+check_deps=""
+
+source_dir="$package_name-$package_version"
+
+configure() {
+    cd "$source_dir" || log_error "Failed to cd: $source_dir"
+    mkdir build
+    cd build || exit 1
+
+    meson setup --prefix=/usr --buildtype=release ..
+}
+
+build() {
+    ninja
+}
+
+install_files() {
+    ninja install
+}
