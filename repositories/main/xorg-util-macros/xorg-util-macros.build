@@ -1,12 +1,12 @@
 #!/bin/sh
 
-package_name="util-macros"
+package_name="xorg-util-macros"
 package_version="1.20.2"
 package_description="m4 macros used by all Xorg packages"
 package_source="https://www.x.org/pub/individual/util/util-macros-1.20.2.tar.xz 5f683a1966834b0a6ae07b3680bcb863"
 pkg_deps=""
 
-source_dir="$package_name-$package_version"
+source_dir="util-macros-$package_version"
 
 configure() {
     cd "$source_dir" || log_error "In $package_name.build: Failed to cd to $source_dir"
