@@ -331,14 +331,18 @@ backend_build_source() (
     . "$(realpath "$_pkg_build")" || \
         log_error "Failed to source: $_pkg_build"
 
+    # These come from the packages build script
+    _pkg_name="${package_name:?}"
+    _build_dir="${PKGDIR:?}/build/$_pkg_name"
+
+    # Create staging directory
+    _pkg_creation_dir="$_build_dir/package"
+    mkdir -p "$_pkg_creation_dir"
+
     # Handle the special case where we use N/A to create a metapackage
     # See libxorg.build
     [ "${package_source}" = 'N/A' ] && \
         exit 0
-
-    # These come from the packages build script
-    _pkg_name="${package_name:?}"
-    _build_dir="${PKGDIR:?}/build/$_pkg_name"
 
     while read -r url sum junk; do
         _needed_tarballs="$_needed_tarballs ${url##*/}"
@@ -367,9 +371,6 @@ backend_build_source() (
         cp -a "$patch" "$_build_dir"
     done
 
-    # Create staging directory
-    _pkg_creation_dir="$_build_dir/package"
-    mkdir -p "$_pkg_creation_dir"
     export DESTDIR="$_pkg_creation_dir"
     export PKGROOT="$_pkg_dir"
     log_debug "DESTDIR is: $DESTDIR"
