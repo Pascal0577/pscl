@@ -1,14 +1,14 @@
 #!/bin/sh
 # shellcheck disable=SC2034
 
-package_name="xorg-mkfontscale"
-package_version="1.2.3"
+package_name="xorg-xwd"
+package_version="1.0.9"
 package_description=""
-package_source="https://www.x.org/archive//individual/app/mkfontscale-1.2.3.tar.xz 7dcf5f702781bdd4aaff02e963a56270"
+package_source="https://www.x.org/archive/individual/app/xwd-1.0.9.tar.xz b0081fb92ae56510958024242ed1bc23"
 
-pkg_deps="freetype zlib libfontenc"
+pkg_deps="glibc libx11 libxkbfile"
 opt_deps=""
-build_deps="make xorgproto xorg-util-macros"
+build_deps="libxt xorg-util-macros"
 check_deps=""
 
 source_dir="$package_name-$package_version"

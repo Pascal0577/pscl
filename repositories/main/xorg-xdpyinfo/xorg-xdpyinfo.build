@@ -1,14 +1,14 @@
 #!/bin/sh
 # shellcheck disable=SC2034
 
-package_name="xorg-mkfontscale"
-package_version="1.2.3"
+package_name="xorg-xdpyinfo"
+package_version="1.3.4"
 package_description=""
-package_source="https://www.x.org/archive//individual/app/mkfontscale-1.2.3.tar.xz 7dcf5f702781bdd4aaff02e963a56270"
+package_source="https://www.x.org/archive/individual/app/xdpyinfo-1.3.4.tar.xz 933e6d65f96c890f8e96a9f21094f0de"
 
-pkg_deps="freetype zlib libfontenc"
+pkg_deps=" libx11 libxcb libxcomposite libxext libxi libxinerama libxrender libxtst libxxf86vm"
 opt_deps=""
-build_deps="make xorgproto xorg-util-macros"
+build_deps="xorgproto xorg-util-macros"
 check_deps=""
 
 source_dir="$package_name-$package_version"
