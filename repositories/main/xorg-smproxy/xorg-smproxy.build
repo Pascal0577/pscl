@@ -11,7 +11,7 @@ opt_deps=""
 build_deps=""
 check_deps=""
 
-source_dir="$package_name-$package_version"
+source_dir="smproxy-$package_version"
 
 configure() {
     cd "$source_dir" || log_error "Failed to cd: $source_dir"
