@@ -298,7 +298,8 @@ backend_run_checks() (
 
     mkdir -p "${INSTALL_ROOT:-}/${PACKAGE_CACHE:?}"
 
-    [ ! -d "$LOG_DIR" ] && mkdir -p "$LOG_DIR"
+    mkdir -p "$LOG_DIR" || \
+        log_error "Cannot create log directory"
 )
 
 ###############
