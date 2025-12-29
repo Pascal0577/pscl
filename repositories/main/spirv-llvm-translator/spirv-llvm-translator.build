@@ -1,0 +1,35 @@
+#!/bin/sh
+# shellcheck disable=SC2034
+
+package_name="spirv-llvm-translator"
+package_version="18.1.13"
+package_description=""
+package_source="https://github.com/KhronosGroup/SPIRV-LLVM-Translator/archive/v18.1.3/SPIRV-LLVM-Translator-18.1.3.tar.gz 094ff60909ada1e76e87da90df053be6"
+
+pkg_deps="libxml llvm spirv-tools"
+opt_deps=""
+build_deps=""
+check_deps=""
+
+source_dir="SPIRV-LLVM-Translator-$package_version"
+
+configure() {
+    cd "$source_dir" || log_error "Failed to cd: $source_dir"
+    mkdir build
+    cd build || exit 1
+
+    cmake -D CMAKE_INSTALL_PREFIX=/usr                   \
+        -D CMAKE_BUILD_TYPE=Release                    \
+        -D BUILD_SHARED_LIBS=ON                        \
+        -D CMAKE_SKIP_INSTALL_RPATH=ON                 \
+        -D LLVM_EXTERNAL_SPIRV_HEADERS_SOURCE_DIR=/usr \
+        -G Ninja ..
+}
+
+build() {
+    ninja
+}
+
+install_files() {
+    ninja install
+}

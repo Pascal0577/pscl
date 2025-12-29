@@ -1,0 +1,35 @@
+#!/bin/sh
+# shellcheck disable=SC2034
+
+package_name="glslang"
+package_version="14.3.0"
+package_description=""
+package_source="https://github.com/KhronosGroup/glslang/archive/14.3.0/glslang-14.3.0.tar.gz 90eec8d14a8d1002389e00ab449c7ca8"
+
+pkg_deps="spirv-tools"
+opt_deps=""
+build_deps="cmake ninja"
+check_deps=""
+
+source_dir="$package_name-$package_version"
+
+configure() {
+    cd "$source_dir" || log_error "Failed to cd: $source_dir"
+    mkdir build
+    cd build || exit 1
+
+    cmake -D CMAKE_INSTALL_PREFIX=/usr     \
+        -D CMAKE_BUILD_TYPE=Release      \
+        -D ALLOW_EXTERNAL_SPIRV_TOOLS=ON \
+        -D BUILD_SHARED_LIBS=ON          \
+        -D GLSLANG_TESTS=ON              \
+        -G Ninja ..
+}
+
+build() {
+    ninja
+}
+
+install_files() {
+    ninja install
+}

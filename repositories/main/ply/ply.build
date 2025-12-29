@@ -1,0 +1,26 @@
+#!/bin/sh
+# shellcheck disable=SC2034
+
+package_name="ply"
+package_version="3.1.1"
+package_description=""
+package_source="https://files.pythonhosted.org/packages/source/p/ply/ply-3.11.tar.gz"
+
+pkg_deps=""
+opt_deps=""
+build_deps="python3"
+check_deps=""
+
+source_dir="$package_name-$package_version"
+
+configure() {
+    cd "$source_dir" || log_error "Failed to cd: $source_dir"
+}
+
+build() {
+    pip3 wheel -w dist --no-build-isolation --no-deps --no-cache-dir $PWD
+}
+
+install_files() {
+    pip3 install --no-index --find-links=dist --no-cache-dir --no-user --root "$DESTDIR" ply
+}

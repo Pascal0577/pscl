@@ -1,0 +1,58 @@
+#!/bin/sh
+# shellcheck disable=SC2034
+
+package_name="llvm"
+package_version="18.1.7"
+package_source="https://github.com/llvm/llvm-project/releases/download/llvmorg-18.1.7/llvm-18.1.7.src.tar.xz ad39785449a878df1eed590339c3a8c4
+https://anduin.linuxfromscratch.org/BLFS/llvm/llvm-cmake-18.src.tar.xz bf2ad617d47ce40fe77c0e5c26b1fe43
+https://anduin.linuxfromscratch.org/BLFS/llvm/llvm-third-party-18.src.tar.xz 5ebac19868c66cdac8b87077faefd38c
+https://github.com/llvm/llvm-project/releases/download/llvmorg-18.1.7/clang-18.1.7.src.tar.xz 47e26237223d5ee0e6b674f028b56dae
+https://github.com/llvm/llvm-project/releases/download/llvmorg-18.1.7/compiler-rt-18.1.7.src.tar.xz 31753c0ec6271a37c12a17cf84187098"
+package_description=""
+
+pkg_deps=""
+opt_deps=""
+build_deps="cmake ninja"
+check_deps=""
+
+source_dir="$package_name-${package_version}.src"
+
+configure() {
+    cd "$source_dir" || log_error "Failed to cd: $source_dir"
+    mv ../llvm-cmake-18.src .
+    sed '/LLVM_COMMON_CMAKE_UTILS/s@../cmake@llvm-cmake-18.src@' -i CMakeLists.txt
+
+    mv ../../llvm-third-party-18.src .
+    sed '/LLVM_THIRD_PARTY_DIR/s@../third-party@llvm-third-party-18.src@' -i cmake/modules/HandleLLVMOptions.cmake
+
+    mv ../clang-18.1.7.src ./tools/clang
+    mv ../compiler-rt-18.1.7.src ./projects/compiler-rt
+
+    grep -rl '#!.*python' | xargs sed -i '1s/python$/python3/'
+
+    mkdir -v build
+    cd build || exit 1
+
+    CC=gcc CXX=g++                               \
+    cmake -D CMAKE_INSTALL_PREFIX=/usr           \
+        -D CMAKE_SKIP_INSTALL_RPATH=ON         \
+        -D LLVM_ENABLE_FFI=ON                  \
+        -D CMAKE_BUILD_TYPE=Release            \
+        -D LLVM_BUILD_LLVM_DYLIB=ON            \
+        -D LLVM_LINK_LLVM_DYLIB=ON             \
+        -D LLVM_ENABLE_RTTI=ON                 \
+        -D LLVM_TARGETS_TO_BUILD="host;AMDGPU" \
+        -D LLVM_BINUTILS_INCDIR=/usr/include   \
+        -D LLVM_INCLUDE_BENCHMARKS=OFF         \
+        -D CLANG_DEFAULT_PIE_ON_LINUX=ON       \
+        -D CLANG_CONFIG_FILE_SYSTEM_DIR=/etc/clang \
+        -W no-dev -G Ninja ..
+}
+
+build() {
+    ninja
+}
+
+install_files() {
+    ninja install
+}

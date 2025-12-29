@@ -1,0 +1,29 @@
+#!/bin/sh
+# shellcheck disable=SC2034
+
+package_name="libva"
+package_version="2.22.0"
+package_description=""
+package_source="https://github.com/intel/libva/archive/2.22.0/libva-2.22.0.tar.gz 8dba13313d724b5e930f06e65b7437e2"
+
+pkg_deps="libdrm"
+opt_deps=""
+build_deps="meson ninja"
+check_deps=""
+
+source_dir="$package_name-$package_version"
+
+configure() {
+    cd "$source_dir" || log_error "Failed to cd: $source_dir"
+    cd build || exit 1
+
+    meson setup --prefix=/usr --buildtype=release
+}
+
+build() {
+    ninja
+}
+
+install_files() {
+    ninja install
+}
