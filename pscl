@@ -11,6 +11,8 @@ readonly CACHE_DIR="${CACHE_DIR:-${PKGDIR}/source_cache}"
 readonly PACKAGE_CACHE="${PACKAGE_CACHE:-${PKGDIR}/package_cache}"
 readonly REPOSITORY_LIST="${REPOSITORY_LIST:-${PKGDIR}/repositories/main}"
 readonly EXTENSION_DIR="${PKGDIR:?}/extensions"
+readonly LOG_DIR="${LOG_DIR:-$PKGDIR/logs}"
+readonly LOG_FILE="${LOG_DIR:-}/pscl-$(date +%s).log"
 
 readonly green="\x1b[32m"
 
