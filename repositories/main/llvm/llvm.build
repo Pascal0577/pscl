@@ -2,7 +2,7 @@
 # shellcheck disable=SC2034
 
 package_name="llvm"
-package_version="18.1.7"
+package_version="20.1.8"
 package_source="https://github.com/llvm/llvm-project/releases/download/llvmorg-20.1.8/llvm-20.1.8.src.tar.xz 78040509eb91309b4ec2edfe12cd20d8
 https://anduin.linuxfromscratch.org/BLFS/llvm/llvm-cmake-20.1.8.src.tar.xz 5bfb8f4b4a2b3ccffca0d2406e4cdcc6
 https://anduin.linuxfromscratch.org/BLFS/llvm/llvm-third-party-20.1.8.src.tar.xz 2ffd8624b3cbddf55a4e74a7d8ea89fa
