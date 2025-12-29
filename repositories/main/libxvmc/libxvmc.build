@@ -6,7 +6,7 @@ package_description="X.Org libxvmc library"
 package_source="https://www.x.org/pub/individual/lib/libXvMC-1.0.14.tar.xz a90a5f01102dc445c7decbbd9ef77608"
 pkg_deps="libx11 libxext libxv xorgproto xorg-util-macros"
 
-source_dir="libXvmc-$package_version"
+source_dir="libXvMC-$package_version"
 
 configure() {
     cd "$source_dir" || log_error "Failed to cd to $source_dir"
