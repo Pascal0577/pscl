@@ -1,0 +1,30 @@
+#!/bin/sh
+# shellcheck disable=SC2034
+
+package_name="libtirpc"
+package_version="1.3.5"
+package_description=""
+package_source="https://downloads.sourceforge.net/libtirpc/libtirpc-1.3.5.tar.bz2 59a5aba60d99621963d0109f95b622f2"
+
+pkg_deps=""
+opt_deps=""
+build_deps="make"
+check_deps=""
+
+source_dir="$package_name-$package_version"
+
+configure() {
+    cd "$source_dir" || log_error "Failed to cd: $source_dir"
+    ./configure --prefix=/usr                                   \
+            --sysconfdir=/etc                               \
+            --disable-static                                \
+            --disable-gssapi
+}
+
+build() {
+    make
+}
+
+install_files() {
+    make install
+}
