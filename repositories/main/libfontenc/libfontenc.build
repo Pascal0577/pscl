@@ -4,7 +4,7 @@ package_name="libfontenc"
 package_version="1.1.8"
 package_description="X.Org libfontenc library"
 package_source="https://www.x.org/pub/individual/lib/libfontenc-1.1.8.tar.xz 8816cc44d06ebe42e85950b368185826"
-pkg_deps="zlib pkgconf xorgproto xorg-util-macros xorg-font-encodings"
+pkg_deps="zlib pkgconf xorgproto xorg-util-macros"
 
 source_dir="$package_name-$package_version"
 
