@@ -2,9 +2,9 @@
 # shellcheck disable=SC2034
 
 package_name="glslang"
-package_version="14.3.0"
+package_version="15.4.0"
 package_description=""
-package_source="https://github.com/KhronosGroup/glslang/archive/14.3.0/glslang-14.3.0.tar.gz 90eec8d14a8d1002389e00ab449c7ca8"
+package_source="https://github.com/KhronosGroup/glslang/archive/15.4.0/glslang-15.4.0.tar.gz a400ed377dc9de8b87a8179a90cef3b8"
 
 pkg_deps="spirv-tools"
 opt_deps=""
