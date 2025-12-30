@@ -22,7 +22,7 @@ configure() {
         --prefix=/usr    \
         --buildtype=release      \
         -D platforms=x11,wayland \
-        -D gallium-drivers=i915,virgl  \
+        -D gallium-drivers=iris,virgl  \
         -D vulkan-drivers=intel   \
         -D valgrind=disabled     \
         -D video-codecs=all      \
