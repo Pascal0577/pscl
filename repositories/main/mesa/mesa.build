@@ -2,11 +2,11 @@
 # shellcheck disable=SC2034
 
 package_name="mesa"
-package_version="24.1.5"
+package_version="25.1.8"
 package_description=""
-package_source="https://mesa.freedesktop.org/archive/mesa-24.1.5.tar.xz 0f4de2192e63b438637b98937ac85a10"
+package_source="https://mesa.freedesktop.org/archive/mesa-25.1.8.tar.xz fe3eb39e8a3c6fbb36eb3da57be022e7"
 
-pkg_deps="libxorg libdrm mako glslang libva libvdpau llvm wayland-protocols libclc vulkan-loader ply"
+pkg_deps="libxorg libdrm mako glslang libva libvdpau llvm wayland-protocols libclc vulkan-loader ply pyyaml"
 opt_deps=""
 build_deps=""
 check_deps=""
