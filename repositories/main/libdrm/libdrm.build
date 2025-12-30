@@ -4,7 +4,7 @@
 package_name="libdrm"
 package_version="2.4.122"
 package_description=""
-package_source="https://dri.freedesktop.org/libdrm/libdrm-2.4.122.tar.xz 143c8df50e09cd1eeb1fb53f05ecb64a"
+package_source="https://dri.freedesktop.org/libdrm/libdrm-2.4.125.tar.xz 3baec8e685510892b3355a7074baa874"
 
 pkg_deps="libxorg"
 opt_deps=""
