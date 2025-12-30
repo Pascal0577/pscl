@@ -2,9 +2,9 @@
 # shellcheck disable=SC2034
 
 package_name="xorg-server"
-package_version="21.1.13"
+package_version="21.1.18"
 package_description="The core of the X Window System"
-package_source="https://www.x.org/pub/individual/xserver/xorg-server-21.1.13.tar.xz 69dbed93746d0af6b46de76d711614e4"
+package_source="https://www.x.org/pub/individual/xserver/xorg-server-21.1.18.tar.xz 43225ddc1fd8d7ae7671c25ab6d1f927"
 
 pkg_deps="libxcvt pixman xorg-font-util xkeyboard-config libepoxy libtirpc"
 opt_deps=""
@@ -15,7 +15,7 @@ source_dir="$package_name-$package_version"
 
 configure() {
     cd "$source_dir" || log_error "Failed to cd: $source_dir"
-    patch -Np1 -i ../xorg-server-21.1.13-tearfree_backport-2.patch
+    patch -Np1 -i ../xorg-server-21.1.18-tearfree_backport-2.patch
 
     mkdir build
     cd build
