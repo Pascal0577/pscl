@@ -1,0 +1,26 @@
+#!/bin/sh
+# shellcheck disable=SC2034
+
+package_name="pyyaml"
+package_version="6.0.2"
+package_description=""
+package_source="https://files.pythonhosted.org/packages/source/P/PyYAML/pyyaml-6.0.2.tar.gz 9600ee49b2b4e1a0237cf4173b6dc594"
+
+pkg_deps="cython libyaml"
+opt_deps=""
+build_deps=""
+check_deps=""
+
+source_dir="$package_name-$package_version"
+
+configure() {
+    cd "$source_dir" || log_error "Failed to cd: $source_dir"
+}
+
+build() {
+    pip3 wheel -w dist --no-build-isolation --no-deps --no-cache-dir $PWD
+}
+
+install_files() {
+    pip3 install --no-index --find-links dist --no-user --root "$DESTDIR" PyYAML
+}
