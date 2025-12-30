@@ -21,7 +21,7 @@ configure() {
     cd build
 
     meson setup ..          \
-      --prefix=$XORG_PREFIX \
+      --prefix=/usr \
       --localstatedir=/var  \
       -D glamor=true        \
       -D xkb_output_dir=/var/lib/xkb
