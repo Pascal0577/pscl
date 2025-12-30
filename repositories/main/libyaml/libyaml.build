@@ -1,0 +1,27 @@
+#!/bin/sh
+# shellcheck disable=SC2034
+
+package_name="libyaml"
+package_version="0.2.5"
+package_description=""
+package_source="https://github.com/yaml/libyaml/releases/download/0.2.5/yaml-0.2.5.tar.gz bb15429d8fb787e7d3f1c83ae129a999"
+
+pkg_deps=""
+opt_deps=""
+build_deps=""
+check_deps=""
+
+source_dir="$package_name-$package_version"
+
+configure() {
+    cd "$source_dir" || log_error "Failed to cd: $source_dir"
+    ./configure --prefix=/usr --disable-static
+}
+
+build() {
+    make
+}
+
+install_files() {
+    make install
+}
