@@ -4,7 +4,7 @@
 package_name="spirv-tools"
 package_version="1.3.290.0"
 package_description=""
-package_source="https://github.com/KhronosGroup/SPIRV-Tools/archive/vulkan-sdk-1.3.290.0/SPIRV-Tools-1.3.290.0.tar.gz 4a3f873a07f33cffd70890e17a34fe8b"
+package_source="https://github.com/KhronosGroup/SPIRV-Tools/archive/vulkan-sdk-1.4.321.0/SPIRV-Tools-vulkan-sdk-1.4.321.0.tar.gz bd91a34dcbd8301cba5f4fa9524c7d9f"
 
 pkg_deps="spirv-headers"
 opt_deps=""
