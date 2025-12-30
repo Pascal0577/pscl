@@ -2,9 +2,9 @@
 # shellcheck disable=SC2034
 
 package_name="libclc"
-package_version="18.1.7"
+package_version="20.1.8"
 package_description=""
-package_source="https://github.com/llvm/llvm-project/releases/download/llvmorg-18.1.7/libclc-18.1.7.src.tar.xz 0c7627f6c82bb63f712e1cc00d89eed7"
+package_source="https://github.com/llvm/llvm-project/releases/download/llvmorg-20.1.8/libclc-20.1.8.src.tar.xz b49b6b81298c9eb1609073b9164ff4cb"
 
 pkg_deps="spirv-llvm-translator"
 opt_deps=""
