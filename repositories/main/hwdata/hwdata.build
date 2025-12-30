@@ -1,0 +1,27 @@
+#!/bin/sh
+# shellcheck disable=SC2034
+
+package_name="hwdata"
+package_version="0.398"
+package_description=""
+package_source="https://github.com/vcrhonek/hwdata/archive/v0.398/hwdata-0.398.tar.gz 1ce78576cdde13f0e1953445a98bf173"
+
+pkg_deps=""
+opt_deps=""
+build_deps=""
+check_deps=""
+
+source_dir="$package_name-$package_version"
+
+configure() {
+    cd "$source_dir" || log_error "Failed to cd: $source_dir"
+    ./configure --prefix=/usr --disable-blacklist
+}
+
+build() {
+    :
+}
+
+install_files() {
+    make install
+}
