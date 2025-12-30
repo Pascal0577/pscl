@@ -275,7 +275,7 @@ backend_prepare_sources() (
 
 backend_want_to_build_package() (
     [ "$CREATE_PACKAGE" = 0 ] && return 1
-    [ "$INSTALL_FORCE" = 1 ] && return 1
+    [ "$INSTALL_FORCE" = 1 ] && return 0
 
     _pkg_name="$1"
     [ ! -f "${INSTALL_ROOT:-}/${PACKAGE_CACHE:?}/$_pkg_name.tar.zst" ] && return 0
