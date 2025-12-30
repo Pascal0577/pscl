@@ -2,7 +2,7 @@
 # shellcheck disable=SC2034
 
 package_name="spirv-llvm-translator"
-package_version="18.1.13"
+package_version="20.1.5"
 package_description=""
 package_source="https://github.com/KhronosGroup/SPIRV-LLVM-Translator/archive/v20.1.5/SPIRV-LLVM-Translator-20.1.5.tar.gz 510a7cceed8205e4c3877f23d9c0911a"
 
