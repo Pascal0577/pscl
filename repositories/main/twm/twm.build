@@ -2,9 +2,9 @@
 # shellcheck disable=SC2034
 
 package_name="twm"
-package_version="1.0.12"
+package_version="1.0.13.1"
 package_description="A very minimal window manager"
-package_source="https://www.x.org/pub/individual/app/twm-1.0.12.tar.xz 805ee08b5a87e1103dfe2eb925b613b4"
+package_source="https://www.x.org/pub/individual/app/twm-1.0.13.1.tar.xz 2a337b776c904eab5b874eddc0124d4f"
 
 pkg_deps="xorg-server"
 opt_deps=""
