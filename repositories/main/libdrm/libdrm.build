@@ -2,7 +2,7 @@
 # shellcheck disable=SC2034
 
 package_name="libdrm"
-package_version="2.4.122"
+package_version="2.4.125"
 package_description=""
 package_source="https://dri.freedesktop.org/libdrm/libdrm-2.4.125.tar.xz 3baec8e685510892b3355a7074baa874"
 
