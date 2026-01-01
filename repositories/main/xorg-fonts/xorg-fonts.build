@@ -3,7 +3,7 @@
 package_name="xorg-fonts"
 package_version=""
 package_description=""
-package_source=""
+package_source="N/A"
 pkg_deps="xorg-font-util xorg-font-encodings xorg-font-alias xorg-font-adobe-utopia-type1 xorg-font-bh-ttf xorg-font-bh-type1 xorg-font-ibm-type1 xorg-font-misc-ethiopic xorg-font-xfree86-type1"
 
 source_dir="$package_name-$package_version"
