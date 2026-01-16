@@ -1,0 +1,29 @@
+#!/bin/sh
+# shellcheck disable=SC2034
+
+package_name="libssh2"
+package_version="1.11.1"
+package_description="A client-side C library implementing the SSH2 protocol"
+package_source="https://www.libssh2.org/download/libssh2-1.11.1.tar.gz 38857d10b5c5deb198d6989dacace2e6"
+
+pkg_deps=""
+opt_deps=""
+build_deps=""
+check_deps=""
+
+source_dir="$package_name-$package_version"
+
+configure() {
+    cd "$source_dir" || log_error "Failed to cd: $source_dir"
+    ./configure --prefix=/usr          \
+        --disable-docker-tests \
+        --disable-static
+}
+
+build() {
+    make
+}
+
+install_files() {
+    make install
+}
