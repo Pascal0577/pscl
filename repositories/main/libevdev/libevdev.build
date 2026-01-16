@@ -19,9 +19,10 @@ configure() {
     cd build || exit 1
 
     meson setup ..                  \
-          --prefix=/usr             \
-          --buildtype=release       \
-          -D documentation=disabled
+        --prefix=/usr             \
+        --buildtype=release       \
+        -D documentation=disabled \
+        -D tests=disabled
 }
 
 build() {
