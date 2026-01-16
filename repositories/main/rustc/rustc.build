@@ -92,5 +92,6 @@ install_files() {
     install -vdm755 "$DESTDIR/usr/share/zsh/site-functions"
     ln -sfv /opt/rustc/share/zsh/site-functions/_cargo "$DESTDIR/usr/share/zsh/site-functions"
 
+    mkdir "$DESTDIR/usr/share/bash-completion/completions"
     mv -v "$DESTDIR/etc/bash_completion.d/cargo" "$DESTDIR/usr/share/bash-completion/completions"
 }
