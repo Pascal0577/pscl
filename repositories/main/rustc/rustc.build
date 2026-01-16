@@ -14,7 +14,7 @@ check_deps=""
 source_dir="$package_name-$package_version"
 
 configure() {
-    cd "$source_dir" || log_error "Failed to cd: $source_dir"
+    cd "${source_dir}-src" || log_error "Failed to cd: $source_dir"
     mkdir -pv "$DESTDIR/opt/rustc-1.89.0"
     ln -svfn rustc-1.89.0 "$DESTDIR/opt/rustc"
 
