@@ -1,0 +1,27 @@
+#!/bin/sh
+# shellcheck disable=SC2034
+
+package_name="oxwm"
+package_version="0.9.0"
+package_description="Tony's Window Manager"
+package_source="https://github.com/tonybanters/oxwm/archive/refs/tags/v0.9.0.tar.gz c64d4a29d7220fe05b0211bd7bd7d678"
+
+pkg_deps="libx11 libxft freetype fontconfig pkgconf"
+opt_deps=""
+build_deps=""
+check_deps=""
+
+source_dir="$package_name-$package_version"
+
+configure() {
+    cd "$source_dir" || log_error "Failed to cd: $source_dir"
+}
+
+build() {
+    cargo build --release
+}
+
+install_files() {
+    mkdir -pv "$DESTDIR/usr/bin"
+    cp target/release/oxwm "$DESTDIR/usr/bin/"
+}
