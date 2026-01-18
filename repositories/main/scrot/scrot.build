@@ -8,7 +8,7 @@ package_source="https://github.com/resurrecting-open-source-projects/scrot/archi
 
 pkg_deps="xorg-server libxcomposite libxext libxfixes libxinerama imlib2"
 opt_deps=""
-build_deps="autoconf pkgconf"
+build_deps="autoconf pkgconf autoconf-archive"
 check_deps=""
 
 configure() {
