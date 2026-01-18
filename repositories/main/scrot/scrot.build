@@ -14,7 +14,7 @@ check_deps=""
 configure() {
     cd scrot-1.12.1
     ./autogen.sh
-    ./configure --prefix=/usr --disable=static
+    ./configure --prefix=/usr
 }
 
 build() {
