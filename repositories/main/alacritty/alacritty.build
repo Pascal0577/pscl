@@ -2,13 +2,13 @@
 # shellcheck disable=SC2034
 
 package_name="alacritty"
-package_version=""
-package_description=""
-package_source=""
+package_version="0.16.1"
+package_description="A terminal emulator"
+package_source="https://github.com/alacritty/alacritty/archive/refs/tags/v0.16.1.tar.gz 90b352df7af4b3e2f3306900fa6a252c"
 
 pkg_deps="freetype fontconfig pkgconf libxkbcommon python3 libxcb"
 opt_deps=""
-build_deps="cmake make"
+build_deps="cmake make rustc"
 check_deps=""
 
 source_dir="$package_name-$package_version"
@@ -18,7 +18,13 @@ configure() {
 }
 
 build() {
+    cargo build --release
 }
 
 install_files() {
+    mkdir -pv "$DESTDIR/usr/bin" "$DESTDIR/usr/share/pixmaps/Alacritty.svg" "$DESTDIR/usr/share/applications"
+
+    cp -v target/release/alacritty "$DESTDIR/usr/bin"
+    cp -v extra/logo/alacritty-term.svg "$DESTDIR/usr/share/pixmaps/Alacritty.svg"
+    cp -v extra/linux/Alacritty.desktop "$DESTDIR/usr/share/applications"
 }
