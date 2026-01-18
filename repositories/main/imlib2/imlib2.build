@@ -1,0 +1,27 @@
+#!/bin/sh
+# shellcheck disable=SC2034
+
+package_name="imlib2"
+package_version="1.12.5"
+package_description=""
+package_source="https://downloads.sourceforge.net/enlightenment/imlib2-1.12.5.tar.xz c81c9f91d92ecbd87cf652f867ec5d74"
+
+pkg_deps="libxorg giflib"
+opt_deps=""
+build_deps=""
+check_deps=""
+
+source_dir="$package_name-$package_version"
+
+configure() {
+    cd "$source_dir" || log_error "Failed to cd: $source_dir"
+    ./configure --prefix=/usr --disable-static
+}
+
+build() {
+    make
+}
+
+install_files() {
+    make install
+}
