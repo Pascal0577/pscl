@@ -93,4 +93,7 @@ install_files() {
 
     mkdir -pv "$DESTDIR/usr/share/bash-completion/completions"
     mv -v "$DESTDIR/etc/bash_completion.d/cargo" "$DESTDIR/usr/share/bash-completion/completions"
+
+    mkdir -pv "$DESTDIR/etc/profile.d/"
+    cp -av "$PKGROOT/70-rustc-in-path.sh" "$DESTDIR/etc/profile.d/"
 }
