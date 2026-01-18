@@ -1,0 +1,27 @@
+#!/bin/sh
+# shellcheck disable=SC2034
+
+package_name="autoconf-archive"
+package_version="2023.02.20"
+package_description="A collection of macros for GNU autoconf"
+package_source="https://github.com/autoconf-archive/autoconf-archive/archive/refs/tags/v2023.02.20.tar.gz 317a5efd4b2406d43639e38bf978c489"
+
+pkg_deps=""
+opt_deps=""
+build_deps=""
+check_deps=""
+
+source_dir="$package_name-$package_version"
+
+configure() {
+    cd "$source_dir" || log_error "Failed to cd: $source_dir"
+}
+
+build() {
+    :
+}
+
+install_files() {
+    mkdir -pv "$DESTDIR/usr/share/aclocal"
+    cp -av m4/*.m4 "$DESTDIR/usr/share/aclocal"
+}
