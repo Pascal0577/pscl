@@ -1,0 +1,31 @@
+#!/bin/sh
+# shellcheck disable=SC2034
+
+package_name="libxkbcommon"
+package_version="1.11.0"
+package_description="A keymap compiler and support library"
+package_source="https://github.com/lfs-book/libxkbcommon/archive/v1.11.0/libxkbcommon-1.11.0.tar.gz 28be5e49d8aa19e20fd7acd4b24e19be"
+
+pkg_deps="libxkb xkeyboard-config wayland-protocols wayland"
+opt_deps=""
+build_deps=""
+check_deps=""
+
+source_dir="$package_name-$package_version"
+
+configure() {
+    cd "$source_dir" || log_error "Failed to cd: $source_dir"
+    mkdir build && cd build
+    meson setup ..             \
+        --prefix=/usr        \
+        --buildtype=release  \
+        -D enable-docs=false
+}
+
+build() {
+    ninja
+}
+
+install_files() {
+    ninja install
+}
