@@ -1,0 +1,26 @@
+#!/bin/sh
+# shellcheck disable=SC2034
+
+package_name="dmenu"
+package_version="5.4"
+package_description="Dynamic menu for X"
+package_source="https://dl.suckless.org/tools/dmenu-5.4.tar.gz 79b8e1caf61133742e2250ca37b2de92"
+
+pkg_deps="bash libx11 libxinerama libxft freetype fontconfig"
+opt_deps=""
+build_deps=""
+check_deps=""
+
+source_dir="$package_name-$package_version"
+
+configure() {
+    cd "$source_dir" || log_error "Failed to cd: $source_dir"
+}
+
+build() {
+    make
+}
+
+install_files() {
+    make install
+}
