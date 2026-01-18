@@ -6,7 +6,7 @@ package_version="1.11.0"
 package_description="A keymap compiler and support library"
 package_source="https://github.com/lfs-book/libxkbcommon/archive/v1.11.0/libxkbcommon-1.11.0.tar.gz 28be5e49d8aa19e20fd7acd4b24e19be"
 
-pkg_deps="libxkb xkeyboard-config wayland-protocols wayland"
+pkg_deps="libxcb xkeyboard-config wayland-protocols wayland"
 opt_deps=""
 build_deps=""
 check_deps=""
