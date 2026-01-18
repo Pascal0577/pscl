@@ -1,0 +1,24 @@
+#!/bin/sh
+# shellcheck disable=SC2034
+
+package_name="alacritty"
+package_version=""
+package_description=""
+package_source=""
+
+pkg_deps="freetype fontconfig pkgconf libxkbcommon python3 libxcb"
+opt_deps=""
+build_deps="cmake make"
+check_deps=""
+
+source_dir="$package_name-$package_version"
+
+configure() {
+    cd "$source_dir" || log_error "Failed to cd: $source_dir"
+}
+
+build() {
+}
+
+install_files() {
+}
