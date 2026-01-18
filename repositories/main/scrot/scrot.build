@@ -2,7 +2,7 @@
 # shellcheck disable=SC2034
 
 package_name="scrot"
-package_version="1.21.1"
+package_version="1.12.1"
 package_description="A simple command line screen capture utility"
 package_source="https://github.com/resurrecting-open-source-projects/scrot/archive/refs/tags/1.12.1.tar.gz 05fb3cd75e174b095b9eae9da346be3d"
 
@@ -12,7 +12,7 @@ build_deps="autoconf pkgconf"
 check_deps=""
 
 configure() {
-    echo "$PWD"
+    cd scrot-1.12.1
     ./autogen.sh
     ./configure --prefix=/usr --disable=static
 }
