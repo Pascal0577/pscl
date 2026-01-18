@@ -1,3 +1,3 @@
 #!/bin/sh
 
-ln -sv /opt /opt/rustc-1.89.0
+ln -sv /opt/rustc-1.89.0 /opt/rustc
