@@ -41,30 +41,34 @@ END {
     target_depth = target_depth - 1
 
     for (i=target_depth; i>0; i--) {
-        for (j=1; j<=NR; j++) {
-            if (depths[j] != i) continue
+        for (j=i+1; j<=NR; j++) {
+            if (depths[j] != target_depth) continue
 
             if (connectors[j] == "├── ") {
                 for (k=j+1; k<=NR; k++) {
-                    if (depths[k] == i) {
+                    if (depths[k] == target_depth) {
                         for (n=j+1; n<k; n++) {
-                            if (depths[n] == i + 1) connectors[n] = "│   " connectors[n]
+                            if (depths[n] > target_depth) connectors[n] = "│   " connectors[n]
                         }
+                        # Stop processing additional lines to avoid duplicating "│   "
                         break
                     }
                 }
             }
 
-            if (connectors[j] == "└── " && depths[j+1] > i) {
+            if (connectors[j] == "└── " && depths[j+1] > target_depth) {
                 for (k=j+1; k<=NR; k++) {
-                    if (depths[k] > i) {
+                    if (depths[k] > target_depth) {
                         connectors[k] = "    " connectors[k]
-                    } else {
-                        break
                     }
                 }
             }
         }
         target_depth = target_depth - 1
+    }
+
+
+    for (j = 1; j <= NR; j++) {
+        printf "%s%s|%s\n", connectors[j], lines[j], depths[j]
     }
 }
