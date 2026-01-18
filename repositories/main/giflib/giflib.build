@@ -1,0 +1,32 @@
+#!/bin/sh
+# shellcheck disable=SC2034
+
+package_name="giflib"
+package_version="5.2.2"
+package_description=""
+package_source="https://sourceforge.net/projects/giflib/files/giflib-5.2.2.tar.gz 913dd251492134e235ee3c9a91987a4d"
+
+pkg_deps=""
+opt_deps=""
+build_deps=""
+check_deps=""
+
+source_dir="$package_name-$package_version"
+
+configure() {
+    cd "$source_dir" || log_error "Failed to cd: $source_dir"
+    patch -Np1 -i "$PKGROOT/giflib-5.2.2-upstream_fixes-1.patch"
+    patch -Np1 -i "$PKGROOT/giflib-5.2.2-security_fixes-1.patch"
+    cp pic/gifgrid.gif doc/giflib-logo.gif
+}
+
+build() {
+    make
+}
+
+install_files() {
+    make PREFIX=/usr install
+
+    # Remove unneeded static library
+    rm -fv "$DESTDIR/usr/lib/libgif.a"
+}

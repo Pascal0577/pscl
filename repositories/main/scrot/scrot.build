@@ -1,0 +1,27 @@
+#!/bin/sh
+# shellcheck disable=SC2034
+
+package_name="scrot"
+package_version="1.21.1"
+package_description="A simple command line screen capture utility"
+package_source="https://github.com/resurrecting-open-source-projects/scrot/archive/refs/tags/1.12.1.tar.gz 05fb3cd75e174b095b9eae9da346be3d"
+
+pkg_deps="xorg-server libxcomposite libxext libxfixes libxinerama imlib2"
+opt_deps=""
+build_deps="autoconf pkgconf"
+check_deps=""
+
+source_dir="$package_name-$package_version"
+
+configure() {
+    cd "$source_dir" || log_error "Failed to cd: $source_dir"
+    ./configure --prefix=/usr
+}
+
+build() {
+    make
+}
+
+install_files() {
+    make install
+}
