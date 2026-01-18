@@ -1,0 +1,42 @@
+#!/bin/sh
+# shellcheck disable=SC2034
+
+package_name="qt6"
+package_version="6.9.2"
+package_description="Cross-platform GUI framework"
+package_source="https://download.qt.io/archive/qt/6.9/6.9.2/single/qt-everywhere-src-6.9.2.tar.xz 78fe69ae8049f6b0139ceaa28e643f53"
+
+pkg_deps="libxorg"
+opt_deps=""
+build_deps=""
+check_deps=""
+
+source_dir="qt-everywhere-src-6.9.2"
+
+configure() {
+    cd "$source_dir" || log_error "Failed to cd: $source_dir"
+    ./configure -prefix /opt/qt6 \
+        -sysconfdir /etc/xdg     \
+        -dbus-linked             \
+        -openssl-linked          \
+        -system-sqlite           \
+        -nomake examples         \
+        -no-rpath                \
+        -no-sbom                 \
+        -journald                \
+        -skip qt3d               \
+        -skip qtquick3dphysics   \
+        -skip qtwebengine
+}
+
+build() {
+    ninja
+}
+
+install_files() {
+    ninja install
+    find "$DESTDIR/opt/qt6/" -name \*.prl -exec sed -i -e '/^QMAKE_PRL_BUILD_DIR/d' {} \;
+
+    mkdir -pv "$DESTDIR/etc/profile.d/"
+    cp -a "$PKGROOT/70-qt6-paths.sh" "$DESTDIR/etc/profile.d/"
+}
