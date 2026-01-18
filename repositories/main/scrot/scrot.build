@@ -12,6 +12,7 @@ build_deps="autoconf pkgconf"
 check_deps=""
 
 configure() {
+    echo "$PWD"
     ./autogen.sh
     ./configure --prefix=/usr --disable=static
 }
