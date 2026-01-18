@@ -211,7 +211,7 @@ get_dependency_tree() (
 
         _current_name="${_current%%|*}"
 
-        if backend_is_installed "$_current" && [ "$INSTALL_FORCE" = 0 ]; then
+        if backend_is_installed "$_current_name" && [ "$INSTALL_FORCE" = 0 ]; then
             _resolved="$_resolved$_current_name "
             log_debug "$_current is already installed. Skipping adding it to the tree"
             continue
@@ -240,7 +240,7 @@ get_dependency_tree() (
             dep_name="${dep_struct%%|*}"
             
             # Skip if already installed (unless forcing)
-            if backend_is_installed "$dep_struct" && [ "$INSTALL_FORCE" = 0 ]; then
+            if backend_is_installed "$dep_name" && [ "$INSTALL_FORCE" = 0 ]; then
                 _resolved="$_resolved$dep_name "
                 continue
             fi
