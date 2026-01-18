@@ -238,6 +238,7 @@ get_dependency_tree() (
 
         for dep_struct in $_deps; do
             dep_name="${dep_struct%%|*}"
+            if backend_is_installed "$dep_struct"; then continue; fi
             case $_resolved in
                 *" $dep_name "*) ;;
                 *)
