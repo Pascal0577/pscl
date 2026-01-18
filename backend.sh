@@ -16,17 +16,27 @@ backend_ask_confirmation() (
     _msg=""
     case "$_type" in 
         build)
-            _msg="Do you want to build these packages:" ;;
+            _msg="Do you want to build these packages [Y/n]: " ;;
         install)
-            _msg="Do you want to install these packages:" ;;
+            _msg="Do you want to install these packages [Y/n]: " ;;
         uninstall)
-            _msg="Do you want to uninstall these packages:" ;;
+            _msg="Do you want to uninstall these packages [Y/n]: " ;;
         activation)
-            _msg="Do you want to alter the activation status of these packages:" ;;
+            _msg="Do you want to alter the activation status of these packages [Y/n]: " ;;
     esac
 
-    echo "$_msg $_packages" >&2
+    printf "%s" "$_msg" >&2
+    tput sc >&2
+    
+    printf "\n" >&2
+    for _pkg in $_packages; do
+        echo "${_pkg%%|*}" >&2
+    done
+    echo "" >&2
+    
+    tput rc >&2
     read -r _ans
+    tput ed >&2
 
     case "$_ans" in
         y|yes|Y|"") echo "$_packages" ;;
