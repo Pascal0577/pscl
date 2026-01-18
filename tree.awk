@@ -48,7 +48,7 @@ END {
                 for (k=j+1; k<=NR; k++) {
                     if (depths[k] == target_depth) {
                         for (n=j+1; n<k; n++) {
-                            if (depths[n] > target_depth) connectors[n] = "│   " connectors[n]
+                            if (depths[n] == target_depth + 1) connectors[n] = "│   " connectors[n]
                         }
                         # Stop processing additional lines to avoid duplicating "│   "
                         break
