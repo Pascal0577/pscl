@@ -151,8 +151,10 @@ extension_uninstall_extension() (
                     log_error "Failed to execute post-uninstall cmds for $_ext_name"
             fi
 
-            rm "$_install_path" || \
-                log_error "Failed to copy extension to extensions directory"
+            uninstalled_dir="${EXTENSION_DIR}/uninstalled"
+            mkdir "$uninstalled_dir"
+            mv "$_install_path" "$uninstalled_dir" || \
+                log_error "Failed to move extension to uninstalled directory"
         ) 
         then
             printf "%b[SUCCESS]%b: Successfully uninstalled extension: %s\n" \
