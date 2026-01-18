@@ -11,11 +11,8 @@ opt_deps=""
 build_deps="autoconf pkgconf"
 check_deps=""
 
-source_dir="$package_name-$package_version"
-
 configure() {
-    cd "$source_dir" || log_error "Failed to cd: $source_dir"
-    ./configure --prefix=/usr
+    ./configure --prefix=/usr --disable=static
 }
 
 build() {
