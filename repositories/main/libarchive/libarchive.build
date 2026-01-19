@@ -4,7 +4,7 @@
 package_name="libarchive"
 package_version="3.8.2"
 package_description=""
-package_source="https://github.com/libarchive/libarchive/releases/download/v3.8.2/libarchive-3.8.2.tar.xz d41d8cd98f00b204e9800998ecf8427e"
+package_source="https://github.com/libarchive/libarchive/releases/download/v3.8.2/libarchive-3.8.2.tar.xz a01a1c81b72cb972841cc6c7a9a8fcb9"
 
 pkg_deps="libxml"
 
