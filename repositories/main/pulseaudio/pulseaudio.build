@@ -1,0 +1,35 @@
+#!/bin/sh
+# shellcheck disable=SC2034
+
+package_name="pulseaudio"
+package_version="17.0"
+package_description="A sound system for POSIX OSes"
+package_source="https://www.freedesktop.org/software/pulseaudio/releases/pulseaudio-17.0.tar.xz c4a3596a26ff4b9dcd0c394dd1d4f8ee"
+
+pkg_deps="libsndfile alsa-lib dbus glib speex speexdsp libxorg"
+opt_deps=""
+build_deps="meson ninja"
+check_deps=""
+
+source_dir="$package_name-$package_version"
+
+configure() {
+    cd "$source_dir" || log_error "Failed to cd: $source_dir"
+    mkdir build && cd build
+    meson setup --prefix=/usr \
+        --buildtype=release \
+        -D database=gdbm    \
+        -D doxygen=false    \
+        -D bluez5=disabled  \
+        -D tests=false      \
+        ..
+}
+
+build() {
+    ninja
+}
+
+install_files() {
+    ninja install
+    rm "$DESTDIR/usr/share/dbus-1/system.d/pulseaudio-system.conf"
+}

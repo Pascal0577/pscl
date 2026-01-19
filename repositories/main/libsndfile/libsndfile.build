@@ -1,0 +1,30 @@
+#!/bin/sh
+# shellcheck disable=SC2034
+
+package_name="libsndfile"
+package_version="1.2.2"
+package_description="A library of C routines for reading and writing files containing sampled audio data"
+package_source="https://github.com/libsndfile/libsndfile/releases/download/1.2.2/libsndfile-1.2.2.tar.xz 04e2e6f726da7c5dc87f8cf72f250d04"
+
+pkg_deps="flac opus libvorbis"
+opt_deps=""
+build_deps="make"
+check_deps=""
+
+source_dir="$package_name-$package_version"
+
+configure() {
+    cd "$source_dir" || log_error "Failed to cd: $source_dir"
+    sed '/typedef enum/,/bool ;/d' -i src/ALAC/alac_encoder.c
+    sed '/typedef enum/,/bool ;/d' -i src/ALAC/alac_decoder.c
+    ./configure --prefix=/usr    \
+        --docdir=/usr/share/doc/libsndfile-1.2.2
+}
+
+build() {
+    make
+}
+
+install_files() {
+    make install
+}

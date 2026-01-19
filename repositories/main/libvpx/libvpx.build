@@ -1,0 +1,32 @@
+#!/bin/sh
+# shellcheck disable=SC2034
+
+package_name="libvpx"
+package_version="1.15.2"
+package_description=""
+package_source="https://github.com/webmproject/libvpx/archive/v1.15.2/libvpx-1.15.2.tar.gz 4c7a93808c12b359733430c8377b7fcf"
+
+pkg_deps=""
+opt_deps=""
+build_deps="which make yasm"
+check_deps=""
+
+source_dir="$package_name-$package_version"
+
+configure() {
+    cd "$source_dir" || log_error "Failed to cd: $source_dir"
+    sed -i 's/cp -p/cp/' build/make/Makefile
+    mkdir libvpx-build && cd libvpx-build
+
+    ../configure --prefix=/usr    \
+        --enable-shared  \
+        --disable-static
+}
+
+build() {
+    make
+}
+
+install_files() {
+    make install
+}

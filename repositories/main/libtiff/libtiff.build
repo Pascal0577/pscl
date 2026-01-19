@@ -1,0 +1,33 @@
+#!/bin/sh
+# shellcheck disable=SC2034
+
+package_name="libtiff"
+package_version="4.7.0"
+package_description=""
+package_source="https://download.osgeo.org/libtiff/tiff-4.7.0.tar.gz 3a0fa4a270a4a192b08913f88d0cfbdd"
+
+pkg_deps="libjpeg-turbo libwebp"
+opt_deps=""
+build_deps="cmake ninja"
+check_deps=""
+
+source_dir="$package_name-$package_version"
+
+configure() {
+    cd "$source_dir" || log_error "Failed to cd: $source_dir"
+    mkdir -p libtiff-build &&
+    cd       libtiff-build &&
+
+    cmake -D CMAKE_INSTALL_PREFIX=/usr ..     \
+          -D CMAKE_POLICY_VERSION_MINIMUM=3.5 \
+          -G Ninja                            \
+          -D CMAKE_INSTALL_DOCDIR=/usr/share/doc/libtiff-4.7.0
+}
+
+build() {
+    ninja
+}
+
+install_files() {
+    ninja install
+}

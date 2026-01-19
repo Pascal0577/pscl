@@ -1,0 +1,29 @@
+#!/bin/sh
+# shellcheck disable=SC2034
+
+package_name="speex"
+package_version="1.2.1"
+package_description=""
+package_source="https://downloads.xiph.org/releases/speex/speex-1.2.1.tar.gz"
+
+pkg_deps="libogg"
+opt_deps=""
+build_deps="make"
+check_deps=""
+
+source_dir="$package_name-$package_version"
+
+configure() {
+    cd "$source_dir" || log_error "Failed to cd: $source_dir"
+    ./configure --prefix=/usr    \
+        --disable-static \
+        --docdir=/usr/share/doc/speex-1.2.1
+}
+
+build() {
+    make
+}
+
+install_files() {
+    make install
+}

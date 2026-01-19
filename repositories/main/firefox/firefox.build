@@ -1,0 +1,111 @@
+#!/bin/sh
+# shellcheck disable=SC2034
+
+package_name="firefox"
+package_version="140.2.0"
+package_description=""
+package_source="https://archive.mozilla.org/pub/firefox/releases/140.2.0esr/source/firefox-140.2.0esr.source.tar.xz 64773387a541a2ed5c1ce9f247469ba3"
+
+pkg_deps="cbindgen gtk3 libnotify libarchive llvm nodejs pulseaudio python3 startup-notification icu libevent libvpx libwebp nasm nss yasm ffmpeg"
+opt_deps=""
+build_deps=""
+check_deps=""
+
+source_dir="$package_name-$package_version"
+
+configure() {
+    cd "$source_dir" || log_error "Failed to cd: $source_dir"
+    cat > mozconfig << "EOF"
+# If you have installed (or will install) wireless-tools, and you wish
+# to use geolocation web services, comment out this line
+ac_add_options --disable-necko-wifi
+
+# If you wish to use libproxy to determine proxy server information, you will
+# need to install the libproxy package and then uncomment the option below:
+#ac_add_options --enable-libproxy
+
+# Uncomment the following option if you have not installed PulseAudio and
+# want to use alsa instead
+#ac_add_options --enable-audio-backends=alsa
+
+# Comment out following options if you have not installed
+# recommended dependencies:
+ac_add_options --with-system-icu
+ac_add_options --with-system-libevent
+ac_add_options --with-system-libvpx
+ac_add_options --with-system-nspr
+ac_add_options --with-system-nss
+ac_add_options --with-system-webp
+
+# The libdav1d library (av1 decoder) requires nasm. Uncomment this
+# if nasm has not been installed. Do not uncomment this if you have
+# ffmpeg installed.
+#ac_add_options --disable-av1
+
+# Stripping is now enabled by default.
+# Uncomment these lines if you need to run a debugger:
+#ac_add_options --disable-strip
+#ac_add_options --disable-install-strip
+
+# Disabling debug symbols makes the build much smaller and a little
+# faster. Comment this if you need to run a debugger.
+ac_add_options --disable-debug-symbols
+
+# The BLFS editors recommend not changing anything below this line:
+ac_add_options --prefix=/usr
+ac_add_options --enable-application=browser
+ac_add_options --disable-crashreporter
+ac_add_options --disable-updater
+
+# Enabling the tests will use a lot more space and significantly
+# increase the build time, for no obvious benefit.
+ac_add_options --disable-tests
+
+# This enables SIMD optimization in the shipped encoding_rs crate.
+ac_add_options --enable-rust-simd
+
+ac_add_options --enable-system-ffi
+ac_add_options --enable-system-pixman
+
+ac_add_options --with-system-jpeg
+ac_add_options --with-system-png
+ac_add_options --with-system-zlib
+
+# Sandboxing works well on x86_64 but might cause issues on other
+# platforms, e.g. i686.
+[ $(uname -m) != x86_64 ] && ac_add_options --disable-sandbox
+
+# Using sandboxed wasm libraries has been moved to all builds instead
+# of only mozilla automation builds. It requires extra llvm packages
+# and was reported to seriously slow the build. Disable it.
+ac_add_options --without-wasm-sandboxed-libraries
+
+# The following option unsets Telemetry Reporting. With the Addons Fiasco,
+# Mozilla was found to be collecting user's data, including saved passwords and
+# web form data, without users consent. Mozilla was also found shipping updates
+# to systems without the user's knowledge or permission.
+# As a result of this, use the following command to permanently disable
+# telemetry reporting in Firefox.
+unset MOZ_TELEMETRY_REPORTING
+
+mk_add_options MOZ_OBJDIR=@TOPSRCDIR@/firefox-build-dir
+
+# By default firefox will attempt to use the window class firefox-default on
+# launch. This makes the icon not work properly because wayland does not
+# support the X11 property  class header. Change the remoting name to fix this.
+# This is also reflected in the .desktop file where StartupWMClass is set to
+# firefox.
+MOZ_APP_REMOTINGNAME=firefox
+EOF
+}
+
+build() {
+    export MACH_BUILD_PYTHON_NATIVE_PACKAGE_SOURCE=none &&
+    export MOZBUILD_STATE_PATH=${PWD}/mozbuild          &&
+    ./mach build
+}
+
+install_files() {
+    export MACH_BUILD_PYTHON_NATIVE_PACKAGE_SOURCE=none &&
+    ./mach install
+}

@@ -1,0 +1,35 @@
+#!/bin/sh
+# shellcheck disable=SC2034
+
+package_name="nodejs"
+package_version="22.18.0"
+package_description=""
+package_source="https://nodejs.org/dist/v22.18.0/node-v22.18.0.tar.xz c465f337ce708750125ee9f3b907cbf1"
+
+pkg_deps="which"
+opt_deps=""
+build_deps=""
+check_deps=""
+
+source_dir="node-v22.18.0"
+
+configure() {
+    cd "$source_dir" || log_error "Failed to cd: $source_dir"
+    ./configure --prefix=/usr          \
+            --shared-brotli        \
+            --shared-cares         \
+            --shared-libuv         \
+            --shared-openssl       \
+            --shared-nghttp2       \
+            --shared-zlib          \
+            --with-intl=system-icu
+}
+
+build() {
+    make
+}
+
+install_files() {
+    make install
+    ln -sf node "$DESTDIR/usr/share/doc/node-22.18.0"
+}

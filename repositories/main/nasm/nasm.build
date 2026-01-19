@@ -1,0 +1,27 @@
+#!/bin/sh
+# shellcheck disable=SC2034
+
+package_name="nasm"
+package_version="2.16.03"
+package_description=""
+package_source="https://www.nasm.us/pub/nasm/releasebuilds/2.16.03/nasm-2.16.03.tar.xz 2b8c72c52eee4f20085065e68ac83b55"
+
+pkg_deps=""
+opt_deps=""
+build_deps="make"
+check_deps=""
+
+source_dir="$package_name-$package_version"
+
+configure() {
+    cd "$source_dir" || log_error "Failed to cd: $source_dir"
+    ./configure --prefix=/usr
+}
+
+build() {
+    make
+}
+
+install_files() {
+    make install
+}

@@ -1,0 +1,54 @@
+#!/bin/sh
+# shellcheck disable=SC2034
+
+package_name="nss"
+package_version="3.115"
+package_description=""
+package_source="https://archive.mozilla.org/pub/security/nss/releases/NSS_3_115_RTM/src/nss-3.115.tar.gz 3780ea47a89bccee86feb9d378cdb54e"
+
+pkg_deps="nspr sqlite p11-kit"
+opt_deps=""
+build_deps="make"
+check_deps=""
+
+source_dir="$package_name-$package_version"
+
+configure() {
+    cd "$source_dir" || log_error "Failed to cd: $source_dir"
+    patch -Np1 -i "$PKGROOT/nss-standalone-1.patch"
+    cd nss
+}
+
+build() {
+    make BUILD_OPT=1                       \
+        NSPR_INCLUDE_DIR=/usr/include/nspr \
+        USE_SYSTEM_ZLIB=1                  \
+        ZLIB_LIBS=-lz                      \
+        NSS_ENABLE_WERROR=0                \
+        USE_64=1                           \
+        "$([ -f /usr/include/sqlite3.h ] && echo NSS_USE_SYSTEM_SQLITE=1)"
+}
+
+# Pain
+install_files() {
+    cd ../dist
+
+    mkdir -pv "$DESTDIR/usr/lib"   \
+        "$DESTDIR/usr/include/nss" \
+        "$DESTDIR/usr/bin"         \
+        "$DESTDIR/usr/lib/pkgconfig"
+
+    install -v -m755 Linux*/lib/*.so "$DESTDIR/usr/lib"
+    install -v -m644 Linux*/lib/*.chk "$DESTDIR/usr/lib"
+    install -v -m644 Linux*/lib/libcrmf.a "$DESTDIR/usr/lib"
+
+    install -v -m755 -d "$DESTDIR/usr/include/nss"
+    cp -v -RL public/nss/* "$DESTDIR/usr/include/nss"
+    cp -v -RL private/nss/* "$DESTDIR/usr/include/nss"
+
+    install -v -m755 Linux*/bin/pk12util "$DESTDIR/usr/bin"
+    install -v -m755 Linux*/bin/nss-config "$DESTDIR/usr/bin"
+    install -v -m755 Linux*/bin/certutil "$DESTDIR/usr/bin"
+
+    install -v -m644 Linux*/lib/pkgconfig/nss.pc  "$DESTDIR/usr/lib/pkgconfig"
+}

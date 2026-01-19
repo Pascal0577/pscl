@@ -1,0 +1,37 @@
+#!/bin/sh
+# shellcheck disable=SC2034
+
+package_name="libjpeg-turbo"
+package_version="3.0.1"
+package_description=""
+package_source="https://downloads.sourceforge.net/libjpeg-turbo/libjpeg-turbo-3.0.1.tar.gz 1fdc6494521a8724f5f7cf39b0f6aff3"
+
+pkg_deps="yasm"
+opt_deps=""
+build_deps="cmake make"
+check_deps=""
+
+source_dir="$package_name-$package_version"
+
+configure() {
+    cd "$source_dir" || log_error "Failed to cd: $source_dir"
+    mkdir build &&
+    cd    build &&
+
+    cmake -D CMAKE_INSTALL_PREFIX=/usr        \
+          -D CMAKE_BUILD_TYPE=RELEASE         \
+          -D ENABLE_STATIC=FALSE              \
+          -D CMAKE_INSTALL_DEFAULT_LIBDIR=lib \
+          -D CMAKE_POLICY_VERSION_MINIMUM=3.5 \
+          -D CMAKE_SKIP_INSTALL_RPATH=ON      \
+          -D CMAKE_INSTALL_DOCDIR=/usr/share/doc/libjpeg-turbo-3.0.1 \
+          ..
+}
+
+build() {
+    make
+}
+
+install_files() {
+    make install
+}

@@ -1,0 +1,30 @@
+#!/bin/sh
+# shellcheck disable=SC2034
+
+package_name="yasm"
+package_version="1.3.0"
+package_description=""
+package_source="https://www.tortall.net/projects/yasm/releases/yasm-1.3.0.tar.gz fc9e586751ff789b34b1f21d572d96af"
+
+pkg_deps=""
+opt_deps=""
+build_deps=""
+check_deps=""
+
+source_dir="$package_name-$package_version"
+
+configure() {
+    cd "$source_dir" || log_error "Failed to cd: $source_dir"
+    sed -e 's/def __cplusplus/ defined(__cplusplus) || __STDC_VERSION__ >= 202311L/' -i libyasm/bitvect.h
+
+    sed -i 's#) ytasm.*#)#' Makefile.in
+    ./configure --prefix=/usr
+}
+
+build() {
+    make
+}
+
+install_files() {
+    make install
+}
