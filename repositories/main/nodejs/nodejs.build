@@ -6,7 +6,7 @@ package_version="22.18.0"
 package_description=""
 package_source="https://nodejs.org/dist/v22.18.0/node-v22.18.0.tar.xz c465f337ce708750125ee9f3b907cbf1"
 
-pkg_deps="which"
+pkg_deps="which c-ares nghttp2 brotli"
 opt_deps=""
 build_deps=""
 check_deps=""
