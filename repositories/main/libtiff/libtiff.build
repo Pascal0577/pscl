@@ -6,7 +6,7 @@ package_version="4.7.0"
 package_description=""
 package_source="https://download.osgeo.org/libtiff/tiff-4.7.0.tar.gz 3a0fa4a270a4a192b08913f88d0cfbdd"
 
-pkg_deps="libjpeg-turbo libwebp"
+pkg_deps="libjpeg-turbo"
 opt_deps=""
 build_deps="cmake ninja"
 check_deps=""
