@@ -24,5 +24,4 @@ build() {
 
 install_files() {
     make install
-    rm -v "$DESTDIR/usr/lib/libSDL2*.a"
 }
