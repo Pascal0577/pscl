@@ -10,7 +10,7 @@ source_dir="$package_name-$package_version"
 
 configure() {
     cd "$source_dir" || log_error "In $package_name.build: Failed to cd to $source_dir"
-    patch -p1 ../libpng-1.6.47-apng.patch
+    patch -p1 "$PKGROOT/libpng-1.6.47-apng.patch"
     ./configure --prefix=/usr --disable-static
 }
 
