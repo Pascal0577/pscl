@@ -1,0 +1,30 @@
+#!/bin/sh
+# shellcheck disable=SC2034
+
+package_name="c-ares"
+package_version="1.34.5"
+package_description=""
+package_source="https://github.com/c-ares/c-ares/releases/download/v1.34.5/c-ares-1.34.5.tar.gz 2c6dae580c2ef4ca03c1a27959bb9727"
+
+pkg_deps=""
+opt_deps=""
+build_deps="cmake make"
+check_deps=""
+
+source_dir="$package_name-$package_version"
+
+configure() {
+    cd "$source_dir" || log_error "Failed to cd: $source_dir"
+    mkdir build &&
+    cd    build &&
+
+    cmake  -D CMAKE_INSTALL_PREFIX=/usr ..
+}
+
+build() {
+    make
+}
+
+install_files() {
+    make install
+}
