@@ -1,0 +1,33 @@
+#!/bin/sh
+# shellcheck disable=SC2034
+
+package_name="gdk-pixbuf"
+package_version="2.42.12"
+package_description=""
+package_source="https://download.gnome.org/sources/gdk-pixbuf/2.42/gdk-pixbuf-2.42.12.tar.xz f986fdbba5ec6233c96f8b6535811780"
+
+pkg_deps="glib libjpeg-turbo libpng shared-mime-info docutils libtiff"
+opt_deps=""
+build_deps=""
+check_deps=""
+
+source_dir="$package_name-$package_version"
+
+configure() {
+    cd "$source_dir" || log_error "Failed to cd: $source_dir"
+    mkdir build
+    cd build
+    meson setup ..            \
+        --prefix=/usr       \
+        --buildtype=release \
+        -D others=enabled   \
+        --wrap-mode=nofallback
+}
+
+build() {
+    ninja
+}
+
+install_files() {
+    ninja install
+}

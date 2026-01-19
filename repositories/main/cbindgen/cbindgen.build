@@ -1,0 +1,26 @@
+#!/bin/sh
+# shellcheck disable=SC2034
+
+package_name="cbindgen"
+package_version="0.29.0"
+package_description="Can be used to generate C bindings for Rust code"
+package_source="https://github.com/mozilla/cbindgen/archive/v0.29.0/cbindgen-0.29.0.tar.gz 6020b670f82890ef7205fd2c84395954"
+
+pkg_deps=""
+opt_deps=""
+build_deps="rustc"
+check_deps=""
+
+source_dir="$package_name-$package_version"
+
+configure() {
+    cd "$source_dir" || log_error "Failed to cd: $source_dir"
+}
+
+build() {
+    cargo build --release
+}
+
+install_files() {
+    install -Dm755 target/release/cbindgen "$DESTDIR/usr/bin/"
+}

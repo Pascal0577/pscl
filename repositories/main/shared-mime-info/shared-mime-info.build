@@ -1,0 +1,28 @@
+#!/bin/sh
+# shellcheck disable=SC2034
+
+package_name="shared-mime-info"
+package_version="2.4"
+package_description="Contains a MIME database"
+package_source="https://gitlab.freedesktop.org/xdg/shared-mime-info/-/archive/2.4/shared-mime-info-2.4.tar.gz aac56db912b7b12a04fb0018e28f2f36"
+
+pkg_deps="glib libxml"
+opt_deps=""
+build_deps=""
+check_deps=""
+
+source_dir="$package_name-$package_version"
+
+configure() {
+    cd "$source_dir" || log_error "Failed to cd: $source_dir"
+    mkdir build && cd build
+    meson setup --prefix=/usr --buildtype=release -D update-mimedb=true ..
+}
+
+build() {
+    ninja
+}
+
+install_files() {
+    ninja install
+}

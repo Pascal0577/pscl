@@ -1,0 +1,36 @@
+#!/bin/sh
+# shellcheck disable=SC2034
+
+package_name="nspr"
+package_version="4.37"
+package_description=""
+package_source="https://archive.mozilla.org/pub/nspr/releases/v4.37/src/nspr-4.37.tar.gz be993c415dd4590c8e8fc2da7b0594bf"
+
+pkg_deps=""
+opt_deps=""
+build_deps="make"
+check_deps=""
+
+source_dir="$package_name-$package_version"
+
+configure() {
+    cd "$source_dir" || log_error "Failed to cd: $source_dir"
+    cd nspr
+
+    sed -i '/^RELEASE/s|^|#|' pr/src/misc/Makefile.in &&
+    sed -i 's|$(LIBRARY) ||'  config/rules.mk         &&
+
+
+    ./configure --prefix=/usr   \
+        --with-mozilla  \
+        --with-pthreads \
+        --enable-64bit
+}
+
+build() {
+    make
+}
+
+install_files() {
+    make install
+}

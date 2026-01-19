@@ -1,0 +1,29 @@
+#!/bin/sh
+# shellcheck disable=SC2034
+
+package_name="startup-notification"
+package_version="0.12"
+package_description=""
+package_source="https://www.freedesktop.org/software/startup-notification/releases/startup-notification-0.12.tar.gz 2cd77326d4dcaed9a5a23a1232fb38e9"
+
+pkg_deps="libxorg xcb-util"
+opt_deps=""
+build_deps="make"
+check_deps=""
+
+source_dir="$package_name-$package_version"
+
+configure() {
+    cd "$source_dir" || log_error "Failed to cd: $source_dir"
+    ./configure --prefix=/usr --disable-static
+}
+
+build() {
+    make
+}
+
+install_files() {
+    make install
+    install -v -m644 -D doc/startup-notification.txt \
+    "$DESTDIR/usr/share/doc/startup-notification-0.12/startup-notification.txt"
+}

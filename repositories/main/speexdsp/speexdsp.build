@@ -1,0 +1,29 @@
+#!/bin/sh
+# shellcheck disable=SC2034
+
+package_name="speexdsp"
+package_version="1.2.1"
+package_description=""
+package_source="https://downloads.xiph.org/releases/speex/speexdsp-1.2.1.tar.gz e6eb5ddef743a362c8018f260b91dca5"
+
+pkg_deps="libogg speex"
+opt_deps=""
+build_deps=""
+check_deps=""
+
+source_dir="$package_name-$package_version"
+
+configure() {
+    cd "$source_dir" || log_error "Failed to cd: $source_dir"
+    ./configure --prefix=/usr    \
+        --disable-static \
+        --docdir=/usr/share/doc/speexdsp-1.2.1
+}
+
+build() {
+    make
+}
+
+install_files() {
+    make install
+}

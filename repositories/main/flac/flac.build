@@ -1,0 +1,29 @@
+#!/bin/sh
+# shellcheck disable=SC2034
+
+package_name="flac"
+package_version="1.5.0"
+package_description=""
+package_source="https://github.com/xiph/flac/releases/download/1.5.0/flac-1.5.0.tar.xz 0bb45bcf74338b00efeec121fff27367"
+
+pkg_deps="libogg"
+opt_deps=""
+build_deps=""
+check_deps=""
+
+source_dir="$package_name-$package_version"
+
+configure() {
+    cd "$source_dir" || log_error "Failed to cd: $source_dir"
+    ./configure --prefix=/usr            \
+            --disable-thorough-tests \
+            --docdir=/usr/share/doc/flac-1.5.0
+}
+
+build() {
+    make
+}
+
+install_files() {
+    make install
+}

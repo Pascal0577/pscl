@@ -1,0 +1,28 @@
+#!/bin/sh
+# shellcheck disable=SC2034
+
+package_name="sdl2"
+package_version="2.32.8"
+package_description=""
+package_source="https://www.libsdl.org/release/SDL2-2.32.8.tar.gz 7df28be966308a4a51aac87f4e0cf16a"
+
+pkg_deps="libxkbcommon wayland-protocols libxorg"
+opt_deps="alsa-lib"
+build_deps=""
+check_deps=""
+
+source_dir="$package_name-$package_version"
+
+configure() {
+    cd "$source_dir" || log_error "Failed to cd: $source_dir"
+    ./configure --prefix=/usr
+}
+
+build() {
+    make
+}
+
+install_files() {
+    make install
+    rm -v "$DESTDIR/usr/lib/libSDL2*.a"
+}

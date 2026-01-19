@@ -1,0 +1,32 @@
+#!/bin/sh
+# shellcheck disable=SC2034
+
+package_name="opus"
+package_version="1.5.2"
+package_description=""
+package_source="https://downloads.xiph.org/releases/opus/opus-1.5.2.tar.gz c40b3a1fbdbb9a7aa178600b88200c76"
+
+pkg_deps=""
+opt_deps=""
+build_deps="ninja meson"
+check_deps=""
+
+source_dir="$package_name-$package_version"
+
+configure() {
+    cd "$source_dir" || log_error "Failed to cd: $source_dir"
+    mkdir build &&
+    cd    build &&
+
+    meson setup --prefix=/usr        \
+                --buildtype=release  \
+                -D docdir=/usr/share/doc/opus-1.5.2
+}
+
+build() {
+    ninja
+}
+
+install_files() {
+    ninja install
+}
