@@ -4,7 +4,7 @@
 package_name="duktape"
 package_version="2.7.0"
 package_description="An embeddable Javascript engine"
-package_source="https://duktape.org/duktape-2.7.0.tar.xz"
+package_source="https://duktape.org/duktape-2.7.0.tar.xz b3200b02ab80125b694bae887d7c1ca6"
 
 pkg_deps=""
 opt_deps=""
