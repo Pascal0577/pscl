@@ -22,7 +22,6 @@ configure() {
     -e '/PATH=/{s@/sbin:@@;s@/bin:@@}'                  \
     -i etc/login.defs
 
-    touch /usr/bin/passwd
     ./configure --sysconfdir=/etc   \
         --disable-static    \
         --with-{b,yes}crypt \
