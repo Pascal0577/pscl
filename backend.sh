@@ -504,7 +504,6 @@ backend_activate_package() {
     find "$_pkg_install_dir" -type d -printf "%P\0" | \
         xargs -0 -r -P "$(nproc)" -I {} mkdir -p "${INSTALL_ROOT:-}/{}"
 
-    # Create symlinks with parallel xargs
     cd "$_pkg_install_dir" || return 1
     find . -mindepth 1 -type f -printf "%P\0" | \
         xargs -0 -P "$(nproc)" -I {} ln -sf "$_source_prefix/{}" "${INSTALL_ROOT:-}/{}"
@@ -611,27 +610,19 @@ backend_unactivate_package() (
     backend_is_installed "$_pkg" || log_error "Package not installed: $_pkg"
 
     _package_metadata_dir="${INSTALL_ROOT:-}/$METADATA_DIR/$_pkg"
-    _pkgfiles="$(sort -r "$_package_metadata_dir/PKGFILES")"
 
-    # We need to remove individual files first, and then do a second pass
-    # to remove empty directories to avoid race conditions. Despite having
-    # to run the loop twice, it is indeed faster than doing it synchronously
-    while IFS= read -r file; do
-    (
-        _full_path="${INSTALL_ROOT:-}/$file"
+    # shellcheck disable=SC2329
+    remove_file() {
+        _full_path="${INSTALL_ROOT:-}/$1"
         if [ -f "$_full_path" ] || [ -L "$_full_path" ]; then
             log_debug "Removing file: $_full_path"
-            rm "${_full_path:?}" || log_warn "Failed to remove: $_full_path"
+            rm "$_full_path" || log_warn "Failed to remove: $_full_path"
         fi
-    ) &
-    done <<- EOF
-        $_pkgfiles
-	EOF
-    wait
-    
-    while IFS= read -r file; do
-    (
-        _full_path="${INSTALL_ROOT:-}/$file"
+    }
+
+    # shellcheck disable=SC2329
+    remove_dir() {
+        _full_path="${INSTALL_ROOT:-}/$1"
         if [ -d "$_full_path" ]; then
             if rmdir "${_full_path:?}" 2>/dev/null; then
                 log_debug "Removed empty directory: $_full_path"
@@ -640,11 +631,15 @@ backend_unactivate_package() (
                 true
             fi
         fi
-    ) &
-    done <<- EOF
-        $_pkgfiles
-	EOF
-    wait
+    }
+    export -f log_debug log_warn remove_file remove_dir
+    export INSTALL_ROOT
+
+    # We need to remove individual files first, and then do a second pass
+    # to remove empty directories to avoid race conditions. Despite having
+    # to run twice, it is indeed faster than doing it synchronously
+    xargs -a "$_package_metadata_dir/PKGFILES" -P "$(nproc)" {} bash -c 'remove_file "$@"' _ {}
+    xargs -a "$_package_metadata_dir/PKGFILES" -P "$(nproc)" {} bash -c 'remove_dir "$@"' _ {}
 )
 
 backend_remove_files() (
