@@ -486,7 +486,7 @@ backend_register_package() (
     # Add to world file
     _world="${INSTALL_ROOT:-}/${WORLD:?}"
     grep -qx "$_pkg_name" "$_world" 2>/dev/null || \
-        echo "${_pkg_name}:${package_version}:${pkg_deps}:${opt_deps}:${build_deps}:${check_deps}:deactivated" >> "$_world"
+        echo "${_pkg_name}:${package_version:-}:${pkg_deps:-}:${opt_deps:-}:${build_deps:-}:${check_deps:-}:deactivated" >> "$_world"
 )
 
 backend_activate_package() {
