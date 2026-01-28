@@ -489,11 +489,10 @@ backend_activate_package() {
     _data_dir="${INSTALL_ROOT:-}/${METADATA_DIR:?}/$_pkg_name"
     _pkg_install_dir="${INSTALL_ROOT:-}/${PKGDIR:?}/installed_packages/$_pkg_name"
 
-    trap 'unset _pkg_name _data_dir _pkg_install_dir' INT TERM EXIT
+    trap 'unset _pkg_name _data_dir _pkg_install_dir _source_prefix' INT TERM EXIT
 
     [ ! -d "$_pkg_install_dir" ] && log_error "Package not installed: $_pkg_name"
 
-    # Handle post-install script
     _post_install_script="${_pkg_install_dir}/post-install.sh"
     if [ -f "$_post_install_script" ]; then
         cp -a "$_post_install_script" "$_data_dir"
@@ -501,19 +500,14 @@ backend_activate_package() {
     fi
 
     _source_prefix="${_pkg_install_dir##"${INSTALL_ROOT:-}"}"
-    
-    # Use xargs for batching mkdir calls
-    find "$_pkg_install_dir" -mindepth 1 -type d -printf "%P\0" | \
-        xargs -0 -I {} mkdir -p "${INSTALL_ROOT:-}/{}"
-    
+
+    find "$_pkg_install_dir" -type d -printf "%P\0" | \
+        xargs -0 -r -I {} mkdir -p "${INSTALL_ROOT:-}/{}"
+
+    # Create symlinks with parallel xargs
     cd "$_pkg_install_dir" || return 1
     find . -mindepth 1 -type f -printf "%P\0" | \
-    while IFS= read -r -d '' file; do
-        _target="${INSTALL_ROOT:-}/$file"
-        _target_dir="$(dirname "$_target")"
-        [ -d "$_target_dir" ] || mkdir -p "$_target_dir"
-        ln -sf "$_source_prefix/$file" "$_target"
-    done
+        xargs -0 -P $(nproc) -I {} ln -sf "$_source_prefix/{}" "${INSTALL_ROOT:-}/{}"
     cd - >/dev/null
 }
 
