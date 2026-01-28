@@ -473,15 +473,20 @@ backend_register_package() (
     _pkg_name="$1"
     _data_dir="${INSTALL_ROOT:-}/${METADATA_DIR:?}/$_pkg_name"
     _install_dir="${INSTALL_ROOT:-}/${PKGDIR:?}/installed_packages/$_pkg_name"
+    _pkg_dir="$(backend_get_package_dir "$_pkg_name")" || \
+        log_error "Failed to get package directory: $_pkg_name"
+    _pkg_build="${_pkg_dir}/${_pkg_name}.build"
 
     [ -f "$_install_dir/PKGINFO" ] && mv "$_install_dir/PKGINFO" "$_data_dir"
     [ -f "$_data_dir/PKGFILES.pkg-new" ] && \
         mv "$_data_dir/PKGFILES.pkg-new" "$_data_dir/PKGFILES"
 
+    . "$_pkg_build" || log_error "Failed to source: $_pkg_build"
+
     # Add to world file
     _world="${INSTALL_ROOT:-}/${WORLD:?}"
     grep -qx "$_pkg_name" "$_world" 2>/dev/null || \
-        echo "$_pkg_name" >> "$_world"
+        echo "${_pkg_name}:${package_version}:${pkg_deps}:${opt_deps}:${build_deps}:${check_deps}:deactivated" >> "$_world"
 )
 
 backend_activate_package() {
@@ -489,7 +494,10 @@ backend_activate_package() {
     _data_dir="${INSTALL_ROOT:-}/${METADATA_DIR:?}/$_pkg_name"
     _pkg_install_dir="${INSTALL_ROOT:-}/${PKGDIR:?}/installed_packages/$_pkg_name"
 
-    trap 'unset _pkg_name _data_dir _pkg_install_dir _source_prefix' INT TERM EXIT
+    trap '
+        unset _pkg_name _data_dir _pkg_install_dir _source_prefix
+        [ -f "${WORLD}.tmp" ] && rm "${WORLD}.tmp"
+    ' INT TERM EXIT
 
     [ ! -d "$_pkg_install_dir" ] && log_error "Package not installed: $_pkg_name"
 
@@ -508,6 +516,11 @@ backend_activate_package() {
     find . -mindepth 1 -type f -printf "%P\0" | \
         xargs -0 -P "$(nproc)" -I {} ln -sf "$_source_prefix/{}" "${INSTALL_ROOT:-}/{}"
     cd - >/dev/null
+
+    awk -F: -v pkg="$_pkg_name" '
+        BEGIN{OFS=":"} $1==pkg {$7="activated"} 1
+    ' "$WORLD" > "${WORLD}.tmp"
+    mv "${WORLD}.tmp" "$WORLD"
 }
 
 ###################
@@ -640,6 +653,11 @@ backend_unactivate_package() (
     # to run twice, it is indeed faster than doing it synchronously
     xargs -a "$_package_metadata_dir/PKGFILES" -P "$(nproc)" {} bash -c 'remove_file "$@"' _ {}
     xargs -a "$_package_metadata_dir/PKGFILES" -P "$(nproc)" {} bash -c 'remove_dir "$@"' _ {}
+
+    awk -F: -v pkg="$_pkg_name" '
+        BEGIN{OFS=":"} $1==pkg {$7="deactivated"} 1
+    ' "$WORLD" > "${WORLD}.tmp"
+    mv "${WORLD}.tmp" "$WORLD"
 )
 
 backend_remove_files() (
