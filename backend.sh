@@ -502,12 +502,12 @@ backend_activate_package() {
     _source_prefix="${_pkg_install_dir##"${INSTALL_ROOT:-}"}"
 
     find "$_pkg_install_dir" -type d -printf "%P\0" | \
-        xargs -0 -r -I {} mkdir -p "${INSTALL_ROOT:-}/{}"
+        xargs -0 -r -P "$(nproc)" -I {} mkdir -p "${INSTALL_ROOT:-}/{}"
 
     # Create symlinks with parallel xargs
     cd "$_pkg_install_dir" || return 1
     find . -mindepth 1 -type f -printf "%P\0" | \
-        xargs -0 -P $(nproc) -I {} ln -sf "$_source_prefix/{}" "${INSTALL_ROOT:-}/{}"
+        xargs -0 -P "$(nproc)" -I {} ln -sf "$_source_prefix/{}" "${INSTALL_ROOT:-}/{}"
     cd - >/dev/null
 }
 
