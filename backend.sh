@@ -530,45 +530,6 @@ backend_activate_package() {
 backend_resolve_uninstall_order() (
     _requested_packages="$*"
     _uninstall_order=""
-    _map_dir="$(mktemp -d)"
-    _job_count=0
-    _max_job_nums="$(nproc)"
-
-    trap 'rm -rf ${_map_dir:?}' INT TERM EXIT
-    # First build a map of all installed packages and their dependencies
-    # We do this with asynchronous subshells to try to do it as fast as 
-    # possible
-    log_debug "Creating dependency map"
-    while read -r installed_pkg; do
-        (
-            _pkginfo="${INSTALL_ROOT:-}/${METADATA_DIR:?}/$installed_pkg/PKGINFO"
-            [ -f "$_pkginfo" ] || exit 0
-
-            # shellcheck source=/dev/null
-            . "$_pkginfo" || \
-                log_error "Failed to source: $_pkginfo"
-
-            _deps="${pkg_deps:-} ${opt_deps:-} ${build_deps:-} ${check_deps:-}"
-            _deps="$(trim_string_and_return "$_deps")"
-
-            log_debug "Adding [$_deps] to map"
-            # Print result to its own file to avoid race conditions
-            tmpfile=$(mktemp "${_map_dir:?}/file_XXXXXX")
-            printf "%s:%s\n" "$installed_pkg" "$_deps" > "$tmpfile"
-        ) &
-
-        _job_count=$((_job_count + 1))
-
-        if [ "$_job_count" -ge "$_max_job_nums" ]; then
-            # wait -n is better if the shell supports it
-            wait -n 2>/dev/null || wait
-            _job_count=$((_job_count - 1))
-        fi
-    done < "${INSTALL_ROOT:-}/${WORLD:?}"
-    wait
-
-    # Combine all outputs of the child processes
-    _map="$(cat "$_map_dir"/* 2>/dev/null || true)"
 
     # If all of a dependency's reverse dependencies are in the uninstall
     # order, add the dependency to the uninstall order. We need to start
@@ -591,7 +552,8 @@ backend_resolve_uninstall_order() (
             # the uninstall order if any of those reverse dependencies are not
             # already in the uninstall order. We only want to remove packages with no 
             # external reverse dependencies
-            if string_is_in_list "$_leaf_name" "$deps"; then
+            if string_is_in_list "$_leaf_name" "$deps" || \
+                string_is_in_list "$_leaf_name" "$opts"; then
                 log_debug "Checking if $pkg is in $_uninstall_order"
                 case "$_uninstall_order" in
                     *"$pkg|"*|*" $pkg|"*) continue ;;
@@ -603,9 +565,7 @@ backend_resolve_uninstall_order() (
                         ;;
                 esac
             fi
-        done <<- EOF
-            "$WORLD"
-		EOF
+        done < "$WORLD"
 
         # The aforementioned helpful error message
         [ -n "$_reverse_deps" ] && \
