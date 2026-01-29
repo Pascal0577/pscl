@@ -449,7 +449,7 @@ backend_install_files() (
         log_error "Failed to get package directory for: $_pkg_name"
     _package_archive="${INSTALL_ROOT:-}/$PACKAGE_CACHE/$_pkg_name.tar.zst"
     _data_dir="${INSTALL_ROOT:-}/${METADATA_DIR:?}/$_pkg_name"
-    _install_dir="${INSTALL_ROOT:-}/${PKGDIR:?}/installed_packages/$_pkg_name"
+    _install_dir="${INSTALL_ROOT:-}/${PKGDIR:?}/packages/$_pkg_name"
 
     [ ! -e "$_package_archive" ] && \
         log_error "Package archive doesn't exit: $_package_archive"
@@ -472,7 +472,7 @@ backend_install_files() (
 backend_register_package() (
     _pkg_name="$1"
     _data_dir="${INSTALL_ROOT:-}/${METADATA_DIR:?}/$_pkg_name"
-    _install_dir="${INSTALL_ROOT:-}/${PKGDIR:?}/installed_packages/$_pkg_name"
+    _install_dir="${INSTALL_ROOT:-}/${PKGDIR:?}/packages/$_pkg_name"
     _pkg_dir="$(backend_get_package_dir "$_pkg_name")" || \
         log_error "Failed to get package directory: $_pkg_name"
     _pkg_build="${_pkg_dir}/${_pkg_name}.build"
@@ -492,7 +492,7 @@ backend_register_package() (
 backend_activate_package() {
     _pkg_name="$1"
     _data_dir="${INSTALL_ROOT:-}/${METADATA_DIR:?}/$_pkg_name"
-    _pkg_install_dir="${INSTALL_ROOT:-}/${PKGDIR:?}/installed_packages/$_pkg_name"
+    _pkg_install_dir="${INSTALL_ROOT:-}/${PKGDIR:?}/packages/$_pkg_name"
 
     trap '
         unset _pkg_name _data_dir _pkg_install_dir _source_prefix
@@ -586,8 +586,7 @@ backend_resolve_uninstall_order() (
         string_is_in_list "$_leaf_name" "$_requested_packages" && \
             _track_rdeps=0 || _track_rdeps=1
         # shellcheck disable=SC2034
-        while IFS=':' read -r pkg deps junk; do
-            pkg="$(trim_string_and_return "$pkg")"
+        while IFS=':' read -r pkg version deps opts junk; do
             # If one of the dependencies has a reverse dependency, remove it from
             # the uninstall order if any of those reverse dependencies are not
             # already in the uninstall order. We only want to remove packages with no 
@@ -605,7 +604,7 @@ backend_resolve_uninstall_order() (
                 esac
             fi
         done <<- EOF
-            ${_map:?}
+            "$WORLD"
 		EOF
 
         # The aforementioned helpful error message
@@ -662,7 +661,7 @@ backend_unactivate_package() (
 
 backend_remove_files() (
     _pkg="$1"
-    _pkg_install_dir="${INSTALL_ROOT:-}/${PKGDIR:?}/installed_packages/${_pkg:?}"
+    _pkg_install_dir="${INSTALL_ROOT:-}/${PKGDIR:?}/packages/${_pkg:?}"
     [ -d "$_pkg_install_dir" ] && rm -rf "${_pkg_install_dir:?}"
     return 0
 )
