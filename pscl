@@ -154,6 +154,7 @@ parse_arguments() {
             ;;
 
         -h|--help) print_usage ;;
+        --no-confirm) NO_CONFIRM=true ;;
 
         *)
             # Allow extensions to handle completely custom actions
@@ -279,7 +280,8 @@ main_install() (
     _install_order="$(backend_resolve_install_order "$_requested_packages")" || \
         log_error "Failed to resolve install order"
 
-    _install_order="$(backend_ask_confirmation install "$_install_order")" || \
+    "$NO_CONFIRM" || \
+        _install_order="$(backend_ask_confirmation install "$_install_order")" || \
         log_error "Not proceeding"
     _install_order_names="$(get_field "$_install_order" 1)"
 
