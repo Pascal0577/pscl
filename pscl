@@ -17,9 +17,6 @@ readonly LOG_FILE="${LOG_DIR:-}/pscl-$(date +%s).log"
 readonly green="\x1b[32m"
 
 parse_arguments() {
-    _flag="$1"
-    shift
-
     # Default values
     ACTION=""
     ARGUMENTS=""
@@ -40,6 +37,18 @@ parse_arguments() {
     BUILD_DEPS="${BUILD_DEPS:-false}"
     CHECK_DEPS="${CHECK_DEPS:-true}"
     ASK_CONFIRMATION="${ASK_CONFIRMATION:-true}"
+
+    while [ $# -gt 0 ]; do
+        case "$1" in
+            --no-confirm)
+                NO_CONFIRM=true
+                shift
+                ;;
+        esac
+    done
+
+    _flag="$1"
+    shift
 
     case "$_flag" in
         -B*)
@@ -154,7 +163,6 @@ parse_arguments() {
             ;;
 
         -h|--help) print_usage ;;
-        --no-confirm) NO_CONFIRM=true ;;
 
         *)
             # Allow extensions to handle completely custom actions
