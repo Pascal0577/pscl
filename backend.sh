@@ -527,56 +527,54 @@ backend_activate_package() {
 # Uninstall Steps #
 ###################
 
-backend_resolve_uninstall_order() {
+backend_resolve_uninstall_order() (
     _requested_packages="$*"
-    
+    _uninstall_order=""
+
+    # If all of a dependency's reverse dependencies are in the uninstall
+    # order, add the dependency to the uninstall order. We need to start
+    # at the top of the tree which is why we use the reversed dependency tree 
     INSTALL_FORCE=1
     _tree="$(get_dependency_tree "$_requested_packages")"
     _uninstall_order="$_tree"
-    
-    _reverse_deps=""
-    
-    # shellcheck disable=SC2034
-    while IFS=':' read -r pkg version deps opts junk; do
-        case " $_tree " in
-            *" $pkg|"*) continue ;;
-        esac
-        
-        # If one of the dependencies has a reverse dependency, remove it from
-        # the uninstall order if any of those reverse dependencies are not
-        # already in the uninstall order. We only want to remove packages with no 
-        # external reverse dependencies
-        for leaf in $_tree; do
-            _leaf_name="${leaf%%|*}"
-            
-            # If the leaf is one of the requested packages, build a list of
-            # its reverse dependencies so a helpful error message can be given
-            string_is_in_list "$_leaf_name" "$_requested_packages" && \
-                _track_rdeps=0 || _track_rdeps=1
 
+    # Now we find the reverse dependencies of everything in the dependency tree
+    _reverse_deps=""
+    for leaf in $_tree; do
+        _leaf_name="${leaf%%|*}"
+        # If the leaf is one of the requested packages, build a list of
+        # its reverse dependencies so a helpful error message can be given
+        string_is_in_list "$_leaf_name" "$_requested_packages" && \
+            _track_rdeps=0 || _track_rdeps=1
+        # shellcheck disable=SC2034
+        while IFS=':' read -r pkg version deps opts junk; do
+            # If one of the dependencies has a reverse dependency, remove it from
+            # the uninstall order if any of those reverse dependencies are not
+            # already in the uninstall order. We only want to remove packages with no 
+            # external reverse dependencies
             if string_is_in_list "$_leaf_name" "$deps" || \
                 string_is_in_list "$_leaf_name" "$opts"; then
-                case " $_uninstall_order " in
-                    *" $leaf "*) ;;
+                log_debug "Checking if $pkg is in $_uninstall_order"
+                case "$_uninstall_order" in
+                    *"$pkg|"*|*" $pkg|"*) continue ;;
                     *)
-                        [ "$_track_rdeps" = 0 ] && \
-                            _reverse_deps="$_reverse_deps $pkg"
+                        [ "$_track_rdeps" = 0 ] && _reverse_deps="$_reverse_deps $pkg"
                         log_debug "Removing from uninstall order: $leaf"
-                        _uninstall_order="$(remove_string_from_list \
-                            "$leaf" "$_uninstall_order")"
+                        _uninstall_order="$(remove_string_from_list "$leaf" "$_uninstall_order")"
                         break
                         ;;
                 esac
             fi
-        done
-    done < "$WORLD"
-    
-    [ -n "$_reverse_deps" ] && \
-        log_error "Cannot remove packages: Needed by:$_reverse_deps"
+        done < "$WORLD"
+
+        # The aforementioned helpful error message
+        [ -n "$_reverse_deps" ] && \
+            log_error "Cannot remove $leaf: Needed by:$_reverse_deps"
+    done
 
     log_debug "Uninstall order is: $_uninstall_order"
     trim_string_and_return "$_uninstall_order"
-}
+)
 
 backend_unactivate_package() (
     _pkg="$1"
