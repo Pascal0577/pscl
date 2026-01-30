@@ -539,15 +539,13 @@ backend_resolve_uninstall_order() (
     _uninstall_order="$_tree"
 
     # Now we find the reverse dependencies of everything in the dependency tree
-    _reverse_deps=""
-    for leaf in $_tree; do
-        _leaf_name="${leaf%%|*}"
-        # If the leaf is one of the requested packages, build a list of
-        # its reverse dependencies so a helpful error message can be given
-        string_is_in_list "$_leaf_name" "$_requested_packages" && \
-            _track_rdeps=0 || _track_rdeps=1
-        # shellcheck disable=SC2034
-        while IFS=':' read -r pkg version deps opts junk; do
+    # shellcheck disable=SC2034
+    while IFS=':' read -r pkg version deps opt junk; do
+        for leaf in $_tree; do
+            _leaf_name="${leaf%%|*}"
+            string_is_in_list "$_leaf_name" "$_requested_packages" && \
+                _track_rdeps=0 || _track_rdeps=1
+
             # If one of the dependencies has a reverse dependency, remove it from
             # the uninstall order if any of those reverse dependencies are not
             # already in the uninstall order. We only want to remove packages with no 
@@ -558,19 +556,17 @@ backend_resolve_uninstall_order() (
                 case "$_uninstall_order" in
                     *"$pkg|"*|*" $pkg|"*) continue ;;
                     *)
-                        [ "$_track_rdeps" = 0 ] && _reverse_deps="$_reverse_deps $pkg"
+                        [ "$_track_rdeps" = 0 ] && \
+                            _reverse_deps="$_reverse_deps $pkg"
                         log_debug "Removing from uninstall order: $leaf"
-                        _uninstall_order="$(remove_string_from_list "$leaf" "$_uninstall_order")"
+                        _uninstall_order="$(remove_string_from_list \
+                            "$leaf" "$_uninstall_order")"
                         break
                         ;;
                 esac
             fi
-        done < "$WORLD"
-
-        # The aforementioned helpful error message
-        [ -n "$_reverse_deps" ] && \
-            log_error "Cannot remove $leaf: Needed by:$_reverse_deps"
-    done
+        done
+    done < "$WORLD"
 
     log_debug "Uninstall order is: $_uninstall_order"
     trim_string_and_return "$_uninstall_order"
