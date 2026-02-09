@@ -519,8 +519,8 @@ backend_activate_package() {
 
     awk -F: -v pkg="$_pkg_name" '
         BEGIN{OFS=":"} $1==pkg {$7="activated"} 1
-    ' "$WORLD" > "${WORLD}.tmp"
-    mv "${WORLD}.tmp" "$WORLD"
+    ' "${INSTALL_ROOT}/$WORLD" > "${INSTALL_ROOT}/${WORLD}.tmp"
+    mv "${INSTALL_ROOT}/${WORLD}.tmp" "${INSTALL_ROOT}/$WORLD"
 }
 
 ###################
