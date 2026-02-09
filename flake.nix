@@ -10,10 +10,12 @@
     in {
         devShells.x86_64-linux.default = pkgs.mkShellNoCC {
             buildInputs = with pkgs; [
+                btrfs-progs
                 gcc15
                 wget
                 python312
                 pkg-config
+                bison
             ];
             PYTHON = "${pkgs.python312}/bin/python3";
             shellHook = ''
