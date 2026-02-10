@@ -538,6 +538,9 @@ backend_resolve_uninstall_order() (
     _tree="$(get_dependency_tree "$_requested_packages")"
     _uninstall_order="$_tree"
 
+    # Read from the world file once
+    _world="$(cat "$WORLD")"
+
     # Now we find the reverse dependencies of everything in the dependency tree
     _reverse_deps=""
     for leaf in $_tree; do
@@ -565,7 +568,9 @@ backend_resolve_uninstall_order() (
                         ;;
                 esac
             fi
-        done < "$WORLD"
+        done <<- EOF
+            $_world
+		EOF
 
         # The aforementioned helpful error message
         [ -n "$_reverse_deps" ] && \
