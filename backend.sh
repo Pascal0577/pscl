@@ -25,18 +25,13 @@ backend_ask_confirmation() (
             _msg="Do you want to alter the activation status of these packages [Y/n]: " ;;
     esac
 
-    printf "%s" "$_msg" >&2
-    tput sc >&2
-    
     printf "\n" >&2
     for _pkg in $_packages; do
         echo "${_pkg%%|*}" >&2
     done
     echo "" >&2
-    
-    tput rc >&2
+    printf "%s" "$_msg" >&2
     read -r _ans
-    tput ed >&2
 
     case "$_ans" in
         y|yes|Y|"") echo "$_packages" ;;
