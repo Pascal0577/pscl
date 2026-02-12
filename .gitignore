@@ -1,0 +1,9 @@
+*.tar.xz
+*.tgz
+make-package-dir.sh
+blank.build
+build
+pkg.lock
+source_cache
+logs
+tests
