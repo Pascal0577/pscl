@@ -1,0 +1,8 @@
+#!/bin/sh
+set -e
+cd "$SRCDIR"
+cd "$source_dir" || log_error "Failed to cd: $source_dir"
+sed '/typedef enum/,/bool ;/d' -i src/ALAC/alac_encoder.c
+sed '/typedef enum/,/bool ;/d' -i src/ALAC/alac_decoder.c
+./configure --prefix=/usr    \
+    --docdir=/usr/share/doc/libsndfile-1.2.2

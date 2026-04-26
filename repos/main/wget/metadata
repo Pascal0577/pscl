@@ -1,0 +1,9 @@
+name wget
+version 1.25.0
+description A utility useful for non-interactive downloading of files from the web
+sources https://ftp.gnu.org/gnu/wget/wget-1.25.0.tar.gz
+checksums c70ba58b36f944e8ba1d655ace552881
+pkg_deps make-ca libpsl
+opt_deps 
+build_deps 
+check_deps 

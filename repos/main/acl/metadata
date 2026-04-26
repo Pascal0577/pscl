@@ -1,0 +1,9 @@
+name acl
+version 2.3.2
+description Utilities to administer Access Control Lists
+sources https://download.savannah.gnu.org/releases/acl/acl-2.3.2.tar.xz
+checksums 590765dee95907dbc3c856f7255bd669
+pkg_deps 
+opt_deps 
+build_deps 
+check_deps 

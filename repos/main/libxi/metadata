@@ -1,0 +1,9 @@
+name libxi
+version 1.8.2
+description X.Org libxi library
+sources https://www.x.org/pub/individual/lib/libXi-1.8.2.tar.xz
+checksums 95a960c1692a83cc551979f7ffe28cf4
+pkg_deps libx11 libxext libxfixes xorgproto xorg-util-macros
+opt_deps 
+build_deps 
+check_deps 

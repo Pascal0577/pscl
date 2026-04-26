@@ -1,0 +1,9 @@
+name zstd
+version 1.5.7
+description Zstd compression library
+sources https://github.com/facebook/zstd/releases/download/v1.5.7/zstd-1.5.7.tar.gz
+checksums 780fc1896922b1bc52a4e90980cdda48
+pkg_deps 
+opt_deps 
+build_deps 
+check_deps 

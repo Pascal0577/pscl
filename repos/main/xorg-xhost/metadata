@@ -1,0 +1,9 @@
+name xorg-xhost
+version 1.0.9
+description 
+sources https://www.x.org/archive/individual/app/xhost-1.0.9.tar.xz
+checksums 48ac13856838d34f2e7fca8cdc1f1699
+pkg_deps libx11 libxmu
+opt_deps 
+build_deps 
+check_deps 

@@ -1,0 +1,9 @@
+name libjpeg-turbo
+version 3.0.1
+description 
+sources https://downloads.sourceforge.net/libjpeg-turbo/libjpeg-turbo-3.0.1.tar.gz
+checksums 1fdc6494521a8724f5f7cf39b0f6aff3
+pkg_deps yasm
+opt_deps 
+build_deps cmake make
+check_deps 

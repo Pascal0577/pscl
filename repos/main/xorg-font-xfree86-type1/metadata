@@ -1,0 +1,9 @@
+name xorg-font-xfree86-type1
+version 1.0.5
+description X.Org xorg-font-xfree86-type1 library
+sources https://www.x.org/pub/individual/font//font-xfree86-type1-1.0.5.tar.xz
+checksums 3b47fed2c032af3a32aad9acc1d25150
+pkg_deps xorg-font-alias xorg-font-util xorg-mkfontscale xorg-util-macros
+opt_deps 
+build_deps 
+check_deps 

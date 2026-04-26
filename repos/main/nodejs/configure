@@ -1,0 +1,12 @@
+#!/bin/sh
+set -e
+cd "$SRCDIR"
+cd "$source_dir" || log_error "Failed to cd: $source_dir"
+./configure --prefix=/usr          \
+        --shared-brotli        \
+        --shared-cares         \
+        --shared-libuv         \
+        --shared-openssl       \
+        --shared-nghttp2       \
+        --shared-zlib          \
+        --with-intl=system-icu

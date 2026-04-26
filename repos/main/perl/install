@@ -1,0 +1,5 @@
+#!/bin/sh
+set -e
+cd "$SRCDIR"
+make install
+unset BUILD_ZLIB BUILD_BZIP2

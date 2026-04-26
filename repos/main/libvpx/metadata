@@ -1,0 +1,9 @@
+name libvpx
+version 1.15.2
+description 
+sources https://github.com/webmproject/libvpx/archive/v1.15.2/libvpx-1.15.2.tar.gz
+checksums 4c7a93808c12b359733430c8377b7fcf
+pkg_deps 
+opt_deps 
+build_deps which make yasm
+check_deps 

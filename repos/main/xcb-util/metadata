@@ -1,0 +1,9 @@
+name xcb-util
+version 0.4.1
+description Provides additional extensions to the XCB library
+sources https://xcb.freedesktop.org/dist/xcb-util-0.4.1.tar.xz
+checksums 34d749eab0fd0ffd519ac64798d79847
+pkg_deps libxcb
+opt_deps 
+build_deps 
+check_deps 

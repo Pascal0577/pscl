@@ -1,0 +1,9 @@
+#!/bin/sh
+set -e
+cd "$SRCDIR"
+cd "$source_dir" || log_error "In $package_name.build: Failed to cd to $source_dir"
+SRCDIR=$(pwd)
+cd unix
+./configure --prefix=/usr   \
+    --mandir=/usr/share/man \
+    --disable-rpath

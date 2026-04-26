@@ -1,0 +1,9 @@
+name startup-notification
+version 0.12
+description 
+sources https://www.freedesktop.org/software/startup-notification/releases/startup-notification-0.12.tar.gz
+checksums 2cd77326d4dcaed9a5a23a1232fb38e9
+pkg_deps libxorg xcb-util
+opt_deps 
+build_deps make
+check_deps 

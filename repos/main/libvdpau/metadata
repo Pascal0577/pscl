@@ -1,0 +1,9 @@
+name libvdpau
+version 1.5
+description 
+sources https://gitlab.freedesktop.org/vdpau/libvdpau/-/archive/1.5/libvdpau-1.5.tar.bz2
+checksums 148a192110e7a49d62c0bf9ef916c099
+pkg_deps libxorg
+opt_deps 
+build_deps meson ninja
+check_deps 

@@ -1,0 +1,9 @@
+name btrfs-progs
+version 6.16
+description Contains administration and debugging tools for the B-tree file system
+sources https://www.kernel.org/pub/linux/kernel/people/kdave/btrfs-progs/btrfs-progs-v6.16.tar.xz
+checksums 2954d539b75beb912a0c0c98783ba5f3
+pkg_deps lzo
+opt_deps 
+build_deps 
+check_deps 

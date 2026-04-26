@@ -1,0 +1,9 @@
+name texinfo
+version 7.2
+description Programs for reading, writing, and converting info pages
+sources https://ftpmirror.gnu.org/texinfo/texinfo-7.2.tar.xz
+checksums 11939a7624572814912a18e76c8d8972
+pkg_deps 
+opt_deps 
+build_deps 
+check_deps 

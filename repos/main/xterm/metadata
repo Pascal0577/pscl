@@ -1,0 +1,9 @@
+name xterm
+version 393
+description 
+sources https://invisible-mirror.net/archives/xterm/xterm-393.tgz
+checksums 1ac5147362addade51c4e627d8cb328f
+pkg_deps luit
+opt_deps 
+build_deps make
+check_deps 

@@ -1,0 +1,9 @@
+name libxcomposite
+version 0.4.6
+description X.Org libxcomposite library
+sources https://www.x.org/pub/individual/lib/libXcomposite-0.4.6.tar.xz
+checksums af0a5f0abb5b55f8411cd738cf0e5259
+pkg_deps libx11 libxfixes xorgproto xorg-util-macros
+opt_deps 
+build_deps 
+check_deps 

@@ -1,0 +1,5 @@
+#!/bin/sh
+set -e
+cd "$SRCDIR"
+ninja install
+mv -v "$DESTDIR/usr/share/doc/xorgproto" "$DESTDIR/usr/share/doc/xorgproto-2024.1"

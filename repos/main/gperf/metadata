@@ -1,0 +1,9 @@
+name gperf
+version 3.3
+description Generates a perfect hash function from a key set
+sources https://ftp.gnu.org/gnu/gperf/gperf-3.3.tar.gz
+checksums 31753b021ea78a21f154bf9eecb8b079
+pkg_deps 
+opt_deps 
+build_deps 
+check_deps 

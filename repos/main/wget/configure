@@ -1,0 +1,7 @@
+#!/bin/sh
+set -e
+cd "$SRCDIR"
+cd "$source_dir" || log_error "In $package_name.build: Failed to cd to $source_dir"
+./configure --prefix=/usr      \
+            --sysconfdir=/etc  \
+            --with-ssl=openssl

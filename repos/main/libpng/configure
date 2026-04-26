@@ -1,0 +1,6 @@
+#!/bin/sh
+set -e
+cd "$SRCDIR"
+cd "$source_dir" || log_error "In $package_name.build: Failed to cd to $source_dir"
+gzip -cd "$PKGROOT/libpng-1.6.47-apng.patch.gz" | patch -p1
+./configure --prefix=/usr --disable-static

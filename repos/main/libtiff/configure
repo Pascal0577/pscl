@@ -1,0 +1,10 @@
+#!/bin/sh
+set -e
+cd "$SRCDIR"
+cd "$source_dir" || log_error "Failed to cd: $source_dir"
+mkdir -p libtiff-build &&
+cd       libtiff-build &&
+cmake -D CMAKE_INSTALL_PREFIX=/usr ..     \
+      -D CMAKE_POLICY_VERSION_MINIMUM=3.5 \
+      -G Ninja                            \
+      -D CMAKE_INSTALL_DOCDIR=/usr/share/doc/libtiff-4.7.0

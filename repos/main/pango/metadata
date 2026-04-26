@@ -1,0 +1,9 @@
+name pango
+version 1.56.4
+description A library for laying out and rendering text, with an emphasis on internationalization
+sources https://download.gnome.org/sources/pango/1.56/pango-1.56.4.tar.xz
+checksums 3db267bc07bfd96615c652e9187b85b5
+pkg_deps fontconfig fribidi glib cairo libxorg
+opt_deps 
+build_deps 
+check_deps 

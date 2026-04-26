@@ -1,0 +1,9 @@
+name xorg-xrandr
+version 1.5.2
+description 
+sources https://www.x.org/archive/individual/app/xrandr-1.5.2.tar.xz
+checksums f822a8d5f233e609d27cc22d42a177cb
+pkg_deps glibc libx11 libxrandr
+opt_deps 
+build_deps xorg-util-macros
+check_deps 

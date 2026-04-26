@@ -1,0 +1,9 @@
+name psmisc
+version 23.7
+description Programs for displaying information about running processes
+sources https://sourceforge.net/projects/psmisc/files/psmisc/psmisc-23.7.tar.xz
+checksums 53eae841735189a896d614cba440eb10
+pkg_deps 
+opt_deps 
+build_deps 
+check_deps 

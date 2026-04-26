@@ -1,0 +1,12 @@
+#!/bin/sh
+set -e
+cd "$SRCDIR"
+cd "$source_dir" || log_error "In $package_name.build: Failed to cd to $source_dir"
+sed -i '/"lib64"/s/64//' Modules/GNUInstallDirs.cmake &&
+./bootstrap --prefix=/usr        \
+    --system-libs        \
+	    --mandir=/share/man  \
+	    --no-system-jsoncpp  \
+	    --no-system-cppdap   \
+	    --no-system-librhash \
+	    --docdir=/share/doc/cmake-4.1.2

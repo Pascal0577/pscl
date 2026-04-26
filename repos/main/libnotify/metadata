@@ -1,0 +1,9 @@
+name libnotify
+version 0.8.6
+description 
+sources https://download.gnome.org/sources/libnotify/0.8/libnotify-0.8.6.tar.xz
+checksums 09bce743badbe1c180ce14d92539afb9
+pkg_deps gtk3 glib
+opt_deps 
+build_deps 
+check_deps 

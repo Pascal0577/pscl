@@ -1,0 +1,9 @@
+name at-spi2-core
+version 2.56.4
+description 
+sources https://download.gnome.org/sources/at-spi2-core/2.56/at-spi2-core-2.56.4.tar.xz
+checksums 1bdef0e54532c4f3f004d7e2d40e256a
+pkg_deps dbus glib gsettings-desktop-schemas libxorg
+opt_deps 
+build_deps 
+check_deps 

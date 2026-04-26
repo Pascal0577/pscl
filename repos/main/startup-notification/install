@@ -1,0 +1,6 @@
+#!/bin/sh
+set -e
+cd "$SRCDIR"
+make install
+install -v -m644 -D doc/startup-notification.txt \
+"$DESTDIR/usr/share/doc/startup-notification-0.12/startup-notification.txt"

@@ -1,0 +1,5 @@
+#!/bin/sh
+set -e
+cd "$SRCDIR"
+make install
+make TEXMF=/usr/share/texmf DESTDIR="$DESTDIR" install-tex

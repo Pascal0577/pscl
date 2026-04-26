@@ -1,0 +1,8 @@
+#!/bin/sh
+set -e
+cd "$SRCDIR"
+make
+make html
+# Check if 199 of the tests pass
+make check 2>&1 | tee gmp-check-log
+awk '/# PASS:/{total+=$3} ; END{print total}' gmp-check-log

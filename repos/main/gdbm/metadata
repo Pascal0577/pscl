@@ -1,0 +1,9 @@
+name gdbm
+version 1.26
+description The GNU Database Manager
+sources https://ftp.gnu.org/gnu/gdbm/gdbm-1.26.tar.gz
+checksums aaa600665bc89e2febb3c7bd90679115
+pkg_deps 
+opt_deps 
+build_deps 
+check_deps 

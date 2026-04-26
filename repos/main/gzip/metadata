@@ -1,0 +1,9 @@
+name gzip
+version 1.14
+description Programs for compressing and decompressing files
+sources https://ftpmirror.gnu.org/gzip/gzip-1.14.tar.xz
+checksums 4bf5a10f287501ee8e8ebe00ef62b2c2
+pkg_deps 
+opt_deps 
+build_deps 
+check_deps 

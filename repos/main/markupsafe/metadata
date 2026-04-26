@@ -1,0 +1,9 @@
+name markupsafe
+version 3.0.2
+description a Python module that implements an XML/HTML/XHTML Markup safe string
+sources https://pypi.org/packages/source/M/MarkupSafe/markupsafe-3.0.2.tar.gz
+checksums cb0071711b573b155cc8f86e1de72167
+pkg_deps 
+opt_deps 
+build_deps python3
+check_deps 

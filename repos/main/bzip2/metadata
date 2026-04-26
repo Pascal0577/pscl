@@ -1,0 +1,9 @@
+name bzip2
+version 1.0.8
+description Programs for compressing a decompressing files
+sources https://www.sourceware.org/pub/bzip2/bzip2-1.0.8.tar.gz
+checksums 67e051268d0c475ea773822f7500d0e5
+pkg_deps 
+opt_deps 
+build_deps 
+check_deps 

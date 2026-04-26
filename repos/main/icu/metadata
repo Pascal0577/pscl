@@ -1,0 +1,9 @@
+name icu
+version 77.1
+description A mature, widely used set of C/C++ libraries providing Unicode and Globalization support for software applications
+sources https://github.com/unicode-org/icu/releases/download/release-77-1/icu4c-77_1-src.tgz
+checksums bc0132b4c43db8455d2446c3bae58898
+pkg_deps 
+opt_deps 
+build_deps 
+check_deps 

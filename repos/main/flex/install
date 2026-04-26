@@ -1,0 +1,6 @@
+#!/bin/sh
+set -e
+cd "$SRCDIR"
+make install
+ln -sv flex   "$DESTDIR/usr/bin/lex"
+ln -sv flex.1 "$DESTDIR/usr/share/man/man1/lex.1"

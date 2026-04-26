@@ -1,0 +1,19 @@
+#!/bin/sh
+set -e
+cd "$SRCDIR"
+cd "$source_dir" || log_error "In $package_name.build: Failed to cd to $source_dir"
+patch -Np1 -i "$PKGROOT/glibc-2.42-fhs-1.patch"
+sed -e '/unistd.h/i #include <string.h>' \
+    -e '/libc_rwlock_init/c\
+    __libc_rwlock_define_initialized (, reset_lock);\
+    memcpy (&lock, &reset_lock, sizeof (lock));' \
+    -i stdlib/abort.c 
+mkdir build
+cd build || return 1
+echo "rootsbindir=/usr/sbin" > configparms
+../configure --prefix=/usr                   \
+         --disable-werror                \
+         --disable-nscd                  \
+         libc_cv_slibdir=/usr/lib        \
+         --enable-stack-protector=strong \
+         --enable-kernel=5.4

@@ -1,0 +1,6 @@
+#!/bin/sh
+set -e
+cd "$SRCDIR"
+export MACH_BUILD_PYTHON_NATIVE_PACKAGE_SOURCE=none &&
+export MOZBUILD_STATE_PATH=${PWD}/mozbuild          &&
+./mach build

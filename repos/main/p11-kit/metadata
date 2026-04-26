@@ -1,0 +1,9 @@
+name p11-kit
+version 0.25.10
+description 
+sources https://github.com/p11-glue/p11-kit/releases/download/0.25.10/p11-kit-0.25.10.tar.xz
+checksums 46fb4aa4faf0e18c036715f103e6c429
+pkg_deps libtasn1
+opt_deps 
+build_deps 
+check_deps 

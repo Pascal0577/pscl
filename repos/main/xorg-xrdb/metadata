@@ -1,0 +1,9 @@
+name xorg-xrdb
+version 1.2.2
+description 
+sources https://www.x.org/archive/individual/app/xrdb-1.2.2.tar.xz
+checksums c8629d5a0bc878d10ac49e1b290bf453
+pkg_deps glibc libx11 libxmu
+opt_deps 
+build_deps xorg-util-macros
+check_deps 

@@ -1,0 +1,9 @@
+name xorg-xgamma
+version 1.0.7
+description 
+sources https://www.x.org/archive/individual/app/xgamma-1.0.7.tar.xz
+checksums 41afaa5a68cdd0de7e7ece4805a37f11
+pkg_deps libx11 libxxf86vm
+opt_deps 
+build_deps xorg-util-macros
+check_deps 

@@ -1,0 +1,9 @@
+#!/bin/sh
+set -e
+cd "$SRCDIR"
+cd "$source_dir" || log_error "Failed to cd: $source_dir"
+sed -i -e '/^rcdir =/s,^\(rcdir = \).*,\1/etc/X11/app-defaults,' src/Makefile.in
+./configure --prefix=/usr \
+    --sysconfdir=/etc \
+    --localstatedir=/var \
+    --disable-static

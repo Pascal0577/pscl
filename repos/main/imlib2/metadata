@@ -1,0 +1,9 @@
+name imlib2
+version 1.12.5
+description 
+sources https://downloads.sourceforge.net/enlightenment/imlib2-1.12.5.tar.xz
+checksums c81c9f91d92ecbd87cf652f867ec5d74
+pkg_deps libxorg giflib
+opt_deps 
+build_deps 
+check_deps 

@@ -1,0 +1,9 @@
+name libpng
+version 1.6.50
+description Contains libraries used by other programs for reading and writing PNG files
+sources https://downloads.sourceforge.net/libpng/libpng-1.6.50.tar.xz
+checksums e583e61455c4f40d565d85c0e9a2fbf9
+pkg_deps 
+opt_deps 
+build_deps 
+check_deps 

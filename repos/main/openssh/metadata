@@ -1,0 +1,9 @@
+name openssh
+version 10.0p1
+description 
+sources https://ftp.openbsd.org/pub/OpenBSD/OpenSSH/portable/openssh-10.0p1.tar.gz
+checksums 689148621a2eaa734497b12bed1c5202
+pkg_deps 
+opt_deps 
+build_deps make
+check_deps 

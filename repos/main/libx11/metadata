@@ -1,0 +1,9 @@
+name libx11
+version 1.8.12
+description X.Org libx11 library
+sources https://www.x.org/pub/individual/lib/libX11-1.8.12.tar.xz
+checksums 146d770e564812e00f97e0cbdce632b7
+pkg_deps xtrans libxcb xorgproto xorg-util-macros
+opt_deps 
+build_deps 
+check_deps 

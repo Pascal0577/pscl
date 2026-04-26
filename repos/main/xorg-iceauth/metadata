@@ -1,0 +1,9 @@
+name xorg-iceauth
+version 1.0.10
+description 
+sources https://www.x.org/archive/individual/app/iceauth-1.0.10.tar.xz
+checksums 30f898d71a7d8e817302970f1976198c
+pkg_deps 
+opt_deps 
+build_deps 
+check_deps 

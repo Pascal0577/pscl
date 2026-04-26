@@ -1,0 +1,9 @@
+name libxcursor
+version 1.2.3
+description X.Org libxcursor library
+sources https://www.x.org/pub/individual/lib/libXcursor-1.2.3.tar.xz
+checksums 5ce55e952ec2d84d9817169d5fdb7865
+pkg_deps libx11 libxfixes libxrender xorgproto xorg-util-macros
+opt_deps 
+build_deps 
+check_deps 

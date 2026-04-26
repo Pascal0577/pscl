@@ -1,0 +1,9 @@
+#!/bin/sh
+set -e
+cd "$SRCDIR"
+cd "$source_dir" || log_error "Failed to cd: $source_dir"
+mkdir build
+cd build || exit 1
+cmake -D CMAKE_INSTALL_PREFIX=/usr \
+    -D CMAKE_BUILD_TYPE=Release  \
+    -G Ninja ..

@@ -1,0 +1,9 @@
+name libxdamage
+version 1.1.6
+description X.Org libxdamage library
+sources https://www.x.org/pub/individual/lib/libXdamage-1.1.6.tar.xz
+checksums ca55d29fa0a8b5c4a89f609a7952ebf8
+pkg_deps libx11 libxfixes xorgproto
+opt_deps 
+build_deps 
+check_deps 

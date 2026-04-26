@@ -1,0 +1,9 @@
+name flex
+version 2.6.4
+description A utility for generating programs that recognize patterns in text
+sources https://github.com/westes/flex/releases/download/v2.6.4/flex-2.6.4.tar.gz
+checksums 2882e3179748cc9f9c23ec593d6adc8d
+pkg_deps 
+opt_deps 
+build_deps 
+check_deps 

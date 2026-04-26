@@ -1,0 +1,9 @@
+name sdl2
+version 2.32.8
+description 
+sources https://www.libsdl.org/release/SDL2-2.32.8.tar.gz
+checksums 7df28be966308a4a51aac87f4e0cf16a
+pkg_deps libxkbcommon wayland-protocols libxorg
+opt_deps alsa-lib
+build_deps 
+check_deps 

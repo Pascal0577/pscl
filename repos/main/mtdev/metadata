@@ -1,0 +1,9 @@
+name mtdev
+version 1.1.7
+description contains Multitouch Protocol Translation Library
+sources https://bitmath.org/code/mtdev/mtdev-1.1.7.tar.bz2
+checksums 483ed7fdf7c1e7b7375c05a62848cce7
+pkg_deps 
+opt_deps 
+build_deps 
+check_deps 

@@ -1,0 +1,9 @@
+name libxpm
+version 3.5.17
+description X.Org libxpm library
+sources https://www.x.org/pub/individual/lib/libXpm-3.5.17.tar.xz
+checksums 05b5667aadd476d77e9b5ba1a1de213e
+pkg_deps libx11 libxext libxt xorg-util-macros
+opt_deps 
+build_deps 
+check_deps 

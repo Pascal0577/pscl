@@ -1,0 +1,9 @@
+name pciutils
+version 3.14.0
+description 
+sources https://mj.ucw.cz/download/linux/pci/pciutils-3.14.0.tar.gz
+checksums f70cf2da9377cb484802e291ea60115d
+pkg_deps hwdata
+opt_deps 
+build_deps 
+check_deps 

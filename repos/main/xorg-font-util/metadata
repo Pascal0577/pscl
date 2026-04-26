@@ -1,0 +1,9 @@
+name xorg-font-util
+version 1.4.1
+description X.Org xorg-font-util library
+sources https://www.x.org/pub/individual/font/font-util-1.4.1.tar.xz
+checksums a6541d12ceba004c0c1e3df900324642
+pkg_deps xorg-util-macros
+opt_deps 
+build_deps 
+check_deps 

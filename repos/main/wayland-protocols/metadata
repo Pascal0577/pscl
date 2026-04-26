@@ -1,0 +1,9 @@
+name wayland-protocols
+version 1.45
+description Contains additional Wayland protocols that add functionality outside of protocols already in the Wayland core
+sources https://gitlab.freedesktop.org/wayland/wayland-protocols/-/releases/1.45/downloads/wayland-protocols-1.45.tar.xz
+checksums a235baeab3f1c6d57ac4c7c00ecd7e48
+pkg_deps wayland
+opt_deps 
+build_deps 
+check_deps 

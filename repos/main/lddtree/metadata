@@ -1,0 +1,9 @@
+name lddtree
+version 1.27
+description 
+sources https://github.com/ncopa/lddtree/archive/refs/tags/v1.27.tar.gz
+checksums c0ed1c032e6614e7426af06f6fc04cd7
+pkg_deps 
+opt_deps 
+build_deps 
+check_deps 

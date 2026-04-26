@@ -1,0 +1,9 @@
+name kbd
+version 2.8.0
+description contains key-table files, console fonts, and keyboard utilities
+sources https://www.kernel.org/pub/linux/utils/kbd/kbd-2.8.0.tar.xz
+checksums 24b5d24f7483726b88f214dc6c77aa41
+pkg_deps 
+opt_deps 
+build_deps 
+check_deps 

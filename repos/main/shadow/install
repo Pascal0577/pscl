@@ -1,0 +1,5 @@
+#!/bin/sh
+set -e
+cd "$SRCDIR"
+make exec_prefix=/usr DESTDIR="$DESTDIR" install
+make -C man install-man

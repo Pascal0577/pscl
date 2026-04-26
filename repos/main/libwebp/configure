@@ -1,0 +1,11 @@
+#!/bin/sh
+set -e
+cd "$SRCDIR"
+cd "$source_dir" || log_error "Failed to cd: $source_dir"
+./configure --prefix=/usr           \
+    --enable-libwebpmux     \
+    --enable-libwebpdemux   \
+    --enable-libwebpdecoder \
+    --enable-libwebpextras  \
+    --enable-swap-16bit-csp \
+    --disable-static

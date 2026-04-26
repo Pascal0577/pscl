@@ -1,0 +1,9 @@
+name coreutils
+version 9.7
+description Basic utility programs needed by every operating system
+sources https://ftpmirror.gnu.org/coreutils/coreutils-9.7.tar.xz
+checksums 6b7285faf7d5eb91592bdd689270d3f1
+pkg_deps 
+opt_deps 
+build_deps 
+check_deps 

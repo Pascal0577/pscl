@@ -1,0 +1,9 @@
+name fribidi
+version 1.0.16
+description An implementation of the Unicode Bidirectional Algorithm (BIDI)
+sources https://github.com/fribidi/fribidi/releases/download/v1.0.16/fribidi-1.0.16.tar.xz
+checksums 333ad150991097a627755b752b87f9ff
+pkg_deps 
+opt_deps 
+build_deps 
+check_deps 

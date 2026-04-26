@@ -1,0 +1,4 @@
+#!/bin/sh
+set -e
+cd "$SRCDIR"
+make EFIDIR=LFS EFI_LOADER=grubx64.efi

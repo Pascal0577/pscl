@@ -1,0 +1,7 @@
+#!/bin/sh
+set -e
+cd "$SRCDIR"
+ninja install
+find "$DESTDIR/opt/qt6/" -name \*.prl -exec sed -i -e '/^QMAKE_PRL_BUILD_DIR/d' {} \;
+mkdir -pv "$DESTDIR/etc/profile.d/"
+cp -a "$PKGROOT/70-qt6-paths.sh" "$DESTDIR/etc/profile.d/"

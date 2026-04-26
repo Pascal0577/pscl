@@ -1,0 +1,11 @@
+#!/bin/sh
+set -e
+cd "$SRCDIR"
+cd "$source_dir" || log_error "Failed to cd: $source_dir"
+cd nspr
+sed -i '/^RELEASE/s|^|#|' pr/src/misc/Makefile.in &&
+sed -i 's|$(LIBRARY) ||'  config/rules.mk         &&
+./configure --prefix=/usr   \
+    --with-mozilla  \
+    --with-pthreads \
+    --enable-64bit

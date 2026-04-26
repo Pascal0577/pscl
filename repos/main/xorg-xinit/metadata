@@ -1,0 +1,9 @@
+name xorg-xinit
+version 1.4.2
+description 
+sources https://www.x.org/pub/individual/app/xinit-1.4.2.tar.xz
+checksums 0e9a1b9a82b84ab229c709c0f939c113
+pkg_deps xorg-xauth xorg-xmodmap xorg-xrdb xorg-xclock
+opt_deps twm xterm
+build_deps xorg-util-macros
+check_deps 

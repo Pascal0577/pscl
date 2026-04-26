@@ -1,0 +1,9 @@
+name xorg-xkill
+version 1.0.6
+description 
+sources https://www.x.org/archive/individual/app/xkill-1.0.6.tar.xz
+checksums f62b99839249ce9a7a8bb71a5bab6f9d
+pkg_deps libx11 libxmu
+opt_deps 
+build_deps xorg-util-macros
+check_deps 

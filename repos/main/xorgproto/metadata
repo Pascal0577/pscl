@@ -1,0 +1,9 @@
+name xorgproto
+version 2024.1
+description Provides the header files required to build the X Window system
+sources https://xorg.freedesktop.org/archive/individual/proto/xorgproto-2024.1.tar.xz
+checksums 12374d29fb5ae642cfa872035e401640
+pkg_deps xorg-util-macros
+opt_deps 
+build_deps 
+check_deps 

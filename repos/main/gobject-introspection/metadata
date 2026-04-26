@@ -1,0 +1,9 @@
+name gobject-introspection
+version 1.84.0
+description Contains low-level libraries useful for providing data structure handling for C
+sources https://download.gnome.org/sources/gobject-introspection/1.84/gobject-introspection-1.84.0.tar.xz
+checksums 2a62fb1c584616a8ebcd9dd4d045f27e
+pkg_deps glib-nointrospection
+opt_deps 
+build_deps 
+check_deps 

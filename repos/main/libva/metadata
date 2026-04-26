@@ -1,0 +1,9 @@
+name libva
+version 2.22.0
+description 
+sources https://github.com/intel/libva/archive/2.22.0/libva-2.22.0.tar.gz
+checksums 8dba13313d724b5e930f06e65b7437e2
+pkg_deps libdrm
+opt_deps 
+build_deps meson ninja
+check_deps 

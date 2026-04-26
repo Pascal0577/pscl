@@ -1,0 +1,9 @@
+name libaio
+version 0.3.113
+description Asynchronous I/O facility
+sources https://pagure.io/libaio/archive/libaio-0.3.113/libaio-0.3.113.tar.gz
+checksums 605237f35de238dfacc83bcae406d95d
+pkg_deps 
+opt_deps 
+build_deps 
+check_deps 

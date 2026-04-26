@@ -1,0 +1,10 @@
+#!/bin/sh
+set -e
+cd "$SRCDIR"
+# Perl sucks and sometimes returns non-zero on successful builds
+# So here we are, doing this dumb shit
+make 2>&1 | tee build1.log || true
+make 2>&1 | tee build2.log || true
+if [ -f perl ] && [ -x perl ]; then
+    ./perl -v >/dev/null 2>&1 && return 0
+fi

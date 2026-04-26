@@ -1,0 +1,9 @@
+name mpfr
+version 4.2.2
+description Contains functions for multiple precision math
+sources https://ftp.gnu.org/gnu/mpfr/mpfr-4.2.2.tar.xz
+checksums 7c32c39b8b6e3ae85f25156228156061
+pkg_deps 
+opt_deps 
+build_deps 
+check_deps 

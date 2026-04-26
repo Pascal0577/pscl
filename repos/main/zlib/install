@@ -1,0 +1,5 @@
+#!/bin/sh
+set -e
+cd "$SRCDIR"
+make install
+rm -r "$DESTDIR/usr/lib/libz.a"

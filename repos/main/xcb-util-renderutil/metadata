@@ -1,0 +1,9 @@
+name xcb-util-renderutil
+version 0.3.10
+description Extensions for xcb-util
+sources https://xcb.freedesktop.org/dist/xcb-util-renderutil-0.3.10.tar.xz
+checksums 193b890e2a89a53c31e2ece3afcbd55f
+pkg_deps libxcb xcb-util
+opt_deps 
+build_deps 
+check_deps 

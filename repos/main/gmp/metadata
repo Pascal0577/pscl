@@ -1,0 +1,9 @@
+name gmp
+version 6.3.0
+description Contains math libraries
+sources https://ftp.gnu.org/gnu/gmp/gmp-6.3.0.tar.xz
+checksums 956dc04e864001a9c22429f761f2c283
+pkg_deps 
+opt_deps 
+build_deps 
+check_deps 

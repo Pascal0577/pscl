@@ -1,0 +1,9 @@
+name jinja2
+version 3.1.6
+description a Python module that implements a simple pythonic template language
+sources https://pypi.org/packages/source/J/Jinja2/jinja2-3.1.6.tar.gz
+checksums 66d4c25ff43d1deaf9637ccda523dec8
+pkg_deps 
+opt_deps 
+build_deps python3
+check_deps 

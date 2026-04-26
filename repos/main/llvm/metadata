@@ -1,0 +1,9 @@
+name llvm
+version 20.1.8
+description 
+sources https://github.com/llvm/llvm-project/releases/download/llvmorg-20.1.8/llvm-20.1.8.src.tar.xz https://anduin.linuxfromscratch.org/BLFS/llvm/llvm-cmake-20.1.8.src.tar.xz https://anduin.linuxfromscratch.org/BLFS/llvm/llvm-third-party-20.1.8.src.tar.xz https://github.com/llvm/llvm-project/releases/download/llvmorg-20.1.8/clang-20.1.8.src.tar.xz https://github.com/llvm/llvm-project/releases/download/llvmorg-20.1.8/compiler-rt-20.1.8.src.tar.xz
+checksums 78040509eb91309b4ec2edfe12cd20d8 5bfb8f4b4a2b3ccffca0d2406e4cdcc6 2ffd8624b3cbddf55a4e74a7d8ea89fa 62a0500bb932868061607cde0c01f584 3869861662d173ca8303b9f1524d1e91
+pkg_deps 
+opt_deps 
+build_deps cmake ninja
+check_deps 

@@ -1,0 +1,14 @@
+#!/bin/sh
+set -e
+cd "$SRCDIR"
+cd "$source_dir" || log_error "In $package_name.build: Failed to cd to $source_dir"
+patch -Np1 -i ../glib-skip_warnings-1.patch
+mkdir build
+cd build || true
+meson setup ..                  \
+    --prefix=/usr             \
+    --buildtype=release       \
+    -D introspection=enabled  \
+    -D glib_debug=disabled    \
+    -D man-pages=enabled      \
+    -D sysprof=disabled

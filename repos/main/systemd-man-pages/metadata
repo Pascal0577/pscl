@@ -1,0 +1,9 @@
+name systemd-man-pages
+version 257.8
+description Man pages for SystemD
+sources https://anduin.linuxfromscratch.org/LFS/systemd-man-pages-257.8.tar.xz
+checksums a44063e2ec0cf4adfd2ed5c9e9e095c5
+pkg_deps 
+opt_deps 
+build_deps 
+check_deps 

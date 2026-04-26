@@ -1,0 +1,9 @@
+name libxv
+version 1.0.13
+description X.Org libxv library
+sources https://www.x.org/pub/individual/lib/libXv-1.0.13.tar.xz
+checksums 8a26503185afcb1bbd2c65e43f775a67
+pkg_deps libx11 libxext xorgproto xorg-util-macros
+opt_deps 
+build_deps 
+check_deps 

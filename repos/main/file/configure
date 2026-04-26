@@ -1,0 +1,15 @@
+#!/bin/sh
+set -e
+cd "$SRCDIR"
+cd "$source_dir" || log_error "In $package_name.build: Failed to cd to $source_dir"
+mkdir build
+(
+cd build || return 1
+    ../configure --disable-bzlib      \
+                 --disable-libseccomp \
+                 --disable-xzlib      \
+                 --disable-zlib
+    make
+)
+./configure --prefix=/usr \
+            --build="$(./config.guess)"

@@ -1,0 +1,9 @@
+name xf86-input-synaptics
+version 1.9.2
+description 
+sources https://www.x.org/pub/individual/driver/xf86-input-synaptics-1.9.2.tar.xz
+checksums 3b95e7baf4428b114e9910f999e96601
+pkg_deps libevdev xorg-server
+opt_deps 
+build_deps make
+check_deps 

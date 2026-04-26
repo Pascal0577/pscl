@@ -1,0 +1,9 @@
+name elfutils
+version 0.193
+description A library for handling ELF files
+sources https://sourceware.org/ftp/elfutils/0.193/elfutils-0.193.tar.bz2
+checksums ceefa052ded950a4c523688799193a44
+pkg_deps 
+opt_deps 
+build_deps 
+check_deps 

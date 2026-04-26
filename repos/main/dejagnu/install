@@ -1,0 +1,7 @@
+#!/bin/sh
+set -e
+cd "$SRCDIR"
+make install
+command install -v -dm755  "$DESTDIR"/usr/share/doc/dejagnu-1.6.3
+command install -v -m644   doc/dejagnu.html "$DESTDIR/usr/share/doc/dejagnu-1.6.3"
+command install -v -m644   doc/dejagnu.txt "$DESTDIR/usr/share/doc/dejagnu-1.6.3"

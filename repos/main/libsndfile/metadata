@@ -1,0 +1,9 @@
+name libsndfile
+version 1.2.2
+description A library of C routines for reading and writing files containing sampled audio data
+sources https://github.com/libsndfile/libsndfile/releases/download/1.2.2/libsndfile-1.2.2.tar.xz
+checksums 04e2e6f726da7c5dc87f8cf72f250d04
+pkg_deps flac opus libvorbis
+opt_deps 
+build_deps make
+check_deps 

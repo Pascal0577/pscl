@@ -1,0 +1,9 @@
+name xorg-xlsatoms
+version 1.1.4
+description 
+sources https://www.x.org/archive/individual/app/xlsatoms-1.1.4.tar.xz
+checksums da5b7a39702841281e1d86b7349a03ba
+pkg_deps libxcb
+opt_deps 
+build_deps xorg-util-macros xorgproto
+check_deps 

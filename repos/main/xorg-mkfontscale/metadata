@@ -1,0 +1,9 @@
+name xorg-mkfontscale
+version 1.2.3
+description 
+sources https://www.x.org/archive//individual/app/mkfontscale-1.2.3.tar.xz
+checksums 7dcf5f702781bdd4aaff02e963a56270
+pkg_deps freetype zlib libfontenc
+opt_deps 
+build_deps make xorgproto xorg-util-macros
+check_deps 

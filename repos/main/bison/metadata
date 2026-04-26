@@ -1,0 +1,9 @@
+name bison
+version 3.8.2
+description A parser generator
+sources https://ftpmirror.gnu.org/bison/bison-3.8.2.tar.xz
+checksums c28f119f405a2304ff0a7ccdcc629713
+pkg_deps 
+opt_deps 
+build_deps 
+check_deps 

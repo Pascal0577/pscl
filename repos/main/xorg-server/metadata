@@ -1,0 +1,9 @@
+name xorg-server
+version 21.1.18
+description The core of the X Window System
+sources https://www.x.org/pub/individual/xserver/xorg-server-21.1.18.tar.xz
+checksums 43225ddc1fd8d7ae7671c25ab6d1f927
+pkg_deps libxcvt pixman xorg-font-util xkeyboard-config libepoxy libtirpc
+opt_deps 
+build_deps xcb-util-keysyms xcb-util-image xcb-util-renderutil xcb-util-wm meson ninja
+check_deps 

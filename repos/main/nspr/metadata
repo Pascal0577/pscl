@@ -1,0 +1,9 @@
+name nspr
+version 4.37
+description 
+sources https://archive.mozilla.org/pub/nspr/releases/v4.37/src/nspr-4.37.tar.gz
+checksums be993c415dd4590c8e8fc2da7b0594bf
+pkg_deps 
+opt_deps 
+build_deps make
+check_deps 

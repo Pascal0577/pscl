@@ -1,0 +1,7 @@
+#!/bin/sh
+set -e
+cd "$SRCDIR"
+mkdir -p "$DESTDIR/usr/bin"
+cp -a lddtree.sh "$DESTDIR/usr/bin/"
+ln -s lddtree.sh "$DESTDIR/usr/bin/lddtree"
+chmod +x "$DESTDIR/usr/bin/lddtree.sh"

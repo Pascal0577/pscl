@@ -1,0 +1,9 @@
+name popt
+version 1.19
+description 
+sources https://ftp.osuosl.org/pub/rpm/popt/releases/popt-1.x/popt-1.19.tar.gz
+checksums eaa2135fddb6eb03f2c87ee1823e5a78
+pkg_deps 
+opt_deps 
+build_deps 
+check_deps 

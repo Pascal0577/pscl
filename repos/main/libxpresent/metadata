@@ -1,0 +1,9 @@
+name libxpresent
+version 1.0.1
+description X.Org libxpresent library
+sources https://www.x.org/pub/individual/lib/libXpresent-1.0.1.tar.xz
+checksums bdd3ec17c6181fd7b26f6775886c730d
+pkg_deps libx11 libxext libxfixes libxrandr xorgproto xorg-util-macros
+opt_deps 
+build_deps 
+check_deps 

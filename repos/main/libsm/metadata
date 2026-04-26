@@ -1,0 +1,9 @@
+name libsm
+version 1.2.6
+description X.Org libsm library
+sources https://www.x.org/pub/individual/lib/libSM-1.2.6.tar.xz
+checksums 3aeeea05091db1c69e6f768e0950a431
+pkg_deps libice util-linux xorgproto xorg-util-macros xtrans
+opt_deps 
+build_deps 
+check_deps 

@@ -1,0 +1,17 @@
+#!/bin/sh
+set -e
+cd "$SRCDIR"
+cd "$source_dir" || log_error "In $package_name.build: Failed to cd to $source_dir"
+sed -e '/m64=/s/lib64/lib/' -i.orig gcc/config/i386/t-linux64
+mkdir build
+cd build || true
+../configure --prefix=/usr            \
+     LD=ld                    \
+     --enable-languages=c,c++ \
+     --enable-default-pie     \
+     --enable-default-ssp     \
+     --enable-host-pie        \
+     --disable-multilib       \
+     --disable-bootstrap      \
+     --disable-fixincludes    \
+     --with-system-zlib

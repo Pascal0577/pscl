@@ -1,0 +1,4 @@
+#!/bin/sh
+set -e
+cd "$SRCDIR"
+make ENABLE_DOCS=0

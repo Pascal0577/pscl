@@ -1,0 +1,15 @@
+#!/bin/sh
+set -e
+cd "$SRCDIR"
+cd "$source_dir" || log_error "Failed to cd: $source_dir"
+mkdir build
+cd build || exit 1
+meson setup ..                 \
+    --prefix=/usr    \
+    --buildtype=release      \
+    -D platforms=x11,wayland \
+    -D gallium-drivers=llvmpipe,iris,virgl  \
+    -D vulkan-drivers=intel   \
+    -D valgrind=disabled     \
+    -D video-codecs=all      \
+    -D libunwind=disabled

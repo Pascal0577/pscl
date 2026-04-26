@@ -1,0 +1,9 @@
+name freetype
+version 2.13.3
+description Contains a library which allows applications to properly render TrueType fonts
+sources https://downloads.sourceforge.net/freetype/freetype-2.13.3.tar.xz
+checksums f3b4432c4212064c00500e1ad63fbc64
+pkg_deps harfbuzz libpng which
+opt_deps 
+build_deps 
+check_deps 

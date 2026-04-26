@@ -1,0 +1,9 @@
+name gtk3
+version 3.24.50
+description 
+sources https://download.gnome.org/sources/gtk/3.24/gtk-3.24.50.tar.xz
+checksums 0b3c6d1d6fc321a32624e65750b60f5d
+pkg_deps at-spi2-core gdk-pixbuf libepoxy pango glib
+opt_deps 
+build_deps 
+check_deps 

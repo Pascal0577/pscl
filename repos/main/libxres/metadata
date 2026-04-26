@@ -1,0 +1,9 @@
+name libxres
+version 1.2.2
+description X.Org libxres library
+sources https://www.x.org/pub/individual/lib/libXres-1.2.2.tar.xz
+checksums 66c9e9e01b0b53052bb1d02ebf8d7040
+pkg_deps libx11 libxext xorgproto xorg-util-macros
+opt_deps 
+build_deps 
+check_deps 

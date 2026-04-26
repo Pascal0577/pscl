@@ -1,0 +1,9 @@
+name giflib
+version 5.2.2
+description 
+sources https://sourceforge.net/projects/giflib/files/giflib-5.2.2.tar.gz
+checksums 913dd251492134e235ee3c9a91987a4d
+pkg_deps 
+opt_deps 
+build_deps 
+check_deps 

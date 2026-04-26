@@ -1,0 +1,9 @@
+name spirv-llvm-translator
+version 20.1.5
+description 
+sources https://github.com/KhronosGroup/SPIRV-LLVM-Translator/archive/v20.1.5/SPIRV-LLVM-Translator-20.1.5.tar.gz
+checksums 510a7cceed8205e4c3877f23d9c0911a
+pkg_deps libxml llvm spirv-tools
+opt_deps 
+build_deps 
+check_deps 

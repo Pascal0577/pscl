@@ -1,0 +1,9 @@
+name scrot
+version 1.12.1
+description A simple command line screen capture utility
+sources https://github.com/resurrecting-open-source-projects/scrot/archive/refs/tags/1.12.1.tar.gz
+checksums 05fb3cd75e174b095b9eae9da346be3d
+pkg_deps xorg-server libxcomposite libxext libxfixes libxinerama imlib2
+opt_deps 
+build_deps autoconf pkgconf autoconf-archive
+check_deps 

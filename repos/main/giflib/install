@@ -1,0 +1,6 @@
+#!/bin/sh
+set -e
+cd "$SRCDIR"
+make PREFIX=/usr install
+# Remove unneeded static library
+rm -fv "$DESTDIR/usr/lib/libgif.a"

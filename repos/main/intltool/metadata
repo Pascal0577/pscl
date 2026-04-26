@@ -1,0 +1,9 @@
+name intltool
+version 0.51.0
+description an internationalization tool used for extracting translatable strings from source files
+sources https://launchpad.net/intltool/trunk/0.51.0/+download/intltool-0.51.0.tar.gz
+checksums 12e517cac2b57a0121cda351570f1e63
+pkg_deps 
+opt_deps 
+build_deps 
+check_deps 

@@ -1,0 +1,9 @@
+name ninja
+version 1.12.1
+description a small build system with a focus on speed
+sources https://github.com/ninja-build/ninja/archive/v1.12.1/ninja-1.12.1.tar.gz
+checksums 6288992b05e593a391599692e2f7e490
+pkg_deps 
+opt_deps 
+build_deps python3
+check_deps 

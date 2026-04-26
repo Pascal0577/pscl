@@ -1,0 +1,5 @@
+#!/bin/sh
+set -e
+cd "$SRCDIR"
+make install
+ln -sv gawk.1 "$DESTDIR/usr/share/man/man1/awk.1"

@@ -1,0 +1,5 @@
+#!/bin/sh
+set -e
+cd "$SRCDIR"
+make install
+ln -sf bash /bin/sh && log_warn "Symlink /bin/sh overidden"

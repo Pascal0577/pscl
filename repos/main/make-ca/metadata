@@ -1,0 +1,9 @@
+name make-ca
+version 1.16.1
+description 
+sources https://github.com/lfs-book/make-ca/archive/v1.16.1/make-ca-1.16.1.tar.gz
+checksums bf9cea2d24fc5344d4951b49f275c595
+pkg_deps p11-kit
+opt_deps 
+build_deps 
+check_deps 

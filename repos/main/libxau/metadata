@@ -1,0 +1,9 @@
+name libxau
+version 1.0.12
+description Contains a library implementing the X11 Authorization Protocol
+sources https://www.x.org/pub/individual/lib/libXau-1.0.12.tar.xz
+checksums 4c9f81acf00b62e5de56a912691bd737
+pkg_deps xorgproto
+opt_deps 
+build_deps 
+check_deps 

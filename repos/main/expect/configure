@@ -1,0 +1,11 @@
+#!/bin/sh
+set -e
+cd "$SRCDIR"
+cd "$source_dir" || log_error "In $package_name.build: Failed to cd to $source_dir"
+patch -Np1 -i ../expect-5.45.4-gcc15-1.patch
+PTY_TYPE="termios" ./configure --prefix=/usr           \
+    --with-tcl=/usr/lib     \
+    --enable-shared         \
+    --disable-rpath         \
+    --mandir=/usr/share/man \
+    --with-tclinclude=/usr/include

@@ -1,0 +1,4 @@
+#!/bin/sh
+set -e
+cd "$SRCDIR"
+pip3 wheel -w dist --no-build-isolation --no-deps --no-cache-dir $PWD

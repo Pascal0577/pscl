@@ -1,0 +1,9 @@
+name flac
+version 1.5.0
+description 
+sources https://github.com/xiph/flac/releases/download/1.5.0/flac-1.5.0.tar.xz
+checksums 0bb45bcf74338b00efeec121fff27367
+pkg_deps libogg
+opt_deps 
+build_deps 
+check_deps 

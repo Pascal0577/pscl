@@ -1,0 +1,9 @@
+name xorg-font-bh-type1
+version 1.0.4
+description X.Org xorg-font-bh-type1 library
+sources https://www.x.org/pub/individual/font//font-bh-type1-1.0.4.tar.xz
+checksums 51a17c981275439b85e15430a3d711ee
+pkg_deps xorg-font-alias xorg-font-util xorg-mkfontscale xorg-util-macros
+opt_deps 
+build_deps 
+check_deps 

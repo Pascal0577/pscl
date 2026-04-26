@@ -1,0 +1,9 @@
+#!/bin/sh
+set -e
+cd "$SRCDIR"
+cd "$source_dir" || log_error "In $package_name.build: Failed to cd to $source_dir"
+sed -e "/^extern int (\*xstat)/s/()/(const char * restrict, struct stat * restrict)/" -i src/extern.h
+sed -e "/^int (\*xstat)/s/()/(const char * restrict,  struct stat * restrict)/" -i src/global.c
+./configure --prefix=/usr \
+    --enable-mt   \
+    --with-rmt=/usr/libexec/rmt

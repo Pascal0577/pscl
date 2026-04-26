@@ -1,0 +1,6 @@
+#!/bin/sh
+set -e
+cd "$SRCDIR"
+make install
+mkdir -pv "$DESTDIR/usr/share/alsa"
+cp -a ../alsa-ucm-conf-1.2.14/ucm* "$DESTDIR/usr/share/alsa"

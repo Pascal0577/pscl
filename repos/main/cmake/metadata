@@ -1,0 +1,9 @@
+name cmake
+version 4.1.2
+description cmake build systemd
+sources https://cmake.org/files/v4.1/cmake-4.1.2.tar.gz
+checksums 679304270e6e368de5e949a594d2e871
+pkg_deps 
+opt_deps 
+build_deps 
+check_deps 

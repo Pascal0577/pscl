@@ -1,0 +1,4 @@
+#!/bin/sh
+set -e
+cd "$SRCDIR"
+python3 configure.py --bootstrap --verbose

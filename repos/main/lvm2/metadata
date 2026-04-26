@@ -1,0 +1,9 @@
+name lvm2
+version 2.03.36
+description A set of tools that manage logical partitions
+sources https://sourceware.org/ftp/lvm2/LVM2.2.03.36.tgz
+checksums 62a7c701fe07a5c30ff9fcb624cd3437
+pkg_deps libaio
+opt_deps 
+build_deps 
+check_deps 

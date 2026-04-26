@@ -1,0 +1,9 @@
+name vulkan-headers
+version 1.4.321
+description 
+sources https://github.com/KhronosGroup/Vulkan-Headers/archive/v1.4.321/Vulkan-Headers-1.4.321.tar.gz
+checksums 0121ba99047bf40ab93737209c7a170a
+pkg_deps 
+opt_deps 
+build_deps cmake ninja
+check_deps 

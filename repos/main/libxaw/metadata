@@ -1,0 +1,9 @@
+name libxaw
+version 1.0.16
+description X.Org libxaw library
+sources https://www.x.org/pub/individual/lib/libXaw-1.0.16.tar.xz
+checksums 2a9793533224f92ddad256492265dd82
+pkg_deps libx11 libxext libxt libxmu libxpm xorgproto xorg-util-macros
+opt_deps 
+build_deps 
+check_deps 

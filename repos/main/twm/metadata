@@ -1,0 +1,9 @@
+name twm
+version 1.0.13.1
+description A very minimal window manager
+sources https://www.x.org/pub/individual/app/twm-1.0.13.1.tar.xz
+checksums 2a337b776c904eab5b874eddc0124d4f
+pkg_deps xorg-server
+opt_deps 
+build_deps make
+check_deps 

@@ -1,0 +1,9 @@
+name openssl
+version 3.5.2
+description A robust, commercial-grade, full-featured toolkit for general-purpose cryptography and secure communication.
+sources https://github.com/openssl/openssl/releases/download/openssl-3.5.2/openssl-3.5.2.tar.gz
+checksums 890fc59f86fc21b5e4d1c031a698dbde
+pkg_deps 
+opt_deps 
+build_deps 
+check_deps 

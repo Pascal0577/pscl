@@ -1,0 +1,6 @@
+#!/bin/sh
+set -e
+cd "$SRCDIR"
+cd "$source_dir" || log_error "In $package_name.build: Failed to cd to $source_dir"
+echo '#define SYS_VIMRC_FILE "/etc/vimrc"' >> src/feature.h
+./configure --prefix=/usr

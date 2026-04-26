@@ -1,0 +1,9 @@
+name libyaml
+version 0.2.5
+description 
+sources https://github.com/yaml/libyaml/releases/download/0.2.5/yaml-0.2.5.tar.gz
+checksums bb15429d8fb787e7d3f1c83ae129a999
+pkg_deps 
+opt_deps 
+build_deps 
+check_deps 

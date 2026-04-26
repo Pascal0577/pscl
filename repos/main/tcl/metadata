@@ -1,0 +1,9 @@
+name tcl
+version 8.6.16
+description Installed for test suites
+sources https://downloads.sourceforge.net/tcl/tcl8.6.16-src.tar.gz
+checksums eaef5d0a27239fb840f04af8ec608242
+pkg_deps 
+opt_deps 
+build_deps 
+check_deps 

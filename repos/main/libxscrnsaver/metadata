@@ -1,0 +1,9 @@
+name libxscrnsaver
+version 1.2.4
+description X.Org libxscrnsaver library
+sources https://www.x.org/pub/individual/lib/libXScrnSaver-1.2.4.tar.xz
+checksums e613751d38e13aa0d0fd8e0149cec057
+pkg_deps libx11 libxext xorgproto xorg-util-macros
+opt_deps 
+build_deps 
+check_deps 

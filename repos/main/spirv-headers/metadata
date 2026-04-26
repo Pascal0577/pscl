@@ -1,0 +1,9 @@
+name spirv-headers
+version 1.4.321.0
+description 
+sources https://github.com/KhronosGroup/SPIRV-Headers/archive/vulkan-sdk-1.4.321.0/SPIRV-Headers-vulkan-sdk-1.4.321.0.tar.gz
+checksums ef203788b47d207f7a71bdf4fa02d6f2
+pkg_deps 
+opt_deps 
+build_deps cmake ninja
+check_deps 

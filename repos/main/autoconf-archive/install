@@ -1,0 +1,5 @@
+#!/bin/sh
+set -e
+cd "$SRCDIR"
+mkdir -pv "$DESTDIR/usr/share/aclocal"
+cp -av m4/*.m4 "$DESTDIR/usr/share/aclocal"

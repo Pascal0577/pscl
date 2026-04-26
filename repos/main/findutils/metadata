@@ -1,0 +1,9 @@
+name findutils
+version 4.10.0
+description Programs to find files
+sources https://ftpmirror.gnu.org/findutils/findutils-4.10.0.tar.xz
+checksums 870cfd71c07d37ebe56f9f4aaf4ad872
+pkg_deps 
+opt_deps 
+build_deps 
+check_deps 

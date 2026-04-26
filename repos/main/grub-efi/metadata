@@ -1,0 +1,9 @@
+name grub-efi
+version 2.12
+description GRand Unified Bootloader
+sources https://ftp.gnu.org/gnu/grub/grub-2.12.tar.xz
+checksums 60c564b1bdc39d8e43b3aab4bc0fb140
+pkg_deps efibootmgr
+opt_deps 
+build_deps 
+check_deps 

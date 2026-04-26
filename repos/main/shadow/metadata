@@ -1,0 +1,9 @@
+name shadow
+version 4.18.0
+description Programs for handling passwords in a secure way
+sources https://github.com/shadow-maint/shadow/releases/download/4.18.0/shadow-4.18.0.tar.xz
+checksums 30ef46f54363db1d624587be68794ef2
+pkg_deps linux-pam
+opt_deps 
+build_deps 
+check_deps 

@@ -1,0 +1,9 @@
+name file
+version 5.46
+description A utility for determining the type of a given file or files
+sources https://astron.com/pub/file/file-5.46.tar.gz
+checksums 459da2d4b534801e2e2861611d823864
+pkg_deps 
+opt_deps 
+build_deps 
+check_deps 

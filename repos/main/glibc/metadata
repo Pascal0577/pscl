@@ -1,0 +1,9 @@
+name glibc
+version 2.42
+description GNU C Libraries
+sources https://ftpmirror.gnu.org/glibc/glibc-2.42.tar.xz
+checksums 23c6f5a27932b435cae94e087cb8b1f5
+pkg_deps 
+opt_deps 
+build_deps 
+check_deps 

@@ -1,0 +1,9 @@
+name libpciaccess
+version 0.18.1
+description X.Org libpciaccess library
+sources https://www.x.org/pub/individual/lib/libpciaccess-0.18.1.tar.xz
+checksums 57c7efbeceedefde006123a77a7bc825
+pkg_deps zlib meson xorg-util-macros
+opt_deps 
+build_deps 
+check_deps 

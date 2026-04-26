@@ -1,0 +1,9 @@
+name qt6
+version 6.9.2
+description Cross-platform GUI framework
+sources https://download.qt.io/archive/qt/6.9/6.9.2/single/qt-everywhere-src-6.9.2.tar.xz
+checksums 78fe69ae8049f6b0139ceaa28e643f53
+pkg_deps libxorg
+opt_deps 
+build_deps 
+check_deps 

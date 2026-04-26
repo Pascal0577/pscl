@@ -1,0 +1,7 @@
+#!/bin/sh
+set -e
+cd "$SRCDIR"
+mkdir -pv "$DESTDIR/usr/bin" "$DESTDIR/usr/share/pixmaps/Alacritty.svg" "$DESTDIR/usr/share/applications"
+cp -v target/release/alacritty "$DESTDIR/usr/bin"
+cp -v extra/logo/alacritty-term.svg "$DESTDIR/usr/share/pixmaps/Alacritty.svg"
+cp -v extra/linux/Alacritty.desktop "$DESTDIR/usr/share/applications"

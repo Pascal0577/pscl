@@ -1,0 +1,9 @@
+name libxcb
+version 1.17.0
+description Provides an interface to the X Window System protocol
+sources https://xorg.freedesktop.org/archive/individual/lib/libxcb-1.17.0.tar.xz
+checksums 96565523e9f9b701fcb35d31f1d4086e
+pkg_deps libxau xcb-proto libxdmcp
+opt_deps 
+build_deps 
+check_deps 

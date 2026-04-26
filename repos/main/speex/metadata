@@ -1,0 +1,9 @@
+name speex
+version 1.2.1
+description 
+sources https://downloads.xiph.org/releases/speex/speex-1.2.1.tar.gz
+checksums fe7bf610883ff202092b92c72fe0fe3e
+pkg_deps libogg
+opt_deps 
+build_deps make
+check_deps 

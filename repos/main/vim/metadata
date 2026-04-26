@@ -1,0 +1,9 @@
+name vim
+version 9.1.1629
+description vim text editor
+sources https://github.com/vim/vim/archive/v9.1.1629/vim-9.1.1629.tar.gz
+checksums 4f856c3233c1c4570bc17572e4f9e8e4
+pkg_deps 
+opt_deps 
+build_deps 
+check_deps 

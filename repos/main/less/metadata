@@ -1,0 +1,9 @@
+name less
+version 679
+description A text file viewer
+sources https://www.greenwoodsoftware.com/less/less-679.tar.gz
+checksums 0386dc14f6a081a94dfb4c2413864eed
+pkg_deps 
+opt_deps 
+build_deps 
+check_deps 

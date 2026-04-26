@@ -1,0 +1,6 @@
+#!/bin/sh
+set -e
+cd "$SRCDIR"
+make install
+mkdir -p "${DESTDIR:?}/usr/share/doc/libpng-1.6.50"
+cp README libpng-manual.txt "${DESTDIR:?}/usr/share/doc/libpng-1.6.50"

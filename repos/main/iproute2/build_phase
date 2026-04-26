@@ -1,0 +1,4 @@
+#!/bin/sh
+set -e
+cd "$SRCDIR"
+make NETNS_RUN_DIR=/run/netns

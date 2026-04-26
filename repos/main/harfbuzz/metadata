@@ -1,0 +1,9 @@
+name harfbuzz
+version 11.4.1
+description An OpenType text shaping engine
+sources https://github.com/harfbuzz/harfbuzz/releases/download/11.4.1/harfbuzz-11.4.1.tar.xz
+checksums 0f2f8fe443032019b5ca9598c8e2b912
+pkg_deps freetype-before-harfbuzz glib
+opt_deps 
+build_deps 
+check_deps 

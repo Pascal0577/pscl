@@ -1,0 +1,9 @@
+name xorg-font-ibm-type1
+version 1.0.4
+description X.Org xorg-font-ibm-type1 library
+sources https://www.x.org/pub/individual/font//font-ibm-type1-1.0.4.tar.xz
+checksums 00f64a84b6c9886040241e081347a853
+pkg_deps xorg-font-alias xorg-font-util xorg-mkfontscale xorg-util-macros
+opt_deps 
+build_deps 
+check_deps 

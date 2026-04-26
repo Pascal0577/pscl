@@ -1,0 +1,9 @@
+name xcb-proto
+version 1.17.0
+description Provides the XML-XCB protocol
+sources https://xorg.freedesktop.org/archive/individual/proto/xcb-proto-1.17.0.tar.xz
+checksums c415553d2ee1a8cea43c3234a079b53f
+pkg_deps libxml
+opt_deps 
+build_deps python3
+check_deps 

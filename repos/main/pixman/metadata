@@ -1,0 +1,9 @@
+name pixman
+version 0.46.4
+description Contains a library that provides low-level pixel manipulation features such as image compositing and trapezoid rasterization
+sources https://www.cairographics.org/releases/pixman-0.46.4.tar.gz
+checksums c08173c8e1d2cc79428d931c13ffda59
+pkg_deps 
+opt_deps 
+build_deps 
+check_deps 

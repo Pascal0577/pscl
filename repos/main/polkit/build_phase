@@ -1,0 +1,12 @@
+#!/bin/sh
+set -e
+cd "$SRCDIR"
+mkdir build
+cd build || exit 1
+meson setup ..                 \
+    --prefix=/usr              \
+    --buildtype=release        \
+    -D man=false               \
+    -D session_tracking=logind \
+    -D tests=true
+ninja

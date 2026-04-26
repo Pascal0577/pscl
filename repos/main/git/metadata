@@ -1,0 +1,9 @@
+name git
+version 2.51.2
+description 
+sources https://www.kernel.org/pub/software/scm/git/git-2.51.2.tar.xz
+checksums 6d73314753ba69d826c4b33e9ee3a8fc
+pkg_deps curl
+opt_deps 
+build_deps 
+check_deps 

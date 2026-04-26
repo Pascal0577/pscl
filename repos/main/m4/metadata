@@ -1,0 +1,9 @@
+name m4
+version 1.4.20
+description Macro processor
+sources https://ftpmirror.gnu.org/m4/m4-1.4.20.tar.xz
+checksums 6eb2ebed5b24e74b6e890919331d2132
+pkg_deps 
+opt_deps 
+build_deps 
+check_deps 

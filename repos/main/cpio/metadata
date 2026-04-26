@@ -1,0 +1,9 @@
+name cpio
+version 2.15
+description Contains tools for archiving
+sources https://ftp.gnu.org/gnu/cpio/cpio-2.15.tar.bz2
+checksums 3394d444ca1905ea56c94b628b706a0b
+pkg_deps 
+opt_deps 
+build_deps 
+check_deps 

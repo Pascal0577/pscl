@@ -1,0 +1,9 @@
+name tar
+version 1.35
+description Provides the ability to create tar archives as well as perform various other kinds of archive manipulation
+sources https://ftpmirror.gnu.org/tar/tar-1.35.tar.xz
+checksums a2d8042658cfd8ea939e6d911eaf4152
+pkg_deps 
+opt_deps 
+build_deps 
+check_deps 

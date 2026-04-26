@@ -1,0 +1,9 @@
+name dbus
+version 1.16.2
+description a message bus system, a simple way for applications to talk to one another
+sources https://dbus.freedesktop.org/releases/dbus/dbus-1.16.2.tar.xz
+checksums 97832e6f0a260936d28536e5349c22e5
+pkg_deps 
+opt_deps systemd
+build_deps 
+check_deps 

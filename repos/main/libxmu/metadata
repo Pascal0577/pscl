@@ -1,0 +1,9 @@
+name libxmu
+version 1.2.1
+description X.Org libxmu library
+sources https://www.x.org/pub/individual/lib/libXmu-1.2.1.tar.xz
+checksums 85edefb7deaad4590a03fccba517669f
+pkg_deps libx11 libxt libxext xorgproto xorg-util-macros
+opt_deps 
+build_deps 
+check_deps 

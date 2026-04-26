@@ -1,0 +1,9 @@
+name which
+version 2.23
+description 
+sources https://ftp.gnu.org/gnu/which/which-2.23.tar.gz
+checksums 1963b85914132d78373f02a84cdb3c86
+pkg_deps 
+opt_deps 
+build_deps 
+check_deps 

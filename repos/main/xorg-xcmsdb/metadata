@@ -1,0 +1,9 @@
+name xorg-xcmsdb
+version 1.0.6
+description 
+sources https://www.x.org/archive/individual/app/xcmsdb-1.0.6.tar.xz
+checksums 82a90e2feaeab5c5e7610420930cc0f4
+pkg_deps libx11
+opt_deps 
+build_deps xorg-util-macros
+check_deps 

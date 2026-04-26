@@ -1,0 +1,9 @@
+name alacritty
+version 0.16.1
+description A terminal emulator
+sources https://github.com/alacritty/alacritty/archive/refs/tags/v0.16.1.tar.gz
+checksums 90b352df7af4b3e2f3306900fa6a252c
+pkg_deps freetype fontconfig pkgconf libxkbcommon python3 libxcb
+opt_deps 
+build_deps cmake make rustc
+check_deps 

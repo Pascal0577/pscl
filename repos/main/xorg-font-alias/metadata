@@ -1,0 +1,9 @@
+name xorg-font-alias
+version 1.0.5
+description X.Org xorg-font-alias library
+sources https://www.x.org/pub/individual/font//font-alias-1.0.5.tar.xz
+checksums 79f4c023e27d1db1dfd90d041ce89835
+pkg_deps xorg-util-macros
+opt_deps 
+build_deps 
+check_deps 

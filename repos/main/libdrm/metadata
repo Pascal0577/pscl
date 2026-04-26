@@ -1,0 +1,9 @@
+name libdrm
+version 2.4.125
+description 
+sources https://dri.freedesktop.org/libdrm/libdrm-2.4.125.tar.xz
+checksums 3baec8e685510892b3355a7074baa874
+pkg_deps libxorg
+opt_deps 
+build_deps 
+check_deps 

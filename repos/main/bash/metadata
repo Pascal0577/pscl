@@ -1,0 +1,9 @@
+name bash
+version 5.3
+description Bourne-Again-Shell
+sources https://ftpmirror.gnu.org/bash/bash-5.3.tar.gz
+checksums 977c8c0c5ae6309191e7768e28ebc951
+pkg_deps ncurses readline
+opt_deps 
+build_deps 
+check_deps 

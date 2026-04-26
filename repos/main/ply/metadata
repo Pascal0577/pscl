@@ -1,0 +1,9 @@
+name ply
+version 3.11
+description 
+sources https://files.pythonhosted.org/packages/source/p/ply/ply-3.11.tar.gz
+checksums 6465f602e656455affcd7c5734c638f8
+pkg_deps 
+opt_deps 
+build_deps python3
+check_deps 

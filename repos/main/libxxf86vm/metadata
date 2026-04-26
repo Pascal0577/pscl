@@ -1,0 +1,9 @@
+name libxxf86vm
+version 1.1.6
+description X.Org libxxf86vm library
+sources https://www.x.org/pub/individual/lib/libXxf86vm-1.1.6.tar.xz
+checksums d3db4b6dc924dc151822f5f7e79ae873
+pkg_deps libx11 libxext xorgproto xorg-util-macros
+opt_deps 
+build_deps 
+check_deps 

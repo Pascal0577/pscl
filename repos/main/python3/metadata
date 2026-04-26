@@ -1,0 +1,9 @@
+name python3
+version 3.13.7
+description An interpretted computer language
+sources https://www.python.org/ftp/python/3.13.7/Python-3.13.7.tar.xz
+checksums 256cdb3bbf45cdce7499e52ba6c36ea3
+pkg_deps expat
+opt_deps sqlite
+build_deps 
+check_deps 

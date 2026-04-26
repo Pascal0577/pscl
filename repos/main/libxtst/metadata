@@ -1,0 +1,9 @@
+name libxtst
+version 1.2.5
+description X.Org libxtst library
+sources https://www.x.org/pub/individual/lib/libXtst-1.2.5.tar.xz
+checksums b62dc44d8e63a67bb10230d54c44dcb7
+pkg_deps libx11 libxext libxi xorgproto xorg-util-macros
+opt_deps 
+build_deps 
+check_deps 

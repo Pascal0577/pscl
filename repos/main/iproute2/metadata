@@ -1,0 +1,9 @@
+name iproute2
+version 6.16.0
+description programs for basic and advanced IPV4-based networking
+sources https://www.kernel.org/pub/linux/utils/net/iproute2/iproute2-6.16.0.tar.xz
+checksums 80e1f91bf59d572acc15d5c6eb4f3e7c
+pkg_deps 
+opt_deps 
+build_deps 
+check_deps 

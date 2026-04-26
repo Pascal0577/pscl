@@ -1,0 +1,6 @@
+#!/bin/sh
+set -e
+cd "$SRCDIR"
+make -C libelf install
+install -vm644 config/libelf.pc "$DESTDIR/usr/lib/pkgconfig"
+rm "$DESTDIR/usr/lib/libelf.a"

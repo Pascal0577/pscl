@@ -1,0 +1,11 @@
+#!/bin/sh
+set -e
+cd "$SRCDIR"
+cd "$source_dir" || log_error "In $package_name.build: Failed to cd to $source_dir"
+mkdir build
+cd build || exit 1
+meson setup ..                               \
+    --prefix=/usr                            \
+    --buildtype=release                      \
+    -D docdir=/usr/share/doc/Linux-PAM-1.7.1 \
+    -D docs=disabled

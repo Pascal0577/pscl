@@ -1,0 +1,9 @@
+name libxrender
+version 0.9.12
+description X.Org libxrender library
+sources https://www.x.org/pub/individual/lib/libXrender-0.9.12.tar.xz
+checksums 4c54dce455d96e3bdee90823b0869f89
+pkg_deps libx11 xorgproto
+opt_deps 
+build_deps 
+check_deps 

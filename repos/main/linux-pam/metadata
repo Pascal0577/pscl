@@ -1,0 +1,9 @@
+name linux-pam
+version 1.7.1
+description Contains Pluggable Authentication Modules used by the local system administrator to control how application programs authenticate users
+sources https://github.com/linux-pam/linux-pam/releases/download/v1.7.1/Linux-PAM-1.7.1.tar.xz
+checksums 92812d7dd414d816fba8d649e84e68ca
+pkg_deps 
+opt_deps 
+build_deps 
+check_deps 

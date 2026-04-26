@@ -1,0 +1,9 @@
+name cairo
+version 1.18.4
+description A 2D graphics library with support for multiple output devices
+sources https://www.cairographics.org/releases/cairo-1.18.4.tar.xz
+checksums db575fb41bbda127e0147e401f36f8ac
+pkg_deps libpng pixman libxorg fontconfig glib
+opt_deps 
+build_deps 
+check_deps 

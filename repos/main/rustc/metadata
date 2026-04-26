@@ -1,0 +1,9 @@
+name rustc
+version 1.89.0
+description The Rust compiler and package manager
+sources https://static.rust-lang.org/dist/rustc-1.89.0-src.tar.xz
+checksums 982f087479302e6d91432efc81852b00
+pkg_deps cmake curl
+opt_deps libssh2
+build_deps 
+check_deps 

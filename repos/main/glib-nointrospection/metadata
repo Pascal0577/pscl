@@ -1,0 +1,9 @@
+name glib-nointrospection
+version 2.84.4
+description Contains low-level libraries useful for providing data structure handling for C
+sources https://download.gnome.org/sources/glib/2.84/glib-2.84.4.tar.xz
+checksums 5655d0ff809b98dd77c02490609fadde
+pkg_deps docutils libxslt
+opt_deps 
+build_deps 
+check_deps 

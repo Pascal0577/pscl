@@ -1,0 +1,11 @@
+#!/bin/sh
+set -e
+cd "$SRCDIR"
+cd "$source_dir" || log_error "In $package_name.build: Failed to cd to $source_dir"
+./configure --prefix=/usr     \
+    --sysconfdir=/etc \
+    --disable-static  \
+    --with-history    \
+    --with-icu        \
+    PYTHON=/usr/bin/python3 \
+    --docdir=/usr/share/doc/libxml2-2.14.5

@@ -1,0 +1,9 @@
+name sed
+version 4.9
+description Contains a stream editor
+sources https://mirror.team-cymru.com/gnu/sed/sed-4.9.tar.xz
+checksums 6aac9b2dbafcd5b7a67a8a9bcb8036c3
+pkg_deps 
+opt_deps 
+build_deps 
+check_deps 

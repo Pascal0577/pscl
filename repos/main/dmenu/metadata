@@ -1,0 +1,9 @@
+name dmenu
+version 5.4
+description Dynamic menu for X
+sources https://dl.suckless.org/tools/dmenu-5.4.tar.gz
+checksums 79b8e1caf61133742e2250ca37b2de92
+pkg_deps bash libx11 libxinerama libxft freetype fontconfig
+opt_deps 
+build_deps 
+check_deps 

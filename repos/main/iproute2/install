@@ -1,0 +1,4 @@
+#!/bin/sh
+set -e
+cd "$SRCDIR"
+make SBINDIR=/usr/sbin DESTDIR="$DESTDIR" install

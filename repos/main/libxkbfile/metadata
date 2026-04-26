@@ -1,0 +1,9 @@
+name libxkbfile
+version 1.1.3
+description X.Org libxkbfile library
+sources https://www.x.org/pub/individual/lib/libxkbfile-1.1.3.tar.xz
+checksums 229708c15c9937b6e5131d0413474139
+pkg_deps libx11 xorgproto meson xorg-util-macros
+opt_deps 
+build_deps 
+check_deps 

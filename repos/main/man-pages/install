@@ -1,0 +1,4 @@
+#!/bin/sh
+set -e
+cd "$SRCDIR"
+make -R GIT=false DESTDIR="$DESTDIR" prefix=/usr install || log_error "Destdir is: $DESTDIR"

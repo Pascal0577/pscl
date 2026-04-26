@@ -1,0 +1,9 @@
+name xorg-util-macros
+version 1.20.2
+description m4 macros used by all Xorg packages
+sources https://www.x.org/pub/individual/util/util-macros-1.20.2.tar.xz
+checksums 5f683a1966834b0a6ae07b3680bcb863
+pkg_deps 
+opt_deps 
+build_deps 
+check_deps 

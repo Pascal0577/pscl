@@ -1,0 +1,5 @@
+#!/bin/sh
+set -e
+cd "$SRCDIR"
+make install
+rm -fv "$DESTDIR/usr/lib/libltdl.a"

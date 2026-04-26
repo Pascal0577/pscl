@@ -1,0 +1,9 @@
+name libevdev
+version 1.13.2
+description 
+sources https://www.freedesktop.org/software/libevdev/libevdev-1.13.2.tar.xz
+checksums ddb1d798e0f2b4d0bd17c892b7d4aed3
+pkg_deps glibc
+opt_deps 
+build_deps meson ninja
+check_deps 

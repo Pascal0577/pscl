@@ -1,0 +1,12 @@
+#!/bin/sh
+set -e
+cd "$SRCDIR"
+cd "$source_dir" || log_error "Failed to cd: $source_dir"
+patch -Np1 -i ../xorg-server-21.1.18-tearfree_backport-2.patch
+mkdir build
+cd build
+meson setup ..          \
+  --prefix=/usr \
+  --localstatedir=/var  \
+  -D glamor=true        \
+  -D xkb_output_dir=/var/lib/xkb

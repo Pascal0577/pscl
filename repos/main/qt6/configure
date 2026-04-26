@@ -1,0 +1,16 @@
+#!/bin/sh
+set -e
+cd "$SRCDIR"
+cd "$source_dir" || log_error "Failed to cd: $source_dir"
+./configure -prefix /opt/qt6 \
+    -sysconfdir /etc/xdg     \
+    -dbus-linked             \
+    -openssl-linked          \
+    -system-sqlite           \
+    -nomake examples         \
+    -no-rpath                \
+    -no-sbom                 \
+    -journald                \
+    -skip qt3d               \
+    -skip qtquick3dphysics   \
+    -skip qtwebengine

@@ -1,0 +1,9 @@
+name iana-etc
+version 20250807
+description /etc/protocols and /etc/services
+sources https://github.com/Mic92/iana-etc/releases/download/20250807/iana-etc-20250807.tar.gz
+checksums de0a909103d4ff59d1424c5ec7ac9e4a
+pkg_deps 
+opt_deps 
+build_deps 
+check_deps 

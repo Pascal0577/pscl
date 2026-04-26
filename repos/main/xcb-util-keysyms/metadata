@@ -1,0 +1,9 @@
+name xcb-util-keysyms
+version 0.4.1
+description 
+sources https://xcb.freedesktop.org/dist/xcb-util-keysyms-0.4.1.tar.xz
+checksums fbdc05f86f72f287ed71b162f1a9725a
+pkg_deps libxcb xcb-util
+opt_deps 
+build_deps 
+check_deps 

@@ -1,0 +1,9 @@
+name util-linux
+version 2.41.1
+description Miscellaneous utility programs
+sources https://www.kernel.org/pub/linux/utils/util-linux/v2.41/util-linux-2.41.1.tar.xz
+checksums 7e5e68845e2f347cf96f5448165f1764
+pkg_deps 
+opt_deps 
+build_deps 
+check_deps 

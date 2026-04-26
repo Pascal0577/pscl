@@ -1,0 +1,9 @@
+name kmod
+version 34.2
+description libraries and utilities for loading kernel modules
+sources https://www.kernel.org/pub/linux/utils/kernel/kmod/kmod-34.2.tar.xz
+checksums 36f2cc483745e81ede3406fa55e1065a
+pkg_deps 
+opt_deps 
+build_deps 
+check_deps 

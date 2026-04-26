@@ -1,0 +1,7 @@
+#!/bin/sh
+set -e
+cd "$SRCDIR"
+cd "$source_dir" || log_error "In $package_name.build: Failed to cd to $source_dir"
+./configure --prefix=/usr    \
+    --disable-static \
+    --docdir=/usr/share/doc/libxslt-1.1.43

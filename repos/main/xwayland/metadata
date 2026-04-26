@@ -1,0 +1,9 @@
+name xorg-xwayland
+version 24.1.2
+description 
+sources https://www.x.org/pub/individual/xserver/xwayland-24.1.2.tar.xz
+checksums 312c5cf17d1b147df1b787fd170958e1
+pkg_deps glibc libepoxy libtirpc mesa wayland xorg-font-util
+opt_deps 
+build_deps meson ninja
+check_deps 

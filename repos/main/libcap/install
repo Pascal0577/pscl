@@ -1,0 +1,7 @@
+#!/bin/sh
+set -e
+cd "$SRCDIR"
+mkdir -p "$DESTDIR/usr/lib/security"
+mkdir -p "$DESTDIR/etc/security"
+install -v -m755 pam_cap/pam_cap.so      "$DESTDIR/usr/lib/security"
+install -v -m644 pam_cap/capability.conf "$DESTDIR/etc/security"

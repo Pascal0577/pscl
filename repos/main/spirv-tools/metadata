@@ -1,0 +1,9 @@
+name spirv-tools
+version 1.4.321.0
+description 
+sources https://github.com/KhronosGroup/SPIRV-Tools/archive/vulkan-sdk-1.4.321.0/SPIRV-Tools-vulkan-sdk-1.4.321.0.tar.gz
+checksums bd91a34dcbd8301cba5f4fa9524c7d9f
+pkg_deps spirv-headers
+opt_deps 
+build_deps cmake ninja
+check_deps 

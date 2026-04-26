@@ -1,0 +1,9 @@
+name flit-core
+version 3.12.0
+description The distribution-building parts of Flit
+sources https://pypi.org/packages/source/f/flit-core/flit_core-3.12.0.tar.gz
+checksums c538415c1f27bd69cbbbf3cdd5135d39
+pkg_deps 
+opt_deps 
+build_deps python3
+check_deps 

@@ -1,0 +1,9 @@
+name binutils
+version 2.45
+description Contains a linker, an assembler, and other tools for handling object files
+sources https://sourceware.org/pub/binutils/releases/binutils-2.45.tar.xz
+checksums dee5b4267e0305a99a3c9d6131f45759
+pkg_deps 
+opt_deps 
+build_deps 
+check_deps 

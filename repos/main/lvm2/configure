@@ -1,0 +1,8 @@
+#!/bin/sh
+set -e
+cd "$SRCDIR"
+cd "$source_dir" || log_error "In $package_name.build: Failed to cd to $source_dir"
+PATH+=:/usr/sbin ./configure --prefix=/usr \
+    --enable-cmdlib     \
+    --enable-pkgconfig  \
+    --enable-udev_sync

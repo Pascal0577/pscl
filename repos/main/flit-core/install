@@ -1,0 +1,4 @@
+#!/bin/sh
+set -e
+cd "$SRCDIR"
+pip3 install --no-index --find-links dist --root "$DESTDIR" flit_core

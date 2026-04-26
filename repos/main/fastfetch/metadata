@@ -1,0 +1,9 @@
+name fastfetch
+version 2.54.0
+description A fast fetch tool written in C
+sources https://github.com/fastfetch-cli/fastfetch/releases/download/2.54.0/fastfetch-linux-amd64.tar.gz
+checksums d41d8cd98f00b204e9800998ecf8427e
+pkg_deps 
+opt_deps 
+build_deps 
+check_deps 

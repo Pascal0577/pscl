@@ -1,0 +1,9 @@
+name make
+version 4.4.1
+description A program for controlling the generation of executables and other non-source files of a package from source files
+sources https://ftpmirror.gnu.org/make/make-4.4.1.tar.gz
+checksums c8469a3713cbbe04d955d4ae4be23eeb
+pkg_deps 
+opt_deps 
+build_deps 
+check_deps 

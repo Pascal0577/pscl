@@ -1,0 +1,9 @@
+name xcb-util-image
+version 0.4.1
+description Extensions for xcb-util
+sources https://xcb.freedesktop.org/dist/xcb-util-image-0.4.1.tar.xz
+checksums a67bfac2eff696170259ef1f5ce1b611
+pkg_deps libxcb xcb-util
+opt_deps 
+build_deps 
+check_deps 

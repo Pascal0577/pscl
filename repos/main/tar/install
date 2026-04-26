@@ -1,0 +1,5 @@
+#!/bin/sh
+set -e
+cd "$SRCDIR"
+make install
+make -C doc install-html docdir="$DESTDIR/usr/share/doc/tar-1.35"

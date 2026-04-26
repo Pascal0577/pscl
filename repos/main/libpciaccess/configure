@@ -1,0 +1,7 @@
+#!/bin/sh
+set -e
+cd "$SRCDIR"
+cd "$source_dir" || log_error "Failed to cd to $source_dir"
+mkdir -p build
+cd build || log_error "Failed to cd to build"
+meson setup --prefix=/usr --buildtype=release ..

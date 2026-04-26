@@ -1,0 +1,9 @@
+name libxorg
+version 
+description Libraries for xorg
+sources 
+checksums 
+pkg_deps libx11 libxau libxaw libxcb libxcomposite libxcrypt libxcursor libxdamage libxdmcp libxext libxfixes libxfont2 libxft libxi libxinerama libxkbfile libxml libxmu libxpm libxpresent libxrandr libxrender libxres libxscrnsaver libxshmfence libxslt libxt libxtst libxv libxvmc libxxf86dga libxxf86vm libpciaccess
+opt_deps 
+build_deps 
+check_deps 

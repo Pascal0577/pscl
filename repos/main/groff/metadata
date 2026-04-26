@@ -1,0 +1,9 @@
+name groff
+version 1.23.0
+description programs for processing and formatting text and images
+sources https://ftp.gnu.org/gnu/groff/groff-1.23.0.tar.gz
+checksums 5e4f40315a22bb8a158748e7d5094c7d
+pkg_deps 
+opt_deps 
+build_deps 
+check_deps 

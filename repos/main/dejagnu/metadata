@@ -1,0 +1,9 @@
+name dejagnu
+version 1.6.3
+description Framework for running test suites
+sources https://mirror.team-cymru.com/gnu/dejagnu/dejagnu-1.6.3.tar.gz
+checksums 68c5208c58236eba447d7d6d1326b821
+pkg_deps 
+opt_deps 
+build_deps 
+check_deps 

@@ -1,0 +1,9 @@
+name xorg-xcursorgen
+version 1.0.8
+description 
+sources https://www.x.org/archive/individual/app/xcursorgen-1.0.8.tar.xz
+checksums 89e81a1c31e4a1fbd0e431425cd733d7
+pkg_deps libpng libx11 libxcursor
+opt_deps 
+build_deps xorg-util-macros
+check_deps 

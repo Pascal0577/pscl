@@ -1,0 +1,9 @@
+name pkgconf
+version 2.5.1
+description A tool for passing the include path and/or library paths to build tools during the configure and make phases of package installations
+sources https://distfiles.ariadne.space/pkgconf/pkgconf-2.5.1.tar.xz
+checksums 3291128c917fdb8fccd8c9e7784b643b
+pkg_deps 
+opt_deps 
+build_deps 
+check_deps 

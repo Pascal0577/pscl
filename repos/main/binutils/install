@@ -1,0 +1,14 @@
+#!/bin/sh
+set -e
+cd "$SRCDIR"
+make tooldir=/usr install
+rm -v "$DESTDIR/usr/lib/libbfd.a" \
+    "$DESTDIR/usr/lib/libbfd.la" \
+    "$DESTDIR/usr/lib/libctf.a" \
+    "$DESTDIR/usr/lib/libctf.la" \
+    "$DESTDIR/usr/lib/libctf-nobfd.a" \
+    "$DESTDIR/usr/lib/libctf-nobfd.la" \
+    "$DESTDIR/usr/lib/libopcodes.a" \
+    "$DESTDIR/usr/lib/libopcodes.la" \
+    "$DESTDIR/usr/lib/libsframe.a" \
+    "$DESTDIR/usr/lib/libsframe.la"

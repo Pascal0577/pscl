@@ -1,0 +1,5 @@
+#!/bin/sh
+set -e
+cd "$SRCDIR"
+make install
+ln -sf node "$DESTDIR/usr/share/doc/node-22.18.0"

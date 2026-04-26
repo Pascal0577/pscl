@@ -1,0 +1,12 @@
+#!/bin/sh
+set -e
+cd "$SRCDIR"
+cd "$source_dir" || log_error "In $package_name.build: Failed to cd to $source_dir"
+./configure --prefix=/usr                           \
+    --docdir=/usr/share/doc/procps-ng-4.0.5 \
+    --disable-static                        \
+    --disable-kill                          \
+    --enable-watch8bit                      \
+    --with-systemd                          \
+    SYSTEMD_CFLAGS="-I/usr/include" \
+    SYSTEMD_LIBS="-lsystemd"

@@ -1,0 +1,9 @@
+name expat
+version 2.7.1
+description A stream oriented C library for parsing XML
+sources https://github.com/libexpat/libexpat/releases/download/R_2_7_1/expat-2.7.1.tar.xz
+checksums 9f0c266ff4b9720beae0c6bd53ae4469
+pkg_deps 
+opt_deps 
+build_deps 
+check_deps 

@@ -1,0 +1,9 @@
+name e2fsprogs
+version 1.47.3
+description the utilities for handling the ext2 file system. It also supports the ext3 and ext4 journaling file systems
+sources https://downloads.sourceforge.net/project/e2fsprogs/e2fsprogs/v1.47.3/e2fsprogs-1.47.3.tar.gz
+checksums 113d7a7ee0710d2a670a44692a35fd2e
+pkg_deps 
+opt_deps 
+build_deps 
+check_deps 

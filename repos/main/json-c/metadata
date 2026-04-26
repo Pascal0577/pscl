@@ -1,0 +1,9 @@
+name json-c
+version 0.18
+description 
+sources https://s3.amazonaws.com/json-c_releases/releases/json-c-0.18.tar.gz
+checksums e6593766de7d8aa6e3a7e67ebf1e522f
+pkg_deps 
+opt_deps 
+build_deps cmake
+check_deps 

@@ -1,0 +1,9 @@
+name bc
+version 7.0.3
+description An arbitrary precision numeric processing language
+sources https://github.com/gavinhoward/bc/releases/download/7.0.3/bc-7.0.3.tar.xz
+checksums ad4db5a0eb4fdbb3f6813be4b6b3da74
+pkg_deps 
+opt_deps 
+build_deps 
+check_deps 

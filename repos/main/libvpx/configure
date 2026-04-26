@@ -1,0 +1,9 @@
+#!/bin/sh
+set -e
+cd "$SRCDIR"
+cd "$source_dir" || log_error "Failed to cd: $source_dir"
+sed -i 's/cp -p/cp/' build/make/Makefile
+mkdir libvpx-build && cd libvpx-build
+../configure --prefix=/usr    \
+    --enable-shared  \
+    --disable-static

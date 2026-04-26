@@ -1,0 +1,9 @@
+name libarchive
+version 3.8.2
+description 
+sources https://github.com/libarchive/libarchive/releases/download/v3.8.2/libarchive-3.8.2.tar.xz
+checksums a01a1c81b72cb972841cc6c7a9a8fcb9
+pkg_deps libxml
+opt_deps 
+build_deps 
+check_deps 

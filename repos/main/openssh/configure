@@ -1,0 +1,10 @@
+#!/bin/sh
+set -e
+cd "$SRCDIR"
+cd "$source_dir" || log_error "Failed to cd: $source_dir"
+./configure --prefix=/usr                            \
+    --sysconfdir=/etc/ssh                    \
+    --with-privsep-path=/var/lib/sshd        \
+    --with-default-path=/usr/bin             \
+    --with-superuser-path=/usr/sbin:/usr/bin \
+    --with-pid-dir=/run

@@ -1,0 +1,5 @@
+#!/bin/sh
+set -e
+cd "$SRCDIR"
+ninja install
+mkdir -pv /etc/X11/xorg.conf.d

@@ -1,0 +1,10 @@
+#!/bin/sh
+set -e
+cd "$SRCDIR"
+cd "$source_dir" || log_error "Failed to cd to $source_dir"
+./configure --prefix=/usr \
+    --sysconfdir=/etc \
+    --localstatedir=/var \
+    --disable-static \
+    --disable-devel-docs \
+    --docdir="/usr/share/doc/$package_name-$package_version"

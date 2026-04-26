@@ -1,0 +1,5 @@
+#!/bin/sh
+set -e
+cd "$SRCDIR"
+mkdir -pv "$DESTDIR/usr/bin"
+install -Dm755 target/release/cbindgen "$DESTDIR/usr/bin/"

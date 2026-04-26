@@ -1,0 +1,9 @@
+name xz
+version 5.8.1
+description It's xz. You know what it does
+sources https://github.com//tukaani-project/xz/releases/download/v5.8.1/xz-5.8.1.tar.xz
+checksums cf5e1feb023d22c6bdaa30e84ef3abe3
+pkg_deps 
+opt_deps 
+build_deps 
+check_deps 

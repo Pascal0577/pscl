@@ -1,0 +1,9 @@
+name libfs
+version 1.0.10
+description X.Org libfs library
+sources https://www.x.org/pub/individual/lib/libFS-1.0.10.tar.xz
+checksums c5cc0942ed39c49b8fcd47a427bd4305
+pkg_deps xtrans xorgproto xorg-util-macros
+opt_deps 
+build_deps 
+check_deps 

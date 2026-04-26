@@ -1,0 +1,9 @@
+name perl
+version 5.42.0
+description Practical Extraction and Report Language
+sources https://www.cpan.org/src/5.0/perl-5.42.0.tar.xz
+checksums 7a6950a9f12d01eb96a9d2ed2f4e0072
+pkg_deps 
+opt_deps 
+build_deps 
+check_deps 

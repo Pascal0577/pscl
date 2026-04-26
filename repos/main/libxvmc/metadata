@@ -1,0 +1,9 @@
+name libxvmc
+version 1.0.14
+description X.Org libxvmc library
+sources https://www.x.org/pub/individual/lib/libXvMC-1.0.14.tar.xz
+checksums a90a5f01102dc445c7decbbd9ef77608
+pkg_deps libx11 libxext libxv xorgproto xorg-util-macros
+opt_deps 
+build_deps 
+check_deps 

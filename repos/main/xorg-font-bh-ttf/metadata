@@ -1,0 +1,9 @@
+name xorg-font-bh-ttf
+version 1.0.4
+description X.Org xorg-font-bh-ttf library
+sources https://www.x.org/pub/individual/font//font-bh-ttf-1.0.4.tar.xz
+checksums 063bfa1456c8a68208bf96a33f472bb1
+pkg_deps xorg-font-alias xorg-font-util xorg-mkfontscale xorg-util-macros
+opt_deps 
+build_deps 
+check_deps 

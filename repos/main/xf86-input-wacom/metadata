@@ -1,0 +1,9 @@
+name xf86-input-wacom
+version 1.2.2
+description 
+sources https://github.com/linuxwacom/xf86-input-wacom/releases/download/xf86-input-wacom-1.2.2/xf86-input-wacom-1.2.2.tar.bz2
+checksums bd72f813b094b79b450e50a95476977b
+pkg_deps xorg-server
+opt_deps 
+build_deps make
+check_deps 

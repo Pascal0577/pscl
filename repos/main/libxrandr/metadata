@@ -1,0 +1,9 @@
+name libxrandr
+version 1.5.4
+description X.Org libxrandr library
+sources https://www.x.org/pub/individual/lib/libXrandr-1.5.4.tar.xz
+checksums 24e0b72abe16efce9bf10579beaffc27
+pkg_deps libx11 libxext libxrender xorgproto xorg-util-macros
+opt_deps 
+build_deps 
+check_deps 

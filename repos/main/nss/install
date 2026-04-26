@@ -1,0 +1,18 @@
+#!/bin/sh
+set -e
+cd "$SRCDIR"
+cd ../dist
+mkdir -pv "$DESTDIR/usr/lib"   \
+    "$DESTDIR/usr/include/nss" \
+    "$DESTDIR/usr/bin"         \
+    "$DESTDIR/usr/lib/pkgconfig"
+install -v -m755 Linux*/lib/*.so "$DESTDIR/usr/lib"
+install -v -m644 Linux*/lib/*.chk "$DESTDIR/usr/lib"
+install -v -m644 Linux*/lib/libcrmf.a "$DESTDIR/usr/lib"
+install -v -m755 -d "$DESTDIR/usr/include/nss"
+cp -v -RL public/nss/* "$DESTDIR/usr/include/nss"
+cp -v -RL private/nss/* "$DESTDIR/usr/include/nss"
+install -v -m755 Linux*/bin/pk12util "$DESTDIR/usr/bin"
+install -v -m755 Linux*/bin/nss-config "$DESTDIR/usr/bin"
+install -v -m755 Linux*/bin/certutil "$DESTDIR/usr/bin"
+install -v -m644 Linux*/lib/pkgconfig/nss.pc  "$DESTDIR/usr/lib/pkgconfig"

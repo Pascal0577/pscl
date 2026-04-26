@@ -1,0 +1,9 @@
+name xorg-font-encodings
+version 1.1.0
+description X.Org xorg-font-encodings library
+sources https://www.x.org/pub/individual/font/encodings-1.1.0.tar.xz
+checksums a56b1a7f2c14173f71f010225fa131f1
+pkg_deps xorg-font-util xorg-util-macros xorg-mkfontscale
+opt_deps 
+build_deps 
+check_deps 

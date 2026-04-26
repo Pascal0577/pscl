@@ -1,0 +1,9 @@
+name vulkan-loader
+version 1.4.321
+description 
+sources https://github.com/KhronosGroup/Vulkan-Loader/archive/v1.4.321/Vulkan-Loader-1.4.321.tar.gz
+checksums 880cb5b96b4f94282db03337dcb8743d
+pkg_deps vulkan-headers wayland libxorg
+opt_deps 
+build_deps cmake ninja
+check_deps 

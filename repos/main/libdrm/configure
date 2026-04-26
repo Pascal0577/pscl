@@ -1,0 +1,11 @@
+#!/bin/sh
+set -e
+cd "$SRCDIR"
+cd "$source_dir" || log_error "Failed to cd: $source_dir"
+mkdir build
+cd build || exit 1
+meson setup --prefix=/usr \
+    --buildtype=release   \
+    -D udev=true          \
+    -D valgrind=disabled  \
+    ..

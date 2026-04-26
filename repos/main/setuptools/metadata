@@ -1,0 +1,9 @@
+name setuptools
+version 80.9.0
+description a tool used to download, build, install, upgrade, and uninstall Python packages
+sources https://pypi.org/packages/source/s/setuptools/setuptools-80.9.0.tar.gz
+checksums 82e1d67883b713f9493659b50d13b436
+pkg_deps 
+opt_deps 
+build_deps 
+check_deps 

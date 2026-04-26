@@ -1,0 +1,9 @@
+name luit
+version 20240102
+description 
+sources https://invisible-mirror.net/archives/luit/luit-20240102.tgz
+checksums b69a0819905ad8dc4bf82d25f24037a4
+pkg_deps libfontenc
+opt_deps 
+build_deps libx11
+check_deps 

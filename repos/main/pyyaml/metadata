@@ -1,0 +1,9 @@
+name pyyaml
+version 6.0.2
+description 
+sources https://files.pythonhosted.org/packages/source/P/PyYAML/pyyaml-6.0.2.tar.gz
+checksums 9600ee49b2b4e1a0237cf4173b6dc594
+pkg_deps cython libyaml
+opt_deps 
+build_deps 
+check_deps 

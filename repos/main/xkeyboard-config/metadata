@@ -1,0 +1,9 @@
+name xkeyboard-config
+version 2.42
+description 
+sources https://www.x.org/pub/individual/data/xkeyboard-config/xkeyboard-config-2.42.tar.xz
+checksums 2d3b7e43e597f4c607ad6261e2b3d77f
+pkg_deps 
+opt_deps 
+build_deps libxslt meson python3 xorg-xkbcomp
+check_deps 

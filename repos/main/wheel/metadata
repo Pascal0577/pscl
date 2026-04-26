@@ -1,0 +1,9 @@
+name wheel
+version 0.46.1
+description a Python library that is the reference implementation of the Python wheel packaging standard
+sources https://pypi.org/packages/source/w/wheel/wheel-0.46.1.tar.gz
+checksums 65e09ee84af36821e3b1e9564aa91bd5
+pkg_deps 
+opt_deps 
+build_deps python3
+check_deps 

@@ -1,0 +1,9 @@
+name nss
+version 3.115
+description 
+sources https://archive.mozilla.org/pub/security/nss/releases/NSS_3_115_RTM/src/nss-3.115.tar.gz
+checksums 3780ea47a89bccee86feb9d378cdb54e
+pkg_deps nspr sqlite p11-kit
+opt_deps 
+build_deps make
+check_deps 

@@ -1,0 +1,9 @@
+name xcb-util-wm
+version 0.4.2
+description Extensions for xcb-util
+sources https://xcb.freedesktop.org/dist/xcb-util-wm-0.4.2.tar.xz
+checksums 581b3a092e3c0c1b4de6416d90b969c3
+pkg_deps libxcb xcb-util
+opt_deps 
+build_deps 
+check_deps 

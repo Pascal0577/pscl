@@ -1,0 +1,9 @@
+name cbindgen
+version 0.29.0
+description Can be used to generate C bindings for Rust code
+sources https://github.com/mozilla/cbindgen/archive/v0.29.0/cbindgen-0.29.0.tar.gz
+checksums 6020b670f82890ef7205fd2c84395954
+pkg_deps 
+opt_deps 
+build_deps rustc
+check_deps 

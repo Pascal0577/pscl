@@ -1,0 +1,9 @@
+name libclc
+version 20.1.8
+description 
+sources https://github.com/llvm/llvm-project/releases/download/llvmorg-20.1.8/libclc-20.1.8.src.tar.xz
+checksums b49b6b81298c9eb1609073b9164ff4cb
+pkg_deps spirv-llvm-translator
+opt_deps 
+build_deps cmake ninja
+check_deps 

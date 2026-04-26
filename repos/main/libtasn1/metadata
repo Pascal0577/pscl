@@ -1,0 +1,9 @@
+name libtasn1
+version 4.20.0
+description 
+sources https://ftp.gnu.org/gnu/libtasn1/libtasn1-4.20.0.tar.gz
+checksums 930f71d788cf37505a0327c1b84741be
+pkg_deps 
+opt_deps 
+build_deps 
+check_deps 

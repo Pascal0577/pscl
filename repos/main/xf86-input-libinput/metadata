@@ -1,0 +1,9 @@
+name xf86-input-libinput
+version 1.4.0
+description 
+sources https://www.x.org/pub/individual/driver/xf86-input-libinput-1.4.0.tar.xz
+checksums b52a1fc7456cf6595a9a1004287551a3
+pkg_deps libinput xorg-server
+opt_deps 
+build_deps make
+check_deps 

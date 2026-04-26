@@ -1,0 +1,9 @@
+name pulseaudio
+version 17.0
+description A sound system for POSIX OSes
+sources https://www.freedesktop.org/software/pulseaudio/releases/pulseaudio-17.0.tar.xz
+checksums c4a3596a26ff4b9dcd0c394dd1d4f8ee
+pkg_deps libsndfile alsa-lib dbus glib speex speexdsp libxorg
+opt_deps 
+build_deps meson ninja
+check_deps 

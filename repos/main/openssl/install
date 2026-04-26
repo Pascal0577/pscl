@@ -1,0 +1,6 @@
+#!/bin/sh
+set -e
+cd "$SRCDIR"
+sed -i '/INSTALL_LIBS/s/libcrypto.a libssl.a//' Makefile
+make MANSUFFIX=ssl DESTDIR="$DESTDIR" install
+mv -v "$DESTDIR/usr/share/doc/openssl" "$DESTDIR/usr/share/doc/openssl-3.5.2"

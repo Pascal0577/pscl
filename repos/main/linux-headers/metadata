@@ -1,0 +1,9 @@
+name linux-headers
+version 6.16.1
+description API headers for glibc
+sources https://www.kernel.org/pub/linux/kernel/v6.x/linux-6.16.1.tar.xz
+checksums 32d45755e4b39d06e9be58f6817445ee
+pkg_deps 
+opt_deps 
+build_deps 
+check_deps 

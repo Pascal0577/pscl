@@ -1,0 +1,9 @@
+name glslang
+version 15.4.0
+description 
+sources https://github.com/KhronosGroup/glslang/archive/15.4.0/glslang-15.4.0.tar.gz
+checksums a400ed377dc9de8b87a8179a90cef3b8
+pkg_deps spirv-tools
+opt_deps 
+build_deps cmake ninja
+check_deps 
